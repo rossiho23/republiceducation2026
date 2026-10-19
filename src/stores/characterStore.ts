@@ -9,9 +9,9 @@ import { ref, computed } from 'vue';
 import { TeacherProfile, AnchorProfile } from '../types/quiz';
 import { DEFAULT_TEACHERS, DEFAULT_ANCHOR_PAIR } from '../data/defaultCharacters';
 
-const TEACHER_STORAGE_KEY = 'REPUBLIC_QUIZ_TEACHERS_V1';
-const SELECTED_TEACHER_KEY = 'REPUBLIC_QUIZ_SELECTED_TEACHER_V1';
-const ANCHOR_STORAGE_KEY = 'REPUBLIC_QUIZ_ANCHORS_V1';
+const TEACHER_STORAGE_KEY = 'REPUBLIC_QUIZ_TEACHERS_V2_PIXEL';
+const SELECTED_TEACHER_KEY = 'REPUBLIC_QUIZ_SELECTED_TEACHER_V2_PIXEL';
+const ANCHOR_STORAGE_KEY = 'REPUBLIC_QUIZ_ANCHORS_V2_PIXEL';
 
 export const useCharacterStore = defineStore('characterStore', () => {
   const teachers = ref<TeacherProfile[]>([...DEFAULT_TEACHERS]);
@@ -19,13 +19,20 @@ export const useCharacterStore = defineStore('characterStore', () => {
   const anchorPair = ref<AnchorProfile>({ ...DEFAULT_ANCHOR_PAIR });
 
   /**
-   * 初始化載入角色資料
+   * 初始化載入角色資料 (自動升級為 16-Bit 大型街機手繪像素點陣頭像)
    */
   function initCharacters(): void {
     try {
       const storedTeachers = localStorage.getItem(TEACHER_STORAGE_KEY);
       if (storedTeachers) {
-        teachers.value = JSON.parse(storedTeachers);
+        const parsed = JSON.parse(storedTeachers) as TeacherProfile[];
+        // 若為系統預設名師，同步更新為最新手繪像素美術
+        teachers.value = parsed.map(t => {
+          const defaultMatch = DEFAULT_TEACHERS.find(d => d.id === t.id);
+          return defaultMatch ? { ...t, avatarUrl: defaultMatch.avatarUrl } : t;
+        });
+      } else {
+        teachers.value = [...DEFAULT_TEACHERS];
       }
       const storedSelected = localStorage.getItem(SELECTED_TEACHER_KEY);
       if (storedSelected && teachers.value.some(t => t.id === storedSelected)) {
@@ -33,10 +40,19 @@ export const useCharacterStore = defineStore('characterStore', () => {
       }
       const storedAnchors = localStorage.getItem(ANCHOR_STORAGE_KEY);
       if (storedAnchors) {
-        anchorPair.value = JSON.parse(storedAnchors);
+        anchorPair.value = {
+          ...DEFAULT_ANCHOR_PAIR,
+          ...JSON.parse(storedAnchors),
+          leftAnchorAvatar: DEFAULT_ANCHOR_PAIR.leftAnchorAvatar,
+          rightAnchorAvatar: DEFAULT_ANCHOR_PAIR.rightAnchorAvatar
+        };
+      } else {
+        anchorPair.value = { ...DEFAULT_ANCHOR_PAIR };
       }
     } catch (e) {
-      console.warn('載入角色設定失敗，採用預設值:', e);
+      console.warn('載入角色設定失敗，採用預設像素資產:', e);
+      teachers.value = [...DEFAULT_TEACHERS];
+      anchorPair.value = { ...DEFAULT_ANCHOR_PAIR };
     }
   }
 

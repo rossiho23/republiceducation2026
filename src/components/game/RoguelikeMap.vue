@@ -73,10 +73,12 @@
             YOU // 當前
           </div>
 
-          <!-- 節點圖標 (以日系符號呈現) -->
-          <span class="text-xl">
-            {{ getNodeBadgeIcon(node) }}
-          </span>
+          <!-- 16-Bit 像素節點圖標 (告別 Emoji 佔位符號) -->
+          <img 
+            :src="getNodeBadgeIcon(node)" 
+            :alt="node.title"
+            class="w-7 h-7 object-contain select-none"
+          />
 
           <!-- 節點標題 -->
           <span class="text-xs font-black whitespace-nowrap px-1 neo-skew-title">
@@ -108,6 +110,15 @@ import { useQuestionStore } from '../../stores/questionStore';
 import { RoguelikeNode } from '../../types/quiz';
 import { generateRoguelikeMap } from '../../utils/roguelikeGenerator';
 import { soundEngine } from '../../utils/audioEngine';
+import {
+  PIXEL_ROGUE_TROPHY,
+  PIXEL_ROGUE_FLAME,
+  PIXEL_ROGUE_HEADPHONE,
+  PIXEL_ROGUE_MAGNIFIER,
+  PIXEL_ROGUE_CART,
+  PIXEL_ROGUE_LIGHTNING,
+  PIXEL_ROGUE_SCROLL
+} from '../../assets/pixelArt';
 
 defineEmits<{
   (e: 'switch-to-classic'): void;
@@ -166,13 +177,13 @@ function getNodeClass(node: RoguelikeNode): string {
 
 function getNodeBadgeIcon(node: RoguelikeNode): string {
   switch (node.type) {
-    case 'FINAL_EXAM': return '🏆';
-    case 'QUIZ_ELITE': return '🔥';
-    case 'AUDIO_EVENT': return '🎧';
-    case 'VISUAL_EVENT': return '🔍';
-    case 'CANTEEN_REST': return '🛒';
-    case 'CAMPUS_FATE': return '⚡';
-    default: return '📝';
+    case 'FINAL_EXAM': return PIXEL_ROGUE_TROPHY;
+    case 'QUIZ_ELITE': return PIXEL_ROGUE_FLAME;
+    case 'AUDIO_EVENT': return PIXEL_ROGUE_HEADPHONE;
+    case 'VISUAL_EVENT': return PIXEL_ROGUE_MAGNIFIER;
+    case 'CANTEEN_REST': return PIXEL_ROGUE_CART;
+    case 'CAMPUS_FATE': return PIXEL_ROGUE_LIGHTNING;
+    default: return PIXEL_ROGUE_SCROLL;
   }
 }
 

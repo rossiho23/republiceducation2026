@@ -5,6 +5,7 @@
  */
 
 import { QuestionItem } from '../types/quiz';
+import { PIXEL_TATUNG_COOKER, PIXEL_FAMICOM } from '../assets/pixelArt';
 
 export const DEFAULT_QUESTIONS: QuestionItem[] = [
   // ================= 現代化動態題型 (聽力猜歌 / 視覺辨識 / 反向陷阱 / 盲答) =================
@@ -101,15 +102,28 @@ export const DEFAULT_QUESTIONS: QuestionItem[] = [
   },
   {
     id: 'dyn-visual-01',
-    subject: '地理',
+    subject: '自然',
     stage: '國小',
-    question: '【🔍 視覺線索題】這是台灣哪一座著名國家公園的地標景觀？（隨時間清晰辨識）',
-    options: ['太魯閣國家公園 (大理石峽谷)', '墾丁國家公園', '玉山國家公園', '陽明山小油坑'],
+    question: '【🔍 16-Bit 視覺線索題】請辨識這款 1960 年代推出、台灣家家戶戶廚房必備的經典神物是什麼電器？',
+    options: ['大同電鍋 (綠色經典款)', '電子壓力萬用鍋', '商用蒸烤保溫箱', '電磁微波爐'],
     correctIndex: 0,
-    explanation: '太魯閣大理石峽谷與九曲洞是花蓮世界級的地質壯麗景觀！',
+    explanation: '大同電鍋自民國 49 年推出以來，以堅固耐用聞名，是台灣最具代表性的國民家電！',
     difficulty: '普通',
     questionType: 'VISUAL_ZOOM',
-    visualImageUrl: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=300&q=80',
+    visualImageUrl: PIXEL_TATUNG_COOKER,
+    timeLimit: 12
+  },
+  {
+    id: 'dyn-visual-02',
+    subject: '藝能',
+    stage: '國中',
+    question: '【🔍 16-Bit 視覺線索題】請辨識這張 8-Bit 卡匣點陣插畫，是哪一款風靡全台小學生下課時光的經典主機卡匣？',
+    options: ['任天堂紅白機 (Famicom)', 'Sega Mega Drive', 'Game Boy 灰機', '超級任天堂 (SFC)'],
+    correctIndex: 0,
+    explanation: '任天堂紅白機（FC）是 80-90 年代無數台灣玩家的童年回憶，經典黃色或紅色卡匣至今仍具代表性！',
+    difficulty: '普通',
+    questionType: 'VISUAL_ZOOM',
+    visualImageUrl: PIXEL_FAMICOM,
     timeLimit: 12
   },
   {

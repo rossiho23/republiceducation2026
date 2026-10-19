@@ -111,49 +111,15 @@
         <!-- 黑板粉筆槽實木裝飾底條 -->
         <div class="absolute bottom-0 inset-x-0 h-2 bg-[#713f12] border-t border-[#a16207]"></div>
 
-        <!-- ================= 1. 左側：固定學生角色 ================= -->
+        <!-- ================= 1. 左側：固定學生角色 (100% 16-Bit 大型街機手繪像素點陣立繪) ================= -->
         <div class="relative z-20 flex flex-col items-center w-24 sm:w-32 flex-shrink-0 select-none">
           <div class="relative w-20 h-20 sm:w-24 sm:h-24">
-            <!-- 學生大頭立繪 (SVG 繪製) -->
-            <svg viewBox="0 0 80 80" class="w-full h-full drop-shadow-[3px_3px_0px_rgba(0,0,0,0.8)]">
-              <path d="M16 36 C16 10 64 10 64 36 C64 26 50 16 36 18 C26 20 18 26 16 36 Z" fill="#0f172a" />
-              <rect x="20" y="24" width="40" height="38" rx="14" fill="#ffedd5" stroke="#0f172a" stroke-width="2.5" />
-              <circle cx="28" cy="50" r="4" fill="#f87171" opacity="0.6" />
-              <circle cx="52" cy="50" r="4" fill="#f87171" opacity="0.6" />
-
-              <!-- 表情判定 -->
-              <!-- 思考中 (預設) -->
-              <g v-if="!gameStore.isAnswered">
-                <circle cx="32" cy="40" r="4.5" fill="#0f172a" />
-                <circle cx="48" cy="40" r="4.5" fill="#0f172a" />
-                <circle cx="34" cy="38" r="1.5" fill="#ffffff" />
-                <circle cx="50" cy="38" r="1.5" fill="#ffffff" />
-                <path d="M36 56 Q40 54 44 56" stroke="#0f172a" stroke-width="2.5" fill="none" />
-              </g>
-
-              <!-- 答對 (開心瞇瞇眼笑開懷) -->
-              <g v-else-if="gameStore.isLastAnswerCorrect">
-                <path d="M28 40 Q32 34 36 40" stroke="#0f172a" stroke-width="3" fill="none" />
-                <path d="M44 40 Q48 34 52 40" stroke="#0f172a" stroke-width="3" fill="none" />
-                <path d="M34 52 Q40 62 46 52 Z" fill="#dc2626" stroke="#0f172a" stroke-width="1.5" />
-              </g>
-
-              <!-- 答錯 (流眼淚痛哭) -->
-              <g v-else>
-                <line x1="28" y1="36" x2="36" y2="42" stroke="#0f172a" stroke-width="3" stroke-linecap="round" />
-                <line x1="28" y1="42" x2="36" y2="36" stroke="#0f172a" stroke-width="3" stroke-linecap="round" />
-                <line x1="44" y1="36" x2="52" y2="42" stroke="#0f172a" stroke-width="3" stroke-linecap="round" />
-                <line x1="44" y1="42" x2="52" y2="36" stroke="#0f172a" stroke-width="3" stroke-linecap="round" />
-                <ellipse cx="40" cy="54" rx="4" ry="6" fill="#0f172a" />
-                <path d="M26 46 C26 50 23 52 23 48 Z" fill="#38bdf8" />
-                <path d="M54 46 C54 50 57 52 57 48 Z" fill="#38bdf8" />
-              </g>
-
-              <!-- 學生水手制服與衣領領巾 -->
-              <path d="M20 62 L60 62 L64 80 L16 80 Z" fill="#ffffff" stroke="#0f172a" stroke-width="2" />
-              <polygon points="26,62 34,74 24,72" fill="#ef4444" />
-              <polygon points="54,62 46,74 56,72" fill="#ef4444" />
-            </svg>
+            <!-- 學生 16-Bit 像素大頭立繪 (思考/開懷比V/抱頭痛哭三態切換) -->
+            <img 
+              :src="studentAvatar" 
+              alt="作答學生"
+              class="w-full h-full object-contain drop-shadow-[3px_3px_0px_rgba(0,0,0,0.8)] select-none pointer-events-none"
+            />
 
             <!-- 答對/答錯日系印章標記 -->
             <div 
@@ -331,9 +297,20 @@ import { computed, onMounted, onUnmounted, watch } from 'vue';
 import { useGameStore } from '../../stores/gameStore';
 import { useCharacterStore } from '../../stores/characterStore';
 import { melodySynthesizer } from '../../utils/audioMelodySynthesizer';
+import {
+  PIXEL_STUDENT_THINKING,
+  PIXEL_STUDENT_CORRECT,
+  PIXEL_STUDENT_WRONG
+} from '../../assets/pixelArt';
 
 const gameStore = useGameStore();
 const characterStore = useCharacterStore();
+
+/** 依據答題狀態動態切換 16-Bit 像素學生立繪 */
+const studentAvatar = computed(() => {
+  if (!gameStore.isAnswered) return PIXEL_STUDENT_THINKING;
+  return gameStore.isLastAnswerCorrect ? PIXEL_STUDENT_CORRECT : PIXEL_STUDENT_WRONG;
+});
 
 const visibleOptions = computed(() => {
   return gameStore.currentQuestion?.options || [];

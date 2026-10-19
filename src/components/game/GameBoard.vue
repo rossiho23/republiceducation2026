@@ -136,51 +136,27 @@
           </div>
         </div>
 
-        <!-- 中央大頭娃娃吉祥物與立體方塊骰子 -->
-        <div class="absolute bottom-1 left-1/2 -translate-x-1/2 flex flex-col items-center z-20">
+        <!-- 中央 16-Bit 原作大頭娃娃吉祥物與立體方塊骰子 (100% 依據 pic/地圖.jpg 像素點陣重繪) -->
+        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center z-20">
           <div 
-            class="relative transition-transform duration-150"
+            class="relative flex flex-col items-center transition-transform duration-150"
             :class="gameStore.isRollingDice ? 'animate-bounce-short scale-110' : ''"
           >
-            <!-- 頭頂三根呆毛 -->
-            <div class="absolute -top-3 left-1/2 -translate-x-1/2 flex gap-0.5">
-              <span class="w-0.5 h-3 bg-black transform -rotate-12"></span>
-              <span class="w-0.5 h-3.5 bg-black"></span>
-              <span class="w-0.5 h-3 bg-black transform rotate-12"></span>
-            </div>
+            <!-- 16-Bit 趴在深藍 3D 骰子上的大頭吉祥物手繪像素圖 -->
+            <img 
+              :src="PIXEL_MASCOT_ON_DICE" 
+              alt="16-Bit 街機吉祥物"
+              class="w-24 sm:w-28 h-auto drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)] select-none pointer-events-none"
+            />
 
-            <!-- 光頭臉蛋 -->
-            <div class="w-14 h-12 bg-[#ffedd5] border-2 border-black rounded-full flex flex-col items-center justify-center relative shadow-md">
-              <div class="flex gap-3 mb-1">
-                <div class="w-2.5 h-3 bg-black rounded-full relative flex items-start justify-end p-0.5">
-                  <span class="w-1 h-1 bg-white rounded-full"></span>
-                </div>
-                <div class="w-2.5 h-3 bg-black rounded-full relative flex items-start justify-end p-0.5">
-                  <span class="w-1 h-1 bg-white rounded-full"></span>
-                </div>
-              </div>
-              <div class="w-full flex justify-between px-1.5 absolute bottom-2.5">
-                <span class="w-2 h-1.5 bg-rose-400 rounded-full opacity-80"></span>
-                <span class="w-2 h-1.5 bg-rose-400 rounded-full opacity-80"></span>
-              </div>
-              <div class="w-2 h-1 border-b-2 border-black rounded-full"></div>
+            <!-- 浮動骰子即時點數標籤 (金色街機像素徽章) -->
+            <div 
+              class="absolute bottom-1 bg-yellow-400 border-2 border-black text-black font-black font-mono text-xs sm:text-sm px-2 py-0.5 rounded shadow-[2px_2px_0px_#000] flex items-center gap-1"
+              :class="gameStore.isRollingDice ? 'animate-pulse scale-110 bg-[#ff0055] text-white' : ''"
+            >
+              <span>🎲</span>
+              <span>{{ gameStore.isRollingDice ? '?' : gameStore.diceValue }} 步</span>
             </div>
-
-            <!-- 趴在骰子上的小圓手 -->
-            <div class="w-full flex justify-between px-1 absolute -bottom-1">
-              <span class="w-3.5 h-3.5 bg-[#ffedd5] border border-black rounded-full"></span>
-              <span class="w-3.5 h-3.5 bg-[#ffedd5] border border-black rounded-full"></span>
-            </div>
-          </div>
-
-          <!-- 藍色立體骰子 -->
-          <div 
-            class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-b from-[#2563eb] to-[#1e3a8a] border-2 border-slate-900 rounded-lg flex items-center justify-center shadow-pixel transition-transform duration-100"
-            :class="gameStore.isRollingDice ? 'rotate-12 scale-105 ring-2 ring-yellow-300' : ''"
-          >
-            <span class="text-3xl sm:text-4xl font-black font-retro text-white drop-shadow-[0_2px_0_rgba(0,0,0,1)] select-none">
-              {{ gameStore.diceValue }}
-            </span>
           </div>
         </div>
       </div>
@@ -443,6 +419,7 @@
 import { onMounted, onUnmounted } from 'vue';
 import { useGameStore } from '../../stores/gameStore';
 import RetroTileIcon from './RetroTileIcon.vue';
+import { PIXEL_MASCOT_ON_DICE } from '../../assets/pixelArt';
 
 const emit = defineEmits<{
   (e: 'switch-to-roguelike'): void;

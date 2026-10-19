@@ -351,3 +351,49 @@ flowchart TD
     Quiz --> Remedial["期中補考 RemedialExamModal (高飽和警報框 / 連對進度條)"]
     Quiz --> Boss["升學大考 BossExamModal (烈紅斜切邊框 / 街機Boss血條)"]
 ```
+
+---
+
+## 7. 16-Bit 大型街機手繪像素點陣畫資產規格 (Pixel Art Assets Spec)
+
+### 7.1 人物立繪規格 (致敬 `pic/quiz1.jpg` & `pic/new1.jpg`)
+1. **督學名師 (Strict Master Teacher)**：
+   * 100% 依據 `pic/quiz1.jpg` 復刻：深色西裝、立領白襯衫、暗紅領帶、手持木質金屬教鞭。
+   * 精緻黑框眼鏡、反光鏡片與嚴肅抿嘴神態，呈現 90 年代升學補習班名師霸氣。
+2. **考生代表學生 (Student Mascot)**：
+   * 依據 `pic/quiz1.jpg` 左側學生重繪，具備三態高精度像素表情動態：
+     * **思考態 (Thinking)**：托腮沉思、靈動眼神。
+     * **答對態 (Correct)**：瞇瞇眼大笑、雙手比 V、開心跳躍。
+     * **答錯態 (Wrong)**：淚流滿面、抱頭痛哭、汗滴滑落。
+3. **時事雙主播 (News Anchors)**：
+   * 依據 `pic/new1.jpg` 復刻：
+     * **左女主播**：90 年代波浪吹高髮型、寶藍色套裝、珍珠耳環與播報手勢。
+     * **右男主播**：經典圓臉、張大嘴巴、圓鼻子的名嘴滑稽神韻。
+4. **歷史與軍訓名師 (Confucius, Einstein, Military)**：
+   * 全數採用同等 16-bit 像素手繪重製，徹底淘汰粗糙 placeholder。
+
+### 7.2 地圖美術資產規格 (致敬 `pic/地圖.jpg` & `pic/map1.jpg`)
+1. **地圖上半部校舍與吉祥物骰子**：
+   * **經典吉祥物**：大頭吉祥物趴在深藍立體方塊骰子上（還原 `pic/地圖.jpg`）。
+   * **像素校舍背景**：雙層鐘樓校舍、紅瓦排窗、綠蔭遠山與藍天白雲。
+2. **立體雙軌卡匣軌道圖標**：
+   * **START**：小學生書包。
+   * **TROUBLE**：精緻白色骷髏骨與紫色災難毒氣（致敬 `pic/map1.jpg`）。
+   * **三選一**：立體藍底白色「三選一」大字牌。
+   * **天才問題**：紅底白字立體金邊字。
+   * **健康教育**：經典心型解剖紅心圖標。
+   * **各學科**：國文古籍、地理地球儀、自然燒杯量筒、數學三角圓規。
+
+### 7.3 美術資產管線流程圖 (Pipeline Diagram)
+```mermaid
+flowchart LR
+    AssetDef["純前端像素資產定義 src/assets/pixelArt.ts"] --> CharStore["人物狀態庫 characterStore.ts"]
+    AssetDef --> BoardComp["地圖模組 GameBoard.vue & RetroTileIcon.vue"]
+    AssetDef --> QuizComp["答題舞台 QuizCard.vue"]
+    AssetDef --> NewsComp["新聞播報 NewsIntroModal.vue"]
+    
+    CharStore --> TeacherUI["手持教鞭名師立繪"]
+    CharStore --> AnchorUI["演播室雙主播立繪"]
+    QuizComp --> StudentUI["學生三態動態表情 (思考/比V/哭泣)"]
+    BoardComp --> MascotUI["趴骰子大頭吉祥物 & 3D卡匣格子圖標"]
+```
