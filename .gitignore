@@ -1,0 +1,23 @@
+# 依賴項
+node_modules/
+
+# 建置產出
+dist/
+dist-ssr/
+*.local
+
+# 日誌與媒體素材目錄 (依需求排除)
+/pic/
+/log/
+
+# 編輯器與系統暫存
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
