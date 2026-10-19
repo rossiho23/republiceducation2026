@@ -314,3 +314,40 @@ export interface RemedialExamState {
   timeRemaining: number;
 }
 ```
+
+---
+
+## 6. 日系新潮街機撞色風 (Neo-Arcade Stylized) 視覺系統規格
+
+### 6.1 去 AI 化 (De-AI) 設計理念與色彩體系
+徹底摒除現代 Web3/AI 常見之死板深藍紫漸層（Tailwind slate-900 / indigo-950）、柔和毛玻璃（backdrop-blur）與圓潤膠囊圓角（rounded-3xl），全面引進日系大型街機（如《Persona 5》/《Street Fighter 6》）之高張力撞色與動漫幾何美學：
+
+1. **核心配色盤 (Neo-Arcade Palette)**：
+   * **警戒銘黃 (`#FFE600`)**：高對比主色，用於重要標題、按鈕、當前節點與關鍵倒數。
+   * **曜石深墨黑 (`#090B10` / `#050608`)**：深邃底色，取代發灰的 slate-900。
+   * **警示烈紅 (`#FF0055`)**：用於危急扣血、陷阱題、Boss 戰與倒數 3 秒。
+   * **普魯士黑藍 (`#0A1224`)**：用於答題黑板內襯與深色模塊。
+   * **電光青碧 (`#00F0FF`)**：用於學科標籤與科技線條。
+   * **極限狂熱紫 (`#BD00FF`)**：用於盲答迷霧與特殊菁英考驗。
+2. **幾何切割與質感紋理 (Brutal Geometry & Textures)**：
+   * **日系戰術斜切角 (Chamfered Corners)**：使用 CSS `clip-path: polygon(...)` 實現 45° 與 15° 幾何切角，全面取代 rounded 圓角。
+   * **美漫/日漫半色調網點 (Halftone Comic Dots)**：背景採用 SVG 幾何波點網紋，強化街機印刷感。
+   * **警戒斑馬斜條紋 (Hazard Stripes)**：在視窗頂部與下注區域採用黑黃相間 45° 警戒紋理。
+   * **硬實心陰影 (Hard Drop Shadows)**：採用 `box-shadow: 4px 4px 0px #000000`，按鍵按下時位移 `translate(4px, 4px)` 並消除陰影，產生無延遲的街機實體微動按鈕打擊感。
+3. **符號去 Emoji 化**：
+   * 全面淘汰現代手機 Emoji，改以專屬 SVG 像素標章與日系大字報標籤（如 `[NODE]`, `[ELITE]`, `[REST]`, `[EXAM]`）呈現。
+
+### 6.2 視覺組件架構圖 (Mermaid UI Topology)
+```mermaid
+flowchart TD
+    Frame["街機主外框 ArcadeFrame (黑黃斑馬斜條 / 漫畫網點背景)"] --> Title["標題畫面 TitleScreen (P5 斜角大字報 / 撞色卡片)"]
+    Frame --> Roguelike["肉鴿地圖 RoguelikeMap (戰術切角節點 / 實心硬陰影軌跡)"]
+    Frame --> Classic["經典雙軌 GameBoard (立體厚卡匣 / 原版地圖滾動)"]
+    
+    Roguelike --> Wager["下注彈窗 WagerModal (重金屬黑黃賭盤 / 粗黑描邊)"]
+    Wager --> Quiz["答題主舞台 QuizCard (日系綜藝大字報 / 斜切選項 / 實時打擊反饋)"]
+    Classic --> Quiz
+    
+    Quiz --> Remedial["期中補考 RemedialExamModal (高飽和警報框 / 連對進度條)"]
+    Quiz --> Boss["升學大考 BossExamModal (烈紅斜切邊框 / 街機Boss血條)"]
+```

@@ -1,3 +1,5 @@
+@import './styles/neoArcade.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

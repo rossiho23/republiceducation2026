@@ -1,0 +1,167 @@
+/**
+ * @file neoArcade.css
+ * @description 日系新潮街機撞色風 (Neo-Arcade Stylized) 核心視覺樣式庫
+ * 徹底去除 AI 常見之深藍夜間漸層、柔和毛玻璃與大圓角；
+ * 引進日系戰術切角 (Clip-path)、漫畫半色調網點 (Halftone)、黑黃警戒斜條紋與 3px 硬邊實心陰影。
+ */
+
+/* ================= 1. 日系戰術斜切角 (Chamfered Cuts) ================= */
+.neo-cut {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 14px) 0,
+    100% 14px,
+    100% 100%,
+    14px 100%,
+    0 calc(100% - 14px)
+  );
+}
+
+.neo-cut-sm {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 8px) 0,
+    100% 8px,
+    100% 100%,
+    8px 100%,
+    0 calc(100% - 8px)
+  );
+}
+
+.neo-cut-tl-br {
+  clip-path: polygon(
+    14px 0,
+    100% 0,
+    100% calc(100% - 14px),
+    calc(100% - 14px) 100%,
+    0 100%,
+    0 14px
+  );
+}
+
+.neo-cut-hex {
+  clip-path: polygon(
+    12px 0,
+    calc(100% - 12px) 0,
+    100% 50%,
+    calc(100% - 12px) 100%,
+    12px 100%,
+    0 50%
+  );
+}
+
+/* ================= 2. 漫畫半色調網點 (Halftone Comic Dots) ================= */
+.neo-halftone {
+  background-color: #07090e;
+  background-image: radial-gradient(rgba(255, 230, 0, 0.15) 1.5px, transparent 1.5px),
+                    radial-gradient(rgba(0, 240, 255, 0.1) 1.5px, transparent 1.5px);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+}
+
+.neo-halftone-dark {
+  background-color: #050608;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1.2px, transparent 1.2px);
+  background-size: 16px 16px;
+}
+
+/* ================= 3. 45度 警戒斑馬紋理 (Hazard Stripes) ================= */
+.neo-hazard-yellow {
+  background: repeating-linear-gradient(
+    -45deg,
+    #ffe600,
+    #ffe600 12px,
+    #050608 12px,
+    #050608 24px
+  );
+}
+
+.neo-hazard-red {
+  background: repeating-linear-gradient(
+    -45deg,
+    #ff0055,
+    #ff0055 12px,
+    #050608 12px,
+    #050608 24px
+  );
+}
+
+.neo-hazard-cyan {
+  background: repeating-linear-gradient(
+    -45deg,
+    #00f0ff,
+    #00f0ff 12px,
+    #050608 12px,
+    #050608 24px
+  );
+}
+
+/* ================= 4. 硬實心黑陰影與物理微動按鈕 (Neo Buttons) ================= */
+.neo-btn {
+  position: relative;
+  border: 3px solid #000000;
+  box-shadow: 4px 4px 0px #000000;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+  font-weight: 900;
+  user-select: none;
+}
+
+.neo-btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0px #000000;
+}
+
+.neo-btn:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0px #000000;
+}
+
+.neo-btn-red {
+  background-color: #ff0055;
+  color: #ffffff;
+}
+
+.neo-btn-yellow {
+  background-color: #ffe600;
+  color: #050608;
+}
+
+.neo-btn-cyan {
+  background-color: #00f0ff;
+  color: #050608;
+}
+
+/* ================= 5. 卡片與邊框 (Neo Panels) ================= */
+.neo-box {
+  border: 3px solid #000000;
+  box-shadow: 6px 6px 0px #000000;
+  background-color: #0b0e14;
+}
+
+.neo-box-yellow {
+  border: 3px solid #ffe600;
+  box-shadow: 6px 6px 0px #ffe600;
+  background-color: #0b0e14;
+}
+
+.neo-box-red {
+  border: 3px solid #ff0055;
+  box-shadow: 6px 6px 0px #ff0055;
+  background-color: #0b0e14;
+}
+
+/* ================= 6. 大字報斜體排版 (Typography) ================= */
+.neo-skew-title {
+  transform: skewX(-6deg);
+  display: inline-block;
+}
+
+.neo-text-stroke {
+  text-shadow: 
+    -2px -2px 0 #000,  
+     2px -2px 0 #000,
+    -2px  2px 0 #000,
+     2px  2px 0 #000,
+     4px  4px 0 rgba(0, 0, 0, 0.8);
+}

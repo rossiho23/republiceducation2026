@@ -1,52 +1,52 @@
 <template>
-  <div class="flex flex-col gap-3 w-full select-none">
-    <!-- 頂部跑馬燈燈箱：致敬 map1.jpg「離畢業還有 10 層次。」 -->
-    <div class="w-full bg-black border-4 border-red-600 rounded-xl py-2 px-4 shadow-pixel flex items-center justify-center">
-      <h2 class="text-base sm:text-xl md:text-2xl font-black font-retro tracking-widest text-white drop-shadow-[0_2px_4px_rgba(255,0,0,0.8)] animate-pulse">
-        離畢業還有 {{ gameStore.remainingLayers }} 層次。
+  <div class="flex flex-col gap-3 w-full select-none font-mono">
+    <!-- 頂部跑馬燈燈箱：致敬 map1.jpg「離畢業還有 10 層次。」 (日系戰術切角) -->
+    <div class="w-full bg-black border-[3px] border-black py-2.5 px-4 shadow-[6px_6px_0px_#000] flex items-center justify-center neo-cut-sm">
+      <h2 class="text-base sm:text-xl md:text-2xl font-black tracking-widest text-yellow-400 neo-skew-title neo-text-stroke animate-pulse">
+        // 離畢業還有 {{ gameStore.remainingLayers }} 層次。 //
       </h2>
     </div>
 
-    <!-- 街機資訊 HUD -->
-    <div class="bg-arcade-dark border-2 border-arcade-border rounded-xl p-2.5 sm:p-3 shadow-pixel flex flex-wrap items-center justify-between gap-2.5 text-xs">
+    <!-- 街機資訊 HUD (Neo-Arcade 撞色面板) -->
+    <div class="bg-[#121620] border-2 border-black p-2.5 sm:p-3 shadow-[4px_4px_0px_#000] flex flex-wrap items-center justify-between gap-2.5 text-xs neo-cut-sm">
       <!-- 學制階段徽章 -->
       <div class="flex items-center gap-2">
         <span 
-          class="px-2.5 py-1 rounded font-black text-xs text-black uppercase tracking-wider shadow-pixel-sm"
+          class="px-2.5 py-1 font-black text-xs text-black uppercase tracking-wider border border-black shadow-[2px_2px_0px_#000]"
           :style="{ backgroundColor: gameStore.currentStageConfig.badgeColor }"
         >
-          🎓 {{ gameStore.currentStageConfig.title }}
+          {{ gameStore.currentStageConfig.title }}
         </span>
-        <span class="text-xs text-gray-400 font-mono">
+        <span class="text-xs text-yellow-400 font-bold">
           路線: {{ gameStore.currentBranch === 'UPPER' ? '上路 (理科冒險)' : gameStore.currentBranch === 'LOWER' ? '下路 (文藝挑戰)' : '主線起點' }}
         </span>
       </div>
 
       <!-- 體力愛心 HP 條 -->
       <div class="flex items-center gap-2 min-w-[170px]">
-        <span class="font-bold text-arcade-red">❤️ 體力:</span>
-        <div class="flex-1 h-3.5 bg-gray-900 border border-gray-700 rounded-full overflow-hidden p-0.5">
+        <span class="font-black text-[#ff0055]">HP 體力:</span>
+        <div class="flex-1 h-3.5 bg-black border border-gray-700 overflow-hidden p-0.5">
           <div 
-            class="h-full rounded-full transition-all duration-300"
-            :class="gameStore.playerHp <= 30 ? 'bg-red-500 animate-pulse' : 'bg-gradient-to-r from-arcade-yellow to-arcade-green'"
+            class="h-full transition-all duration-300"
+            :class="gameStore.playerHp <= 30 ? 'bg-[#ff0055] animate-pulse' : 'bg-yellow-400'"
             :style="{ width: `${gameStore.playerHp}%` }"
           ></div>
         </div>
-        <span class="font-mono font-bold">{{ gameStore.playerHp }}%</span>
+        <span class="font-mono font-black text-yellow-400">{{ gameStore.playerHp }}%</span>
       </div>
 
       <!-- 學分、得分與連擊 -->
       <div class="flex items-center gap-3 font-mono">
-        <div class="flex items-center gap-1 text-arcade-yellow font-bold">
-          <span>🪙 學分:</span>
+        <div class="flex items-center gap-1 text-yellow-400 font-black">
+          <span>學分:</span>
           <span>{{ gameStore.credits }}</span>
         </div>
-        <div class="flex items-center gap-1 text-arcade-cyan font-bold">
-          <span>⭐ 得分:</span>
+        <div class="flex items-center gap-1 text-cyan-400 font-black">
+          <span>得分:</span>
           <span>{{ gameStore.score }}</span>
         </div>
-        <div v-if="gameStore.comboCount > 1" class="text-arcade-orange font-black animate-bounce-short">
-          🔥 COMBO x{{ gameStore.comboCount }}
+        <div v-if="gameStore.comboCount > 1" class="text-[#ff0055] font-black animate-bounce-short">
+          COMBO x{{ gameStore.comboCount }}
         </div>
       </div>
 
@@ -64,22 +64,22 @@
       <!-- 切換肉鴿地圖按鈕 -->
       <button
         @click="$emit('switch-to-roguelike')"
-        class="px-2.5 py-1 bg-indigo-950 hover:bg-indigo-900 text-yellow-300 font-bold text-xs rounded-lg border border-indigo-500 shadow transition-colors"
+        class="neo-btn neo-btn-yellow text-black text-xs py-1 px-3 neo-cut-sm tracking-wider"
       >
-        🌲 切換肉鴿地圖
+        [切換肉鴿地圖]
       </button>
     </div>
 
     <!-- 主持播音跑馬燈 -->
-    <div class="bg-gradient-to-r from-blue-950 via-slate-900 to-blue-950 border-l-4 border-arcade-yellow px-3 py-1.5 rounded-r shadow-pixel-sm flex items-center gap-2 text-xs">
-      <span class="text-base">📢</span>
-      <p class="text-yellow-200 font-bold tracking-wide truncate">
-        【主持快報】{{ gameStore.hostComment }}
+    <div class="bg-[#121620] border-2 border-black border-l-[6px] border-l-yellow-400 px-3 py-1.5 shadow-[3px_3px_0px_#000] flex items-center gap-2 text-xs neo-cut-sm">
+      <span class="px-1.5 py-0.5 bg-yellow-400 text-black font-black text-[10px]">主持</span>
+      <p class="text-yellow-300 font-bold tracking-wide truncate">
+        {{ gameStore.hostComment }}
       </p>
     </div>
 
     <!-- 街機原創地圖外框 (雙軌分叉版 · 致敬 map1.jpg) -->
-    <div class="w-full bg-slate-950 border-4 border-arcade-border rounded-2xl overflow-hidden shadow-arcade-glow flex flex-col relative">
+    <div class="w-full bg-[#090b10] border-[4px] border-black overflow-hidden shadow-[8px_8px_0px_#000] flex flex-col relative neo-cut">
       
       <!-- ================= 上半部：校舍背景與大頭娃娃骰子 ================= -->
       <div class="relative w-full h-44 sm:h-52 bg-gradient-to-b from-[#38bdf8] via-[#7dd3fc] to-[#bae6fd] overflow-hidden flex flex-col justify-between border-b-4 border-amber-800/80">
