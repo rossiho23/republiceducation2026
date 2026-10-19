@@ -104,6 +104,7 @@
 | **答案填寫習慣差異** | 有些人習慣填 1~4，有些人填 A~D 或 0~3 | 於解析器層統一正規化為大寫字母與數字對應，轉換為 0~3 索引 |
 | **瀏覽器自動播放政策限制音訊** | 現代瀏覽器在使用者與頁面互動前會掛起 AudioContext | 採用延遲啟動策略（Lazy Initialization），在玩家點擊或首次互動時 resume AudioContext |
 | **橫向長軌道視角跳動** | 玩家踩到後方格子時容易超出畫面邊緣 | 實作 `scrollIntoView({ behavior: 'smooth', inline: 'center' })`，隨時自動置中玩家當前格子 |
+| **肉鴿地圖進去後先顯示答案** | `QuizCard.vue` 缺乏 `activeModal === 'QUIZ'` 約束，且 `closeQuizModal()` / `startNewGame()` 缺少重設 `isAnswered = false`，上一題回答狀態殘留導致下一題直接以「已作答完成」亮起正解 | 修正 `QuizCard` 渲染條件為嚴格模態互斥，於 `gameStore` 擴充 `startDirectQuiz` 與 `startWagerQuiz`，進題前徹底重置答題狀態，確保作答前絕不提前揭曉答案 |
 
 ---
 
