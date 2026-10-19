@@ -9,6 +9,9 @@ export type SubjectType =
   | '數學' 
   | '自然' 
   | '社會' 
+  | '歷史'
+  | '地理'
+  | '綜合'
   | '藝能' 
   | '時事冷知識' 
   | '流行音樂' 
@@ -23,8 +26,19 @@ export type DifficultyType = '簡單' | '普通' | '困難';
 /** 學程階段列舉型別 */
 export type StageGrade = '國小' | '國中' | '高中' | '大學' | '通用';
 
-/** 路線分支列舉 */
+/** 路線分支列舉 (經典模式) */
 export type BranchType = 'MAIN' | 'UPPER' | 'LOWER';
+
+/** 現代化題型列舉 */
+export type QuizQuestionType = 
+  | 'STANDARD'      // 標準四選一文字考題
+  | 'AUDIO_GUESS'   // 8-bit 聽力猜歌/猜台詞
+  | 'VISUAL_ZOOM'   // 局部放大/馬賽克照片辨識
+  | 'TRAP_REVERSE'  // 反向選錯陷阱題 (選出錯誤的選項)
+  | 'BLACKOUT';     // 盲答迷霧題 (選項反黑遮蔽)
+
+/** 下注檔次 */
+export type WagerAmount = 0 | 20 | 50 | 100;
 
 /**
  * 單一題目資料結構
@@ -39,7 +53,69 @@ export interface QuestionItem {
   explanation?: string;
   timeLimit?: number;
   difficulty: DifficultyType;
+  questionType?: QuizQuestionType;
+  audioMelodyId?: string;      // 關聯之 8-bit 旋律 ID
+  visualImageUrl?: string;     // 視覺題局部放大圖片
+  isTrapReverse?: boolean;     // 是否為反向選錯題
+  isBlackout?: boolean;        // 是否為盲答遮蔽題
+  isDoubleDamage?: boolean;    // 是否為雙倍扣分題
   isCustom?: boolean;
+}
+
+/** 8-bit 懷舊旋律音符資料模型 */
+export interface AudioNote {
+  freq: number;
+  duration: number;
+}
+
+/** 8-bit 聽力題目旋律設定 */
+export interface AudioMelodyItem {
+  id: string;
+  title: string;
+  hint: string;
+  notes: AudioNote[];
+}
+
+/** 校園被動聖物裝備介面 */
+export interface SchoolRelic {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  effect: 'AUTO_REMOVE_WRONG' | 'DEATH_PREVENTION' | 'BONUS_CREDITS';
+}
+
+/** 補考即時狀態 */
+export interface RemedialExamState {
+  isActive: boolean;
+  currentStreak: number;
+  requiredStreak: number;
+  timeRemaining: number;
+}
+
+/** 肉鴿地圖節點類型 */
+export type RoguelikeNodeType = 
+  | 'QUIZ_NORMAL'
+  | 'QUIZ_ELITE'
+  | 'AUDIO_EVENT'
+  | 'VISUAL_EVENT'
+  | 'CANTEEN_REST'
+  | 'CAMPUS_FATE'
+  | 'FINAL_EXAM';
+
+/** 肉鴿地圖節點介面 */
+export interface RoguelikeNode {
+  id: string;
+  floor: number;
+  colIndex: number;
+  type: RoguelikeNodeType;
+  title: string;
+  subject: SubjectType;
+  difficulty: DifficultyType;
+  icon: string;
+  isAvailable: boolean;
+  isVisited: boolean;
+  nextNodeIds: string[];
 }
 
 /** 道具類型列舉 */

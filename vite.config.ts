@@ -4,6 +4,7 @@ import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/republiceducation2026/',
   plugins: [vue()],
   resolve: {
     alias: {

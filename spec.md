@@ -1,137 +1,311 @@
-# 《民國教育委員會》復刻古街機問答遊戲 — 系統規格書 (spec.md)
+# 《民國教育委員會 2026》現代化升級規格書 (spec.md)
 
 ## 1. 專案概述 (Project Overview)
-本專案為致敬 1993 年台灣大型電玩街機（Arcade）名作《民國教育委員會》（Quiz Channel Quest）之現代化 Web 復刻版。結合「大富翁棋盤探索」與「台灣在地文化綜合升學問答」，融合高度擬真的街機數值節奏感（投幣率控制、升學 Boss 戰、Rank 動態難度、福利社道具庫存與跳級轉學機制），並具備 Excel/CSV/JSON 題庫自訂與擴充能力。
+本專案為致敬 1993 年台灣大型電玩街機（Arcade）名作《民國教育委員會》之現代化 Web 復刻升級版。在保留街機復古美學（8-bit 音效、CRT 掃描線、雙主播新聞過場、師生黑板對決）的基礎上，全面導入**現代數位遊戲化機制（Gamification）**：
+1. **現代化動態題型與博弈機制**：聽力猜歌猜台詞、視覺局部放大辨識、手速搶答、反向選錯陷阱題、盲答迷霧題，以及答題前「即時信心下注（Wagering）」。
+2. **輕度 Roguelike 樹狀分支地圖 (Slay the Spire 架構)**：告別純擲骰看運氣的拖沓節奏，改為透明可視的樹狀節點路線，玩家可依自身學科強項與血量規劃通關路徑。
+3. **校園「留級／重修補考」機制**：答錯率過高時強制觸發期中補考，通過考驗可獲得稀有被動聖物裝備（如作弊小抄、免死金牌）。
 
 ---
 
 ## 2. 技術選型 (Tech Stack)
 * **核心框架**：Vue 3 (Composition API with `<script setup>`) + TypeScript
-* **建置工具**：Vite
-* **樣式與主題**：Tailwind CSS + 街機像素復古風格（CRT 掃描線濾鏡、像素字體、街機機台外框、霓虹看板）
+* **建置工具**：Vite 6
+* **樣式與主題**：Tailwind CSS (自訂 Retro Arcade 調色盤、CRT 掃描線、動態發光特效)
 * **狀態管理**：Pinia
-* **資料處理與試算表解析**：`xlsx` (SheetJS) 支援 Excel 讀寫、自訂 CSV 解析器
-* **音效模組**：Web Audio API 程序化合成音效（8-bit Retro Arcade Sound Generator，免載大音檔，零延遲）
-* **資料儲存**：瀏覽器 LocalStorage（離線持久化玩家自訂題庫、最高分數與人物設定）
+* **多媒體與音效模組**：Web Audio API 程序化合成器（8-bit 音階旋律產生器，支援離線即時合成動漫歌與廣告旋律）
+* **資料持久化**：瀏覽器 LocalStorage（無伺服器架構，保存自訂題庫、歷史戰績、人物形象設定）
+* **視覺特效**：Canvas Confetti (通關撒花)、SVG 貝茲曲線動態路徑繪製
 
 ---
 
-## 3. 核心遊戲機制與架構設計
+## 3. 系統流程圖與狀態機 (UML Diagrams)
 
-### 3.1 遊戲主流程圖 (Game Flowchart)
+### 3.1 Roguelike 地圖與現代化答題主流程圖 (Flowchart)
 ```mermaid
 flowchart TD
-    Start([投幣啟動遊戲]) --> TitleScreen[街機標題畫面 / 投幣聲]
-    TitleScreen --> RouteSelect{關卡路線選擇}
+    Start([啟動遊戲 / 投幣]) --> Title[街機標題畫面]
+    Title --> SelectMode{地圖模式選擇}
 
-    RouteSelect -->|民國教育委員會: 學制闖關| InitSchool[初始化: 國小一年級]
-    RouteSelect -->|題庫與人物後台| CMS[題庫管理 / 題目增修 / 替換老師與主播]
+    SelectMode -->|輕度肉鴿模式 (推薦)| InitRogue[產生 Roguelike 樹狀節點地圖]
+    SelectMode -->|經典街機模式| InitClassic[初始化傳統卡匣軌道]
 
-    InitSchool --> BoardLoop[地圖雙軌棋盤推進]
-    BoardLoop --> RollDice[擲骰決定步數]
-    RollDice --> MovePiece[角色移動]
+    InitRogue --> ViewMap[檢視本層可選節點路線]
+    ViewMap --> PickNode[玩家自主挑選前進節點]
 
-    MovePiece --> TileTypeCheck{格子屬性判定}
-    TileTypeCheck -->|分叉點格 FORK| BranchSelect[玩家選擇: 走上路或下路]
-    TileTypeCheck -->|新聞問題/課外格| NewsAnchorStage[新聞主播台過場演出: 致敬 new1.jpg]
-    TileTypeCheck -->|學科題目/三選一/天才| ClassroomQuiz[課堂師生對抗答題: 致敬 quiz1.jpg]
-    TileTypeCheck -->|福利社格| ShopModal[福利社商店: 購買放大鏡/時鐘/Pass券/養樂多]
-    TileTypeCheck -->|轉學格| TransferModal[轉學判定: 幸運跳級 / 倒退留級]
-    TileTypeCheck -->|校園事件格| CampusEvent[突發事件: 不良少年/教官/獎學金]
-    TileTypeCheck -->|期末終點| BossExam[升學大考 Boss 關卡]
+    PickNode --> NodeTypeCheck{節點類型判定}
+    NodeTypeCheck -->|學科考題| WagerPhase[即時信心下注階段]
+    NodeTypeCheck -->|聽力猜歌| AudioQuiz[8-bit 懷舊旋律聽力題]
+    NodeTypeCheck -->|視覺謎題| VisualQuiz[局部放大照片辨識]
+    NodeTypeCheck -->|福利社補給| ShopModal[福利社購買道具與裝備]
+    NodeTypeCheck -->|突發事件| EventModal[校園命運事件]
+    NodeTypeCheck -->|期末終點| BossExam[升學大考 Boss 檢定]
 
-    NewsAnchorStage --> ClassroomQuiz
-    ClassroomQuiz --> StateUpdate[更新學分/體力/道具]
-    ShopModal --> BoardLoop
-    CampusEvent --> StateUpdate
-    TransferModal --> StateUpdate
+    WagerPhase --> RevealQuiz[揭露題目與特殊規則: 陷阱/盲答/雙倍]
+    RevealQuiz --> PlayerAnswer[玩家限時作答]
+    AudioQuiz --> PlayerAnswer
+    VisualQuiz --> PlayerAnswer
 
-    StateUpdate --> HpCheck{體力 HP > 0?}
-    HpCheck -->|體力耗盡| GameOverScreen[退學/當鋪接關: 9秒投幣倒數]
-    GameOverScreen -->|投幣續關| Revive[原處滿血復活續玩]
-    GameOverScreen -->|放棄/倒數結束| SummaryScreen[遊戲結算: 成績單與名人堂]
+    PlayerAnswer --> SettleAnswer{答案判定}
+    SettleAnswer -->|答對| RewardWin[結算: 下注獲利加倍 + 體力維持 + Rank提升]
+    SettleAnswer -->|答錯| PenaltyLoss[結算: 下注歸零 + 體力扣除 + 記錄失誤]
 
-    HpCheck -->|體力充沛| GoalCheck{是否到達本階段終點?}
-    GoalCheck -->|未到達| BoardLoop
-    GoalCheck -->|已到達| BossExam
+    RewardWin --> RetentionCheck{本學程累積失誤 >= 3 題?}
+    PenaltyLoss --> RetentionCheck
 
-    BossExam --> BossCheck{通過升學考驗?}
-    BossCheck -->|通過| NextGrade[晉升下一學制: 國中 -> 高中 -> 大學 -> 畢業]
-    BossCheck -->|失敗| ExamFail[留級重考 / 扣除大量學分]
-    ExamFail --> BoardLoop
+    RetentionCheck -->|是| TriggerRemedial[觸發: 教官留級警告 & 期中補考]
+    RetentionCheck -->|否| CheckHp{體力 HP > 0?}
 
-    NextGrade --> FinishedCheck{是否完成大學畢業?}
-    FinishedCheck -->|否| BoardLoop
-    FinishedCheck -->|是| VictoryCeremony[光榮畢業典禮 / 大學文憑頒發]
+    TriggerRemedial --> RemedialExam[期中補考考驗: 連續答對3題]
+    RemedialExam -->|補考通過| RemedialPass[獲取特殊聖物裝備 + 危機解除]
+    RemedialExam -->|補考失敗| RemedialFail[降級留級 / 扣除續關代幣]
+    RemedialPass --> CheckHp
+    RemedialFail --> CheckHp
+
+    CheckHp -->|體力耗盡| ContinueScreen[9秒投幣續關畫面]
+    ContinueScreen -->|投幣續關| Revive[滿血復活繼續闖關]
+    ContinueScreen -->|放棄| Summary[結算成績單]
+
+    CheckHp -->|體力存續| FloorFinish{到達本學程頂層?}
+    FloorFinish -->|未達頂層| ViewMap
+    FloorFinish -->|已達頂層| BossExam
+
+    BossExam --> BossResult{大考檢定通過?}
+    BossResult -->|通過| GraduateStage[晉級下一個學程: 國中 -> 高中 -> 大學]
+    BossResult -->|失敗| ContinueScreen
+    GraduateStage --> Victory[光榮畢業典禮]
 ```
 
 ---
 
-## 4. 街機原創橫向卷軸與雙軌分叉路線 (致敬 `pic/地圖.jpg` 與 `pic/map1.jpg`)
+### 3.2 信心下注與動態題型循序圖 (Sequence Diagram)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Player as 玩家 (Player)
+    participant Map as 肉鴿地圖 (RoguelikeMap)
+    participant Wager as 下注彈窗 (WagerModal)
+    participant Quiz as 答題舞台 (QuizCard)
+    participant Audio as 旋律合成器 (AudioMelody)
+    participant Store as 遊戲引擎 (GameStore)
 
-依據 1993 年街機原始截圖，地圖界面結構劃分為三大區塊：
-1. **頂部黑底紅框燈箱**：忠實重現「離畢業還有 10 層次。」跑馬燈，隨進度動態倒數。
-2. **雙軌拓撲與分叉選擇**：
-   * 起點設有「昇學」大方塊與「FORK 路線分叉點」，抵達時彈出路線抉擇（支援按鍵 1 / 2 或 ↑ / ↓ 快速切換）。
-   * **上路線 (理科冒險)**：理化、音樂、三選一送分格、LUCKY 福利社、TROUBLE 骷髏危險格。
-   * **下路線 (文藝挑戰)**：健康教育 (+25 HP 回血)、美術、天才問題 (高難度雙倍得分與學分)、問號事件、課外時事大百科。
-3. **終點匯流**：上下兩路走完後重新匯集於「升學檢定大考 (Boss 戰)」。
+    Player->>Map: 點擊前進節點 (如: 流行音樂·困難)
+    Map->>Store: activateNode(nodeId)
+    Store->>Wager: 顯示學科資訊與下注面板
+    Note over Wager: 提示題目分類與難度，未揭露題幹
+    Player->>Wager: 選擇下注金額 (例: 50 學分)
+    Wager->>Store: placeWager(50)
+    Store->>Quiz: 啟動答題模式 (帶入下注與特殊規則)
 
----
+    alt 聽力題型 (Audio Quiz)
+        Quiz->>Audio: playMelody(melodyId)
+        Audio-->>Player: 播放 8-bit 程序化動漫旋律
+    else 視覺題型 (Visual Quiz)
+        Quiz->>Player: 顯示漸進式像素局部放大遮罩
+    else 盲答/陷阱題型
+        Quiz->>Player: 顯示反向選錯警示 / 黑色遮罩選項
+    end
 
-## 5. 答題人物視覺系統 (致敬 `pic/quiz1.jpg` 與 `pic/new1.jpg`)
+    Player->>Quiz: 選定答案 (或使用道具輔助)
+    Quiz->>Store: submitAnswer(choiceIndex)
 
-### 5.1 課堂答題師生對決舞台 (致敬 `pic/quiz1.jpg`)
-* **背景與舞台**：
-  * 上方標記「民國教育委員會」匾額與當前累積得分。
-  * 中央設置藍色大黑板（展示題目與選項 1, 2, 3 或 1, 2, 3, 4）。
-* **左側學生（固定角色）**：
-  * 經典街機大頭學生漫畫人物，身穿校園制服。
-  * 具備表情狀態切換：
-    * 思考中（摸下巴專注）
-    * 答對（比出勝利 V 手勢、雙眼發光）
-    * 答錯（抱頭痛哭、流眼淚特效）
-* **右側老師（支援自由替換）**：
-  * 手持教鞭之授課老師。
-  * **內建預設名師清單**：
-    1. 嚴肅眼鏡教鞭名師（經典街機原版）
-    2. 至聖先師孔子（國文名師）
-    3. 愛因斯坦博士（科學名師）
-    4. 嚴厲教官／訓導主任
-  * **自訂老師支援**：使用者可在後台自訂「老師姓名、頭銜、頭像圖片 URL 或上傳圖片」。
+    alt 答對
+        Store->>Player: 贏得 100 學分 (本金 + 1:1 獲利) + 連擊提升
+    else 答錯
+        Store->>Player: 扣除下注 50 學分 + 扣除 20 體力 HP
+    end
 
-### 5.2 新聞問題主播台過場演出 (致敬 `pic/new1.jpg`)
-* **背景與主播台**：
-  * 世界地圖藍色像素網格底圖，中間立體金屬大字「新聞問題」。
-  * 前方為現代新聞主播台。
-* **主播雙人搭檔（支援自由替換）**：
-  * 左側：當家資深女主播（頭像可替換）。
-  * 右側：滑稽幽默名嘴主播（頭像可替換）。
-  * 使用者可在後台隨意替換為名人、朋友或自訂圖片！
+    Store->>Map: 前進至下一層 (更新可選節點)
+```
 
 ---
 
-## 6. 資料結構定義更新 (TypeScript Interfaces)
+### 3.3 系統實體關聯圖 (ER Diagram)
+```mermaid
+erDiagram
+    PLAYER ||--o{ INVENTORY_ITEM : possesses
+    PLAYER ||--o{ RELIC_EQUIPMENT : equips
+    PLAYER ||--|| GAME_SESSION : current_state
+
+    GAME_SESSION ||--|{ ROGUELIKE_NODE : traverses
+    GAME_SESSION ||--o{ WAGER_RECORD : bets
+    GAME_SESSION ||--o| REMEDIAL_STATE : undergoes
+
+    ROGUELIKE_NODE ||--o| QUESTION_ITEM : triggers
+    QUESTION_ITEM ||--o| AUDIO_MELODY : attaches_audio
+    QUESTION_ITEM }|--|| SUBJECT_TYPE : categorizes
+
+    PLAYER {
+        string id
+        int hp
+        int maxHp
+        int credits
+        int rank
+        int coins
+    }
+
+    GAME_SESSION {
+        string currentGrade
+        int currentFloor
+        string activeNodeId
+        int totalMistakesInStage
+        boolean isRemedialTriggered
+    }
+
+    ROGUELIKE_NODE {
+        string id
+        int floor
+        string type
+        string subject
+        string difficulty
+        boolean isVisited
+        boolean isAvailable
+        string[] nextNodeIds
+    }
+
+    QUESTION_ITEM {
+        string id
+        string questionType
+        string subject
+        string difficulty
+        string question
+        string[] options
+        int correctIndex
+        boolean isTrapReverse
+        boolean isBlackout
+        string audioMelodyId
+        string visualImageUrl
+    }
+
+    RELIC_EQUIPMENT {
+        string id
+        string name
+        string description
+        string effectType
+    }
+```
+
+---
+
+## 4. 模組規格詳細設計
+
+### 4.1 核心答題機制的現代化改良 (Gamification)
+1. **即時信心下注 (Confidence Wagering)**：
+   * **觸發時機**：進入學科考題節點時，題幹暫不顯示，僅顯示學科（例：社會、流行音樂）與難易度標籤。
+   * **下注檔次**：
+     * `不下注 (0 學分)`：保本模式，答對獲得基礎獎勵。
+     * `小賭怡情 (20 學分)`：1.5 倍學分回饋。
+     * `重注博弈 (50 學分)`：2.0 倍學分回饋。
+     * `孤注一擲 (All-In)`：投注目前所有學分（上限 200），3.0 倍獲利！
+   * **答錯懲處**：賠光下注額；若下注超過 50 且答錯，額外扣除 10 點體力。
+
+2. **多樣動態題型 (Dynamic Quiz Modes)**：
+   * **聽力題 (Audio Quiz)**：
+     * 呼叫 [`src/utils/audioMelodySynthesizer.ts`](file:///C:/Users/rossiyeh/SegaProjectHub/quiz/src/utils/audioMelodySynthesizer.ts)。
+     * 使用 Web Audio API 即時合成 8-bit 音頻。
+     * 內建 10+ 首台灣懷舊旋律（例如：《無敵鐵金剛》、《灌籃高手》、《小虎隊·青蘋果樂園》、《大同電鍋主題歌》、《斯斯感冒膠囊》）。
+     * 提供「▶ 重播旋律」按鈕。
+   * **視覺題 (Visual Zoom Quiz)**：
+     * 展示局部放大圖片或馬賽克遮罩。
+     * 隨著計時器減少，馬賽克程度逐步減輕，考驗敏銳辨識力。
+   * **陷阱題與盲答機制 (Traps & Blackout)**：
+     * **反向題**：題幹附帶紅色警報霓虹閃爍，要求選出「非正確／錯誤」的敘述。
+     * **雙倍傷害 (Double Trouble)**：答錯體力扣除 40 點。
+     * **盲答迷霧 (Blackout)**：四個選項被黑霧覆蓋，玩家可花費 15 學分揭開，或直接盲點（盲點答對加倍得分）。
+
+---
+
+### 4.2 Slay the Spire 式 Roguelike 樹狀節點地圖 (Node-based Map)
+1. **地圖架構**：
+   * 每一個學程（國小、國中、高中、大學）生成一個獨立的樹狀路線圖。
+   * 共包含 **8~10 個樓層 (Floors)**，每層由 2~3 個可選節點構成。
+   * 節點之間由貝茲曲線（SVG Cubic Bezier Curves）連接，可選節點呈現呼吸霓虹發光，已通過節點變灰。
+2. **節點類型**：
+   * `QUIZ_NORMAL`：一般隨堂考（普通題型，平穩獎勵）。
+   * `QUIZ_ELITE`：菁英挑戰題（高難度，但必掉落大額學分或被動道具）。
+   * `AUDIO_EVENT`：懷舊聽力題節點。
+   * `VISUAL_EVENT`：視覺局部放大解謎節點。
+   * `CANTEEN_REST`：校園福利社（可花費學分購買道具、吃點心回復 HP）。
+   * `CAMPUS_FATE`：隨機校園事件（奇遇、不良少年、校長獎勵、抽籤）。
+   * `FINAL_EXAM`：頂樓期末升學檢定大考 (Boss 戰)。
+
+---
+
+### 4.3 留級與期中重修補考機制 (Remedial Exam & Retention)
+1. **觸發條件**：
+   * 在單一學程內，若答錯累計達 **3 題**，或體力掉落至 **25% 以下**，在進入下一層時將強制跳出「教務處留級通告」與「期中補考」。
+2. **補考規則**：
+   * 玩家必須在有限時間內連續答對 **3 道** 題目。
+   * 補考期間禁止使用背包常規道具。
+3. **補考結算**：
+   * **通過補考**：危機解除，體力補回 50 點，並獲得**稀有校園聖物裝備**（三選一）：
+     * 📖 **作弊小抄 (Relic)**：之後每道題目開場自動替您剔除 1 個錯誤選項。
+     * 🛡️ **免死金牌 (Relic)**：當體力歸零時，自動免死一次並回復 30 點 HP。
+     * 💰 **獎學金證明 (Relic)**：每道題目答對額外獲得 +20% 學分。
+   * **補考失敗**：若補考未過，強制扣除 1 枚街機代幣（Coin）留級重修當前學程。
+
+---
+
+## 5. 資料結構擴充定義 (TypeScript Interfaces)
 
 ```typescript
-export type BranchType = 'MAIN' | 'UPPER' | 'LOWER';
+/** 題型種類 */
+export type QuizQuestionType = 
+  | 'STANDARD'      // 標準四選一單選
+  | 'AUDIO_GUESS'   // 8-bit 聽力猜歌/猜台詞
+  | 'VISUAL_ZOOM'   // 局部放大/馬賽克視覺題
+  | 'TRAP_REVERSE'  // 反向選錯題
+  | 'BLACKOUT';     // 盲答迷霧題
 
-/** 老師角色設定介面 */
-export interface TeacherProfile {
+/** 下注檔次 */
+export type WagerAmount = 0 | 20 | 50 | 'ALL_IN';
+
+/** 肉鴿地圖節點類型 */
+export type RoguelikeNodeType = 
+  | 'QUIZ_NORMAL'
+  | 'QUIZ_ELITE'
+  | 'AUDIO_EVENT'
+  | 'VISUAL_EVENT'
+  | 'CANTEEN_REST'
+  | 'CAMPUS_FATE'
+  | 'FINAL_EXAM';
+
+/** 地圖節點介面 */
+export interface RoguelikeNode {
   id: string;
-  name: string;
+  floor: number;
+  colIndex: number;
+  type: RoguelikeNodeType;
   title: string;
-  avatarUrl: string;
-  isCustom?: boolean;
+  subject: SubjectType;
+  difficulty: DifficultyType;
+  icon: string;
+  isAvailable: boolean;
+  isVisited: boolean;
+  nextNodeIds: string[];
 }
 
-/** 新聞主播設定介面 */
-export interface AnchorProfile {
+/** 8-bit 旋律資料模型 */
+export interface AudioMelodyItem {
   id: string;
-  leftAnchorName: string;
-  leftAnchorAvatar: string;
-  rightAnchorName: string;
-  rightAnchorAvatar: string;
-  isCustom?: boolean;
+  title: string;
+  notes: Array<{ freq: number; duration: number }>;
+}
+
+/** 校園被動聖物裝備介面 */
+export interface SchoolRelic {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  effect: 'AUTO_REMOVE_WRONG' | 'DEATH_PREVENTION' | 'BONUS_CREDITS';
+}
+
+/** 補考即時狀態 */
+export interface RemedialExamState {
+  isActive: boolean;
+  currentStreak: number;
+  requiredStreak: number;
+  timeRemaining: number;
 }
 ```

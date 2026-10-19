@@ -1,17 +1,31 @@
 <template>
   <ArcadeFrame @open-cms="isCmsOpen = true">
-    <!-- 首頁街機標題畫面 (未進入棋盤時) -->
+    <!-- 首頁街機標題畫面 (未進入地圖時) -->
     <TitleScreen 
-      v-if="gameStore.tiles.length === 0" 
-      @open-cms="isCmsOpen = true" 
+      v-if="!isGameStarted" 
+      @open-cms="isCmsOpen = true"
+      @start-roguelike="startRoguelikeGame"
+      @start-classic="startClassicGame"
     />
 
-    <!-- 遊戲主體棋盤畫面 (已入學開始闖關) -->
+    <!-- 遊戲主體畫面 (已入學開始闖關) -->
     <div v-else class="flex flex-col gap-4 flex-1">
-      <GameBoard />
+      <!-- 輕度 Roguelike 樹狀分支地圖 (Slay the Spire 架構) -->
+      <RoguelikeMap 
+        v-if="currentMapMode === 'ROGUELIKE'" 
+        @switch-to-classic="currentMapMode = 'CLASSIC'"
+      />
+
+      <!-- 經典街機橫向卷軸雙軌卡匣軌道 -->
+      <GameBoard 
+        v-else 
+        @switch-to-roguelike="currentMapMode = 'ROGUELIKE'"
+      />
     </div>
 
     <!-- 彈窗群 -->
+    <WagerModal />
+    <RemedialExamModal />
     <QuizCard />
     <CanteenModal />
     <TransferModal />
@@ -33,15 +47,18 @@
 <script setup lang="ts">
 /**
  * @file App.vue
- * @description 遊戲主入口組件，調度街機外框、標題畫面、地圖棋盤與各項彈窗
+ * @description 遊戲主入口組件，調度街機外框、標題畫面、Slay the Spire 樹狀地圖、經典棋盤與各項彈窗
  */
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useGameStore } from './stores/gameStore';
 import { useQuestionStore } from './stores/questionStore';
 import { useCharacterStore } from './stores/characterStore';
 import ArcadeFrame from './components/retro/ArcadeFrame.vue';
 import TitleScreen from './components/game/TitleScreen.vue';
 import GameBoard from './components/game/GameBoard.vue';
+import RoguelikeMap from './components/game/RoguelikeMap.vue';
+import WagerModal from './components/game/WagerModal.vue';
+import RemedialExamModal from './components/game/RemedialExamModal.vue';
 import QuizCard from './components/game/QuizCard.vue';
 import CanteenModal from './components/game/CanteenModal.vue';
 import TransferModal from './components/game/TransferModal.vue';
@@ -58,6 +75,20 @@ const questionStore = useQuestionStore();
 const characterStore = useCharacterStore();
 
 const isCmsOpen = ref<boolean>(false);
+const isGameStarted = ref<boolean>(false);
+const currentMapMode = ref<'ROGUELIKE' | 'CLASSIC'>('ROGUELIKE');
+
+function startRoguelikeGame(): void {
+  currentMapMode.value = 'ROGUELIKE';
+  isGameStarted.value = true;
+  gameStore.startNewGame(gameStore.currentStage);
+}
+
+function startClassicGame(): void {
+  currentMapMode.value = 'CLASSIC';
+  isGameStarted.value = true;
+  gameStore.startNewGame(gameStore.currentStage);
+}
 
 onMounted(() => {
   // 初始化題庫與人物形象資料

@@ -254,6 +254,13 @@ class RetroAudioEngine {
   }
 
   /**
+   * 播放慶祝通關號角聲 (Fanfare 別名)
+   */
+  public playFanfare(): void {
+    this.playVictory();
+  }
+
+  /**
    * 播放遊戲失敗／退學通知悲哀下行音 (Game Over)
    */
   public playGameOver(): void {

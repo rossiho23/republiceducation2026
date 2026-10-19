@@ -92,3 +92,41 @@
 - [x] 在 `src/components/cms/QuestionCMS.vue` 增加「人物設定」標籤頁，支援切換與自訂老師/主播圖片
 - [x] 執行專案編譯驗證 (`npm run build`)
 
+## 階段十三：版本發佈與 Git 倉庫設定 (Release & Delivery)
+- [x] 設定 `.gitignore` 排除 `/pic/` 與 `/log/` 目錄
+- [x] 撰寫繁體中文版本發布說明 (`RELEASE_NOTES.md`)
+- [x] 初始化 Git 儲存庫並建立首發 Commit
+- [x] 設定主分支 `main` 並推送至遠端 GitHub 倉庫 (`republiceducation2026.git`)
+- [x] 記錄推播歷程至 `log/20261019_4.md`
+
+## 階段十四：現代化答題機制（聽力、視覺、陷阱、盲答、即時下注）實作
+- [x] 擴充 `src/types/quiz.ts` 支援 `QuizQuestionType`、`AudioMelodyItem`、`WagerAmount` 與 `SchoolRelic` 模型
+- [x] 實作 8-bit 動漫與台灣懷舊廣告旋律合成器 (`src/utils/audioMelodySynthesizer.ts`)
+- [x] 擴充題庫資料集加入聽力題、視覺局部放大題、反向選錯題與盲答迷霧題
+- [x] 製作答題前即時下注彈窗組件 (`src/components/game/WagerModal.vue`)
+- [x] 升級 `src/components/game/QuizCard.vue` 支援：聽力播放控制器、視覺馬賽克漸進解鎖、反向題紅色警示、盲答遮罩
+
+## 階段十五：Slay the Spire 輕度 Roguelike 樹狀分支地圖與重修補考機制實作
+- [x] 實作 Roguelike 樹狀節點網絡生成器 (`src/utils/roguelikeGenerator.ts`)
+- [x] 製作 Slay the Spire 式樹狀節點地圖組件 (`src/components/game/RoguelikeMap.vue`，具備 SVG 貝茲曲線與動態節點發光)
+- [x] 製作留級教官警告與期中連續答對補考彈窗 (`src/components/game/RemedialExamModal.vue`)
+- [x] 在 `src/stores/gameStore.ts` 整合肉鴿地圖前進、下注倍率計算、失誤累積與留級聖物被動效果
+- [x] 在 `src/components/game/TitleScreen.vue` 增加「輕度肉鴿模式」與「經典街機模式」雙模式切換
+
+## 階段十六：全流程整合、編譯驗證與交付報告
+- [x] 執行 `npm run build` 驗證 TypeScript 型別與 Vue 模板編譯
+- [x] 更新 `log/20261019_5.md`
+- [x] 更新 `report.md` 任務總結
+
+## 階段十七：GitHub Pages 自動部署與發布實作 (CI/CD Pipeline)
+- [x] 在 `vite.config.ts` 設定 `base: '/republiceducation2026/'`
+- [x] 撰寫 GitHub Actions 自動部署腳本 (`.github/workflows/deploy.yml`)
+- [x] 執行本地打包檢查確認路徑與編譯無誤 (`npm run build`)
+- [x] 將更新代碼提交並推送到遠端 GitHub 倉庫 (`main` 分支)
+- [x] 撰寫部署日誌至 `log/20261019_7.md`
+
+
+
+
+
+

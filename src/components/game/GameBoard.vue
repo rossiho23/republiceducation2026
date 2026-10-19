@@ -60,6 +60,14 @@
           LV.{{ gameStore.rank }} ({{ getRankTitle(gameStore.rank) }})
         </span>
       </div>
+
+      <!-- 切換肉鴿地圖按鈕 -->
+      <button
+        @click="$emit('switch-to-roguelike')"
+        class="px-2.5 py-1 bg-indigo-950 hover:bg-indigo-900 text-yellow-300 font-bold text-xs rounded-lg border border-indigo-500 shadow transition-colors"
+      >
+        🌲 切換肉鴿地圖
+      </button>
     </div>
 
     <!-- 主持播音跑馬燈 -->
@@ -435,6 +443,10 @@
 import { onMounted, onUnmounted } from 'vue';
 import { useGameStore } from '../../stores/gameStore';
 import RetroTileIcon from './RetroTileIcon.vue';
+
+const emit = defineEmits<{
+  (e: 'switch-to-roguelike'): void;
+}>();
 
 const gameStore = useGameStore();
 

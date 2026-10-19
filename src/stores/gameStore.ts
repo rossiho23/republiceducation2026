@@ -14,7 +14,8 @@ import {
   ItemType, 
   GameItem, 
   BossExamState,
-  BranchType 
+  BranchType,
+  SchoolRelic
 } from '../types/quiz';
 import { 
   generateBoardTiles, 
@@ -37,7 +38,9 @@ export type ActiveModalType =
   | 'CONTINUE'
   | 'VICTORY'
   | 'CMS'
-  | 'NEWS_INTRO';
+  | 'NEWS_INTRO'
+  | 'WAGER'
+  | 'REMEDIAL_EXAM';
 
 export const useGameStore = defineStore('gameStore', () => {
   const questionStore = useQuestionStore();
@@ -56,6 +59,13 @@ export const useGameStore = defineStore('gameStore', () => {
 
   // 街機動態難度 Rank (0 ~ 10 級)
   const rank = ref<number>(5);
+
+  // 現代化下注與博弈狀態
+  const currentWagerAmount = ref<number>(0);
+  const stageMistakeCount = ref<number>(0); // 當前學程失誤累計 (>= 3 觸發補考)
+  const ownedRelics = ref<SchoolRelic[]>([]); // 玩家獲得的校園被動聖物裝備
+  const isBlackoutRevealed = ref<boolean>(false); // 盲答迷霧是否已被玩家揭開
+  const remedialStreak = ref<number>(0); // 補考當前連續答對題數
 
   // 道具背包
   const inventory = ref<Record<ItemType, number>>({
@@ -175,12 +185,23 @@ export const useGameStore = defineStore('gameStore', () => {
     isAnswered.value = false;
     lastSelectedChoice.value = null;
     isLastAnswerCorrect.value = null;
+    isBlackoutRevealed.value = false;
 
-    // 若為三選一模式，隨機隱藏 1 個錯誤選項
-    if (isThreeChoiceMode.value && currentQuestion.value) {
+    // 若持有作弊小抄聖物 (AUTO_REMOVE_WRONG)，開場自動剔除 1 個錯誤選項
+    const hasCheatNote = ownedRelics.value.some(r => r.effect === 'AUTO_REMOVE_WRONG');
+    if (hasCheatNote && currentQuestion.value) {
       const wrongIndices = [0, 1, 2, 3].filter(i => i !== currentQuestion.value?.correctIndex);
       const randomWrong = wrongIndices[Math.floor(Math.random() * wrongIndices.length)];
       disabledOptionIndices.value = [randomWrong];
+    }
+
+    // 若為三選一模式，隨機隱藏 1 個錯誤選項
+    if (isThreeChoiceMode.value && currentQuestion.value) {
+      const wrongIndices = [0, 1, 2, 3].filter(i => i !== currentQuestion.value?.correctIndex && !disabledOptionIndices.value.includes(i));
+      if (wrongIndices.length > 0) {
+        const randomWrong = wrongIndices[Math.floor(Math.random() * wrongIndices.length)];
+        disabledOptionIndices.value.push(randomWrong);
+      }
     }
 
     timerInterval.value = window.setInterval(() => {
@@ -212,6 +233,15 @@ export const useGameStore = defineStore('gameStore', () => {
   function takeDamage(damage: number): void {
     playerHp.value = Math.max(0, playerHp.value - damage);
     if (playerHp.value <= 0) {
+      // 檢查是否持有免死金牌
+      const relicIdx = ownedRelics.value.findIndex(r => r.effect === 'DEATH_PREVENTION');
+      if (relicIdx !== -1) {
+        ownedRelics.value.splice(relicIdx, 1);
+        playerHp.value = 35;
+        soundEngine.playCorrect();
+        hostComment.value = '🛡️【免死金牌】發威！成功抵擋致命危機，體力回升至 35 點！';
+        return;
+      }
       triggerGameOver();
     }
   }
@@ -442,19 +472,57 @@ export const useGameStore = defineStore('gameStore', () => {
       const totalEarned = baseScore + speedBonus + comboCount.value * 50;
 
       score.value += totalEarned;
-      const creditsEarned = isTalentMode.value ? 80 : 40;
+      let creditsEarned = isTalentMode.value ? 80 : 40;
+
+      // 下注結算獲利
+      if (currentWagerAmount.value > 0) {
+        let wagerWin = 0;
+        if (currentWagerAmount.value === 20) wagerWin = Math.round(20 * 1.5);
+        else if (currentWagerAmount.value === 50) wagerWin = Math.round(50 * 2.0);
+        else wagerWin = Math.round(currentWagerAmount.value * 3.0);
+        creditsEarned += wagerWin;
+      }
+
+      // 檢查獎學金聖物 BONUS_CREDITS (+20%)
+      const hasBonusCredits = ownedRelics.value.some(r => r.effect === 'BONUS_CREDITS');
+      if (hasBonusCredits) {
+        creditsEarned = Math.round(creditsEarned * 1.2);
+      }
+
       credits.value += creditsEarned;
 
       if (timeRemaining.value / maxTimeLimit.value >= 0.7) adjustRank(1);
       if (comboCount.value % 2 === 0) adjustRank(1);
 
       hostComment.value = `太優秀了！回答完全正確！獲得 ${totalEarned} 分與 ${creditsEarned} 學分！(連擊: ${comboCount.value})`;
+      currentWagerAmount.value = 0;
     } else {
       soundEngine.playWrong();
       comboCount.value = 0;
-      takeDamage(isTalentMode.value ? 25 : 15);
+      stageMistakeCount.value += 1;
+
+      // 扣除下注額度
+      if (currentWagerAmount.value > 0) {
+        credits.value = Math.max(0, credits.value - currentWagerAmount.value);
+      }
+
+      // 雙倍扣分或反向陷阱懲罰
+      let baseDamage = isTalentMode.value ? 25 : 15;
+      if (currentQuestion.value.isDoubleDamage || currentQuestion.value.isTrapReverse) {
+        baseDamage *= 2;
+      }
+      takeDamage(baseDamage);
       adjustRank(-2);
+
       hostComment.value = `答錯了！正確答案是【${currentQuestion.value.options[currentQuestion.value.correctIndex]}】！損失體力！`;
+      currentWagerAmount.value = 0;
+
+      // 檢查是否達到 3 次失誤，觸發期中留級補考
+      if (stageMistakeCount.value >= 3 && playerHp.value > 0) {
+        setTimeout(() => {
+          activeModal.value = 'REMEDIAL_EXAM';
+        }, 1200);
+      }
     }
   }
 
@@ -698,6 +766,40 @@ export const useGameStore = defineStore('gameStore', () => {
     continueCountdown.value = 0;
   }
 
+  function revealBlackoutOptions(): void {
+    if (credits.value < 15) {
+      hostComment.value = '學分不足 15 點，無法揭開迷霧！請憑直覺盲選！';
+      return;
+    }
+    credits.value -= 15;
+    isBlackoutRevealed.value = true;
+    soundEngine.playItemUse();
+    hostComment.value = '消耗 15 學分！迷霧散去，選項內容清晰可見！';
+  }
+
+  function passRemedialExam(relic: SchoolRelic): void {
+    stageMistakeCount.value = 0;
+    playerHp.value = Math.min(maxHp.value, playerHp.value + 50);
+    ownedRelics.value.push(relic);
+    activeModal.value = 'NONE';
+    soundEngine.playFanfare();
+    hostComment.value = `恭喜通過期中補考！危機解除！獲得被動聖物【${relic.name}】！`;
+  }
+
+  function failRemedialExam(): void {
+    if (coins.value > 0) {
+      coins.value -= 1;
+      stageMistakeCount.value = 0;
+      playerHp.value = 50;
+      activeModal.value = 'NONE';
+      soundEngine.playWrong();
+      hostComment.value = '補考未通過！扣除 1 枚代幣作為重修費，得以保留學籍！';
+    } else {
+      activeModal.value = 'CONTINUE';
+      triggerGameOver();
+    }
+  }
+
   return {
     // 狀態
     currentStage,
@@ -738,6 +840,13 @@ export const useGameStore = defineStore('gameStore', () => {
     mainExamTile,
     remainingLayers,
 
+    // 現代化博弈與肉鴿狀態
+    currentWagerAmount,
+    stageMistakeCount,
+    ownedRelics,
+    isBlackoutRevealed,
+    remedialStreak,
+
     // 方法
     startNewGame,
     rollDice,
@@ -751,5 +860,9 @@ export const useGameStore = defineStore('gameStore', () => {
     handleBossAnswer,
     insertCoinToContinue,
     giveUpContinue,
+    takeDamage,
+    revealBlackoutOptions,
+    passRemedialExam,
+    failRemedialExam,
   };
 });

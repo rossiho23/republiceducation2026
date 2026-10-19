@@ -7,7 +7,111 @@
 import { QuestionItem } from '../types/quiz';
 
 export const DEFAULT_QUESTIONS: QuestionItem[] = [
-  // ================= 國小階段 (基礎常識與生活在地化) =================
+  // ================= 現代化動態題型 (聽力猜歌 / 視覺辨識 / 反向陷阱 / 盲答) =================
+  {
+    id: 'dyn-audio-01',
+    subject: '流行音樂',
+    stage: '通用',
+    question: '【🎧 8-bit 聽力猜歌】請聆聽這段極具代表性的懷舊廣告旋律，請問這是哪一家歷史悠久的台灣國貨品牌？',
+    options: ['大同電鍋 (大同寶寶)', '聲寶家電', '東元電機', '歌林電器'],
+    correctIndex: 0,
+    explanation: '這首正是家喻戶曉的「大同大同國貨好，大同產品最可靠～」大同企業歌！',
+    difficulty: '簡單',
+    questionType: 'AUDIO_GUESS',
+    audioMelodyId: 'melody-tatung',
+    timeLimit: 12
+  },
+  {
+    id: 'dyn-audio-02',
+    subject: '時事冷知識',
+    stage: '通用',
+    question: '【🎧 8-bit 聽力猜台詞】請仔細聆聽這段無人不知的台灣經典藥品電視廣告配樂，請問這是在宣傳哪款產品？',
+    options: ['斯斯感冒膠囊', '普拿疼伏冒熱飲', '五洲製藥牛黃解毒片', '白花油'],
+    correctIndex: 0,
+    explanation: '豬哥亮代言的「感冒用斯斯，咳嗽用斯斯，鼻塞鼻炎用斯斯～」紅遍大街小巷！',
+    difficulty: '簡單',
+    questionType: 'AUDIO_GUESS',
+    audioMelodyId: 'melody-susu',
+    timeLimit: 12
+  },
+  {
+    id: 'dyn-audio-03',
+    subject: '藝能',
+    stage: '國中',
+    question: '【🎧 8-bit 聽力猜歌】這段熱血沸騰的經典卡通機器人旋律，出自哪一部陪伴無數五六年級生童年的經典動漫？',
+    options: ['無敵鐵金剛', '勇者王', '機動戰士鋼彈', '魔神英雄傳'],
+    correctIndex: 0,
+    explanation: '「無敵鐵金剛！無敵鐵金剛！無敵鐵金～剛！」柯國隆駕駛指揮艇組合！',
+    difficulty: '普通',
+    questionType: 'AUDIO_GUESS',
+    audioMelodyId: 'melody-mazinger',
+    timeLimit: 12
+  },
+  {
+    id: 'dyn-audio-04',
+    subject: '流行音樂',
+    stage: '高中',
+    question: '【🎧 8-bit 聽力猜歌】聆聽這首風靡 90 年代台灣校園的偶像男團代表作旋律，請問這首歌的歌名是什麼？',
+    options: ['小虎隊《青蘋果樂園》', '紅孩兒《初戀》', '草蜢《失戀陣線聯盟》', 'L.A. Boyz《跳》'],
+    correctIndex: 0,
+    explanation: '小虎隊吳奇隆、蘇有朋、陳志朋的成名神曲《青蘋果樂園》！',
+    difficulty: '普通',
+    questionType: 'AUDIO_GUESS',
+    audioMelodyId: 'melody-green-apple',
+    timeLimit: 12
+  },
+  {
+    id: 'dyn-trap-01',
+    subject: '社會',
+    stage: '國小',
+    question: '【⚠️ 反向陷阱題】請選出下列選項中，【非】中華民國中央政府五院之一的機構？',
+    options: ['行政院', '立法院', '內政部 (非院級)', '監察院'],
+    correctIndex: 2,
+    explanation: '內政部隸屬於行政院管轄之下，並非憲法規範之五院獨立中央機關！',
+    difficulty: '簡單',
+    questionType: 'TRAP_REVERSE',
+    isTrapReverse: true,
+    timeLimit: 10
+  },
+  {
+    id: 'dyn-trap-02',
+    subject: '自然',
+    stage: '國中',
+    question: '【⚠️ 反向陷阱題】請選出下列關於物理特性的描述中，哪一項是【錯誤】的？',
+    options: ['水在 4°C 時密度最大', '聲音在真空中傳播速度最快 (錯誤！)', '光在真空中速度約每秒30萬公里', '物體自由落體與質量無關'],
+    correctIndex: 1,
+    explanation: '聲音是力學波，需要介質才能傳播，因此聲音在真空中完全無法傳播！',
+    difficulty: '普通',
+    questionType: 'TRAP_REVERSE',
+    isTrapReverse: true,
+    timeLimit: 10
+  },
+  {
+    id: 'dyn-blackout-01',
+    subject: '歷史',
+    stage: '高中',
+    question: '【🌑 盲答迷霧題】1990 年代台灣推動全民健康保險制度，請問健保是在哪一年正式開辦實施的？',
+    options: ['民國 84 年 (1995年)', '民國 79 年 (1990年)', '民國 89 年 (2000年)', '民國 80 年 (1991年)'],
+    correctIndex: 0,
+    explanation: '台灣全民健保於民國 84 年 (1995年) 3 月 1 日正式開辦實施！',
+    difficulty: '困難',
+    questionType: 'BLACKOUT',
+    isBlackout: true,
+    timeLimit: 12
+  },
+  {
+    id: 'dyn-visual-01',
+    subject: '地理',
+    stage: '國小',
+    question: '【🔍 視覺線索題】這是台灣哪一座著名國家公園的地標景觀？（隨時間清晰辨識）',
+    options: ['太魯閣國家公園 (大理石峽谷)', '墾丁國家公園', '玉山國家公園', '陽明山小油坑'],
+    correctIndex: 0,
+    explanation: '太魯閣大理石峽谷與九曲洞是花蓮世界級的地質壯麗景觀！',
+    difficulty: '普通',
+    questionType: 'VISUAL_ZOOM',
+    visualImageUrl: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=300&q=80',
+    timeLimit: 12
+  },
   {
     id: 'elem-chi-01',
     subject: '國文',
