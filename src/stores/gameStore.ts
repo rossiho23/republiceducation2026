@@ -167,6 +167,16 @@ export const useGameStore = defineStore('gameStore', () => {
       YAKULT: 0,
     };
     activeModal.value = 'NONE';
+    currentQuestion.value = null;
+    isAnswered.value = false;
+    lastSelectedChoice.value = null;
+    isLastAnswerCorrect.value = null;
+    disabledOptionIndices.value = [];
+    currentWagerAmount.value = 0;
+    isBlackoutRevealed.value = false;
+    isThreeChoiceMode.value = false;
+    isTalentMode.value = false;
+    stopTimer();
     hostComment.value = `歡迎進入【${STAGE_CONFIGS[stage].title}】！離畢業還有 ${STAGE_CONFIGS[stage].layerCount} 層次！請擲骰出發！`;
   }
 
@@ -526,12 +536,61 @@ export const useGameStore = defineStore('gameStore', () => {
     }
   }
 
+  /**
+   * 關閉答題黑板並重置題目作答狀態
+   */
   function closeQuizModal(): void {
     stopTimer();
     activeModal.value = 'NONE';
     currentQuestion.value = null;
     isThreeChoiceMode.value = false;
     isTalentMode.value = false;
+    isAnswered.value = false;
+    lastSelectedChoice.value = null;
+    isLastAnswerCorrect.value = null;
+    disabledOptionIndices.value = [];
+    currentWagerAmount.value = 0;
+    isBlackoutRevealed.value = false;
+  }
+
+  /**
+   * 直接開啟題目作答 (無下注階段，快節奏進行)
+   * @param {QuestionItem} question 要作答的題目
+   * @param {boolean} [isTalent=false] 是否為天才挑戰模式 (雙倍學分)
+   */
+  function startDirectQuiz(question: QuestionItem, isTalent = false): void {
+    stopTimer();
+    currentQuestion.value = question;
+    isTalentMode.value = isTalent;
+    isThreeChoiceMode.value = false;
+    isAnswered.value = false;
+    lastSelectedChoice.value = null;
+    isLastAnswerCorrect.value = null;
+    disabledOptionIndices.value = [];
+    currentWagerAmount.value = 0;
+    isBlackoutRevealed.value = false;
+    activeModal.value = 'QUIZ';
+    const limit = rank.value >= 7 ? 8 : rank.value >= 4 ? 10 : 12;
+    startQuestionTimer(limit);
+  }
+
+  /**
+   * 開啟信心下注流程 (先下注，再作答)
+   * @param {QuestionItem} question 題目資訊 (題幹暫時封印)
+   * @param {boolean} [isTalent=false] 是否為天才挑戰
+   */
+  function startWagerQuiz(question: QuestionItem, isTalent = false): void {
+    stopTimer();
+    currentQuestion.value = question;
+    isTalentMode.value = isTalent;
+    isThreeChoiceMode.value = false;
+    isAnswered.value = false;
+    lastSelectedChoice.value = null;
+    isLastAnswerCorrect.value = null;
+    disabledOptionIndices.value = [];
+    currentWagerAmount.value = 0;
+    isBlackoutRevealed.value = false;
+    activeModal.value = 'WAGER';
   }
 
   function useItem(itemType: ItemType): boolean {
@@ -854,6 +913,8 @@ export const useGameStore = defineStore('gameStore', () => {
     startQuestionTimer,
     answerCurrentQuestion,
     closeQuizModal,
+    startDirectQuiz,
+    startWagerQuiz,
     useItem,
     buyItem,
     initBossExam,

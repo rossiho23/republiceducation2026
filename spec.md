@@ -213,6 +213,11 @@ erDiagram
      * **雙倍傷害 (Double Trouble)**：答錯體力扣除 40 點。
      * **盲答迷霧 (Blackout)**：四個選項被黑霧覆蓋，玩家可花費 15 學分揭開，或直接盲點（盲點答對加倍得分）。
 
+3. **答題狀態生命週期與答案隱蔽守則 (Answer Secrecy & Lifecycle)**：
+   * **彈窗嚴格互斥**：答題黑板 (`QuizCard`) 僅在 `activeModal === 'QUIZ'` 且 `currentQuestion !== null` 時渲染，嚴禁在下注階段 (`WAGER`)、地圖探索或開新局時提前浮現。
+   * **狀態徹底重置**：每次開啟題目或新局，必須重置 `isAnswered = false`、`lastSelectedChoice = null`、`isLastAnswerCorrect = null`、`disabledOptionIndices = []`。
+   * **答案揭露時機**：只有在玩家親自點擊選項作答後，或倒數計時歸零時，`isAnswered` 轉為 `true`，方得高亮標示「✓ 正解」與顯示「💡 名師解答」。作答前嚴禁揭露任何正解線索。
+
 ---
 
 ### 4.2 Slay the Spire 式 Roguelike 樹狀節點地圖 (Node-based Map)

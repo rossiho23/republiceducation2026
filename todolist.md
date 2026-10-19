@@ -125,8 +125,9 @@
 - [x] 將更新代碼提交並推送到遠端 GitHub 倉庫 (`main` 分支)
 - [x] 撰寫部署日誌至 `log/20261019_7.md`
 
-
-
-
-
-
+## 階段十八：肉鴿地圖題目前置狀態重置與答案提早洩露修復
+- [x] 修正 `QuizCard.vue` 顯示條件，嚴格限制為 `activeModal === 'QUIZ' && currentQuestion`，防止下注前或地圖中提早彈出
+- [x] 在 `gameStore.ts` 擴充乾淨的題目準備與狀態重置機制 (`startDirectQuiz`, `startWagerQuiz`, `closeQuizModal`, `startNewGame`)，確保 `isAnswered`、`lastSelectedChoice` 等狀態在每一次作答前必定為初始乾淨值
+- [x] 重構 `RoguelikeMap.vue` 與 `WagerModal.vue` 的題目流轉機制，確保在玩家確定下注或直接進入題目時，絕不提前標記正解與解答
+- [x] 執行本地 `npm run build` 編譯檢驗
+- [x] 將修復結果輸出至 `/log` 目錄

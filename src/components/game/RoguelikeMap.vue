@@ -212,24 +212,38 @@ function handleNodeClick(node: RoguelikeNode): void {
  */
 function resolveNodeAction(node: RoguelikeNode): void {
   switch (node.type) {
-    case 'QUIZ_NORMAL':
-    case 'QUIZ_ELITE':
-    case 'VISUAL_EVENT': {
+    case 'QUIZ_NORMAL': {
+      // 一般隨堂考：直接乾淨開啟作答黑板，節奏明快
       const q = questionStore.pickQuestion(gameStore.currentStage, node.subject);
       if (q) {
-        gameStore.currentQuestion = q;
-        gameStore.isTalentMode = node.type === 'QUIZ_ELITE';
-        // 先跳出信心下注彈窗！
-        gameStore.activeModal = 'WAGER';
-        gameStore.hostComment = `抵達【${node.title}】！在揭曉題目內容前，請決定您的下注信心！`;
+        gameStore.startDirectQuiz(q, false);
+        gameStore.hostComment = `抵達【${node.title}】！請沉著應對【${node.subject}】隨堂測驗！`;
+      }
+      break;
+    }
+    case 'QUIZ_ELITE': {
+      // 菁英挑戰考：高難度雙倍獎勵，進入信心下注博弈流程
+      const q = questionStore.pickQuestion(gameStore.currentStage, node.subject);
+      if (q) {
+        gameStore.startWagerQuiz(q, true);
+        gameStore.hostComment = `抵達【${node.title}】！面臨高難度菁英考驗，請評估信心下注！`;
+      }
+      break;
+    }
+    case 'VISUAL_EVENT': {
+      // 視覺局部放大解謎：進入信心下注
+      const q = questionStore.pickQuestion(gameStore.currentStage, node.subject);
+      if (q) {
+        gameStore.startWagerQuiz(q, false);
+        gameStore.hostComment = `抵達【${node.title}】！視覺局部放大題，評估信心後開始辨識！`;
       }
       break;
     }
     case 'AUDIO_EVENT': {
+      // 懷舊聽力猜歌：進入信心下注
       const q = questionStore.pickQuestion(gameStore.currentStage, '流行音樂');
       if (q) {
-        gameStore.currentQuestion = q;
-        gameStore.activeModal = 'WAGER';
+        gameStore.startWagerQuiz(q, false);
         gameStore.hostComment = `🎧 抵達【8-bit 聽力猜歌】節點！請評估下注後開始聆聽！`;
       }
       break;

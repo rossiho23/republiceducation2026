@@ -1,5 +1,5 @@
 <template>
-  <div v-if="gameStore.currentQuestion" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 font-mono">
+  <div v-if="gameStore.activeModal === 'QUIZ' && gameStore.currentQuestion" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 font-mono">
     <div class="w-full max-w-3xl bg-[#0f172a] border-4 border-arcade-border rounded-2xl p-4 sm:p-6 shadow-arcade-glow flex flex-col gap-3 relative overflow-hidden">
       
       <!-- 頂部街機題看板 (致敬 quiz1.jpg 最上方：民國教育委員會 與 分數) -->
