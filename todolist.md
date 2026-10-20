@@ -204,4 +204,15 @@
 - [x] 產出修復日誌至 `log/20261020_15.md` 與更新 `report.md`
 
 
+## 階段三十：最新開頭動畫 1020.mp4 與標題語音避讓混音實作 (方案 A)
+- [x] 部署多媒體資產：將 `pic/1020.mp4` 與 `pic/念標題.mp3` 部署至公開資產目錄 (`public/media/` 與 `public/`)
+- [x] 更新 `src/components/game/IntroCinema.vue` 視訊來源為 `1020.mp4`，維持投幣啟動與跳過功能
+- [x] 升級 `src/utils/bgmEngine.ts`：增加 `playTitleVoiceWithDucking()` 函式，支援標題語音播放期間 BGM 避讓至 15% 襯底，播畢後平滑漸強回復至 35%
+- [x] 在主應用入口 (`src/App.vue`) 接軌開頭片頭結束事件，立即觸發「念標題」語音與 BGM 避讓混音
+- [x] 執行本地 `npm run build` 編譯檢驗確認 100% 通過
+- [x] 將新功能代碼提交並推送到遠端 GitHub 倉庫自動發布
+- [x] 產出日誌至 `log/20261020_16.md` 與更新 `report.md`
+
+
+
 

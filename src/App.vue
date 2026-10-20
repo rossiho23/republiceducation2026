@@ -88,11 +88,11 @@ const showIntroCinema = ref<boolean>(true);
 
 /**
  * 開頭映畫結束或被跳過時的回呼處理
- * 關閉片頭組件並自動啟動 The_Final_Question 背景音樂循環播放
+ * 關閉片頭組件，立即播放「民國教育委員會！」標題語音，並同時啟動 BGM 避讓混音循環播放
  */
 function handleIntroComplete(): void {
   showIntroCinema.value = false;
-  bgmEngine.play();
+  bgmEngine.playTitleVoiceWithDucking();
 }
 
 const isCmsOpen = ref<boolean>(false);

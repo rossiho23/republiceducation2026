@@ -100,14 +100,16 @@ const videoRef = ref<HTMLVideoElement | null>(null);
 const hasStarted = ref<boolean>(false);
 const isFadingOut = ref<boolean>(false);
 
-// 備援路徑序列：確保在本地伺服器、二級目錄與各部署路徑均能精確載入
+// 備援路徑序列：確保在本地伺服器、二級目錄與各部署路徑均能精確載入 (優先載入最新 1020.mp4)
 const baseUrl = ((import.meta as any).env?.BASE_URL as string) || '/';
 const cleanBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
 const candidateSources = [
+  `${cleanBase}media/1020.mp4`,
+  `${cleanBase}1020.mp4`,
+  './media/1020.mp4',
+  './1020.mp4',
   `${cleanBase}media/intro.mp4`,
   `${cleanBase}intro.mp4`,
-  './media/intro.mp4',
-  './intro.mp4',
 ];
 const currentSourceIndex = ref<number>(0);
 const currentVideoSrc = ref<string>(candidateSources[0]);
