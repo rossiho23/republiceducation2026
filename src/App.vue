@@ -83,13 +83,13 @@ const currentMapMode = ref<'ROGUELIKE' | 'CLASSIC'>('ROGUELIKE');
 function startRoguelikeGame(): void {
   currentMapMode.value = 'ROGUELIKE';
   isGameStarted.value = true;
-  gameStore.startNewGame(gameStore.currentStage, gameStore.gameLength);
+  gameStore.startNewGame('國小', gameStore.gameLength);
 }
 
 function startClassicGame(): void {
   currentMapMode.value = 'CLASSIC';
   isGameStarted.value = true;
-  gameStore.startNewGame(gameStore.currentStage, gameStore.gameLength);
+  gameStore.startNewGame('國小', gameStore.gameLength);
 }
 
 onMounted(() => {

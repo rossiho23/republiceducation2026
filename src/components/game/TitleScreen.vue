@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <!-- 關卡長度自選模式 (5 關速通 vs 10 關馬拉松) -->
+    <!-- 關卡長度自選模式 (10 關標準挑戰 vs 20 關終極長征) -->
     <div class="my-3 w-full max-w-2xl bg-[#121620] border-2 border-yellow-400 p-3.5 neo-cut-sm shadow-[5px_5px_0px_#000]">
       <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-800 text-left">
         <div class="flex items-center gap-2">
@@ -41,58 +41,58 @@
           </span>
         </div>
         <span class="text-xs sm:text-sm text-yellow-400 font-mono font-black">
-          當前：{{ gameStore.gameLength === 5 ? '⚡ 五關速通賽 (5 關短程)' : '🏆 十關馬拉松 (10 關深度)' }}
+          當前：{{ gameStore.gameLength === 20 ? '👑 二十關終極大考驗 (20 關長征)' : '🏆 十關挑戰賽 (10 關標準)' }}
         </span>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-        <!-- 5 關速通賽按鈕 -->
-        <button
-          type="button"
-          @click="selectGameLength(5)"
-          class="p-3.5 border-2 transition-all neo-cut-sm text-left flex flex-col justify-between cursor-pointer"
-          :class="gameStore.gameLength === 5 
-            ? 'bg-yellow-400 text-black border-black shadow-[4px_4px_0px_#000] scale-[1.02]' 
-            : 'bg-[#0a0d14] text-gray-300 border-gray-700 hover:border-yellow-400 hover:text-white'"
-        >
-          <div class="flex items-center justify-between">
-            <span class="text-base sm:text-lg font-black neo-skew-title flex items-center gap-1.5">
-              ⚡ 五關速通賽
-            </span>
-            <span 
-              class="text-[11px] font-bold px-2 py-0.5 border"
-              :class="gameStore.gameLength === 5 ? 'bg-black text-yellow-400 border-black' : 'bg-gray-800 text-gray-400 border-gray-700'"
-            >
-              3~5 分鐘短程
-            </span>
-          </div>
-          <p class="text-xs mt-2 leading-relaxed opacity-90">
-            5 步地圖直通 Boss 檢定考！適合零碎時間、節奏明快爽快通關！
-          </p>
-        </button>
-
-        <!-- 10 關馬拉松按鈕 -->
+        <!-- 10 關挑戰賽按鈕 -->
         <button
           type="button"
           @click="selectGameLength(10)"
           class="p-3.5 border-2 transition-all neo-cut-sm text-left flex flex-col justify-between cursor-pointer"
           :class="gameStore.gameLength === 10 
+            ? 'bg-yellow-400 text-black border-black shadow-[4px_4px_0px_#000] scale-[1.02]' 
+            : 'bg-[#0a0d14] text-gray-300 border-gray-700 hover:border-yellow-400 hover:text-white'"
+        >
+          <div class="flex items-center justify-between">
+            <span class="text-base sm:text-lg font-black neo-skew-title flex items-center gap-1.5">
+              🏆 十關挑戰賽
+            </span>
+            <span 
+              class="text-[11px] font-bold px-2 py-0.5 border"
+              :class="gameStore.gameLength === 10 ? 'bg-black text-yellow-400 border-black' : 'bg-gray-800 text-gray-400 border-gray-700'"
+            >
+              8~10 分鐘標準
+            </span>
+          </div>
+          <p class="text-xs mt-2 leading-relaxed opacity-90">
+            10 步標準闖關！體驗隨堂考、聽力/局部謎題、福利社與升學 Boss 戰！
+          </p>
+        </button>
+
+        <!-- 20 關終極長征按鈕 -->
+        <button
+          type="button"
+          @click="selectGameLength(20)"
+          class="p-3.5 border-2 transition-all neo-cut-sm text-left flex flex-col justify-between cursor-pointer"
+          :class="gameStore.gameLength === 20 
             ? 'bg-cyan-400 text-black border-black shadow-[4px_4px_0px_#000] scale-[1.02]' 
             : 'bg-[#0a0d14] text-gray-300 border-gray-700 hover:border-cyan-400 hover:text-white'"
         >
           <div class="flex items-center justify-between">
             <span class="text-base sm:text-lg font-black neo-skew-title flex items-center gap-1.5">
-              🏆 十關馬拉松
+              👑 二十關終極大考驗
             </span>
             <span 
               class="text-[11px] font-bold px-2 py-0.5 border"
-              :class="gameStore.gameLength === 10 ? 'bg-black text-cyan-400 border-black' : 'bg-gray-800 text-gray-400 border-gray-700'"
+              :class="gameStore.gameLength === 20 ? 'bg-black text-cyan-400 border-black' : 'bg-gray-800 text-gray-400 border-gray-700'"
             >
-              完整深度挑戰
+              15~20 分鐘深度長征
             </span>
           </div>
           <p class="text-xs mt-2 leading-relaxed opacity-90">
-            10 步完整探索！包含菁英難題、深層突發事件與最高學位畢業考！
+            20 步終極考驗！歷經清晨升旗至挑燈夜戰、多次奧賽菁英戰與畢業檢定！
           </p>
         </button>
       </div>

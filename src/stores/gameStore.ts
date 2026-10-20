@@ -16,7 +16,8 @@ import {
   BossExamState,
   BranchType,
   SchoolRelic,
-  GameLengthMode
+  GameLengthMode,
+  TimeOfDay
 } from '../types/quiz';
 import { 
   generateBoardTiles, 
@@ -48,7 +49,7 @@ export const useGameStore = defineStore('gameStore', () => {
   const questionStore = useQuestionStore();
 
   // ================= 核心數值狀態 =================
-  const currentStage = ref<StageGrade>('高中'); // 預設體驗致敬截圖之高中或國小
+  const currentStage = ref<StageGrade>('國小'); // 預設體驗致敬截圖之高中或國小
   const tiles = ref<MapTile[]>([]);
   const currentTileIndex = ref<number>(0);
   const currentBranch = ref<BranchType>('MAIN'); // 當前所屬分支
@@ -60,7 +61,7 @@ export const useGameStore = defineStore('gameStore', () => {
   const comboCount = ref<number>(0);
 
   // 街機動態難度 Rank (0 ~ 10 級)
-  const rank = ref<number>(5);
+  const rank = ref<number>(1);
 
   // 現代化下注與博弈狀態
   const currentWagerAmount = ref<number>(0);
@@ -106,7 +107,7 @@ export const useGameStore = defineStore('gameStore', () => {
   // 升學 Boss 關卡狀態
   const bossExam = ref<BossExamState>({
     isActive: false,
-    stage: '高中',
+    stage: '國小',
     currentQuestionIndex: 0,
     passedCount: 0,
     targetCount: 5,
@@ -137,11 +138,25 @@ export const useGameStore = defineStore('gameStore', () => {
   const mainForkTile = computed(() => tiles.value.find(t => t.index === 1));
   const mainExamTile = computed(() => tiles.value.find(t => t.type === 'EXAM'));
 
-  // 離畢業還有幾層次 (依據長度模式動態計算)
+  // 離畢業還有幾層次 (依據長度模式動態計算：10 或 20)
   const remainingLayers = computed(() => {
-    const base = gameLength.value === 5 ? 5 : (currentStageConfig.value?.layerCount || 10);
+    const base = gameLength.value;
     const progress = Math.min(base, currentTileIndex.value);
     return Math.max(1, base - progress);
+  });
+
+  /**
+   * 當前進度之晨昏時段 (DAWN / DAY / DUSK / NIGHT)
+   * 0%~25% DAWN 晨曦, 25%~60% DAY 白晝, 60%~85% DUSK 黃昏, 85%~100% NIGHT 深夜
+   */
+  const currentTimeOfDay = computed<TimeOfDay>(() => {
+    const total = gameLength.value;
+    const current = Math.min(total, currentTileIndex.value);
+    const ratio = total > 1 ? current / (total - 1) : 0;
+    if (ratio < 0.25) return 'DAWN';
+    if (ratio < 0.6) return 'DAY';
+    if (ratio < 0.85) return 'DUSK';
+    return 'NIGHT';
   });
 
   // ================= 核心方法 =================
@@ -162,7 +177,7 @@ export const useGameStore = defineStore('gameStore', () => {
    * @param {StageGrade} [stage='高中'] 起始學程
    * @param {GameLengthMode} [length] 關卡長度模式 (若未帶則維持既有設定)
    */
-  function startNewGame(stage: StageGrade = '高中', length?: GameLengthMode): void {
+  function startNewGame(stage: StageGrade = '國小', length?: GameLengthMode): void {
     questionStore.initQuestions();
     questionStore.clearUsedQuestions();
     soundEngine.playCoin();
@@ -794,7 +809,7 @@ export const useGameStore = defineStore('gameStore', () => {
     currentBranch.value = 'MAIN';
     playerHp.value = 100;
     rank.value = STAGE_CONFIGS[currentStage.value].baseRank;
-    const remainingCount = gameLength.value === 5 ? 5 : STAGE_CONFIGS[currentStage.value].layerCount;
+    const remainingCount = gameLength.value;
     hostComment.value = `恭喜榮升【${STAGE_CONFIGS[currentStage.value].title}】！離畢業還有 ${remainingCount} 層次！`;
   }
 
@@ -954,6 +969,7 @@ export const useGameStore = defineStore('gameStore', () => {
     mainForkTile,
     mainExamTile,
     remainingLayers,
+    currentTimeOfDay,
 
     // 關卡長度模式
     gameLength,

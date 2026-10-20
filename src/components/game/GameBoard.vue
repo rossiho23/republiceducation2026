@@ -18,7 +18,7 @@
           {{ gameStore.currentStageConfig.title }}
         </span>
         <span class="px-2 py-0.5 bg-black border border-yellow-400 text-yellow-400 text-xs font-black">
-          {{ gameStore.gameLength === 5 ? '⚡ 5 關速通' : '🏆 10 關馬拉松' }}
+          {{ gameStore.gameLength === 20 ? '👑 20 關長征' : '🏆 10 關挑戰' }}
         </span>
         <span class="text-xs sm:text-sm text-yellow-400 font-bold">
           路線: {{ gameStore.currentBranch === 'UPPER' ? '上路 (理科冒險)' : gameStore.currentBranch === 'LOWER' ? '下路 (文藝挑戰)' : '主線起點' }}
@@ -95,53 +95,168 @@
     <!-- 街機原創地圖外框 (雙軌分叉版 · 致敬 map1.jpg) -->
     <div class="w-full bg-[#090b10] border-[4px] border-black overflow-hidden shadow-[8px_8px_0px_#000] flex flex-col relative neo-cut">
       
-      <!-- ================= 上半部：校舍背景與大頭娃娃骰子 ================= -->
-      <div class="relative w-full h-52 sm:h-64 bg-gradient-to-b from-[#38bdf8] via-[#7dd3fc] to-[#bae6fd] overflow-hidden flex flex-col justify-between border-b-4 border-amber-800/80">
-        <!-- 像素白雲飄動 -->
-        <div class="absolute inset-0 pointer-events-none overflow-hidden">
-          <div class="pixel-cloud cloud-1"></div>
-          <div class="pixel-cloud cloud-2"></div>
-          <div class="pixel-cloud cloud-3"></div>
+      <!-- ================= 上半部：四大學程專屬校舍背景與日夜晨昏演色 ================= -->
+      <div 
+        class="relative w-full h-52 sm:h-64 overflow-hidden flex flex-col justify-between border-b-4 border-black transition-colors duration-1000 select-none"
+        :class="skyBackgroundClass"
+      >
+        <!-- 時段指示器與氛圍徽章 (左上方日系戰術黑方塊) -->
+        <div class="absolute top-2.5 left-3 z-30 flex items-center gap-2">
+          <div class="px-2.5 py-0.5 bg-black/80 border border-yellow-400 text-yellow-300 text-[11px] sm:text-xs font-black tracking-wider neo-cut-sm shadow-[2px_2px_0px_#000]">
+            {{ timeOfDayLabel }}
+          </div>
         </div>
 
-        <!-- 遠處像素綠林山脈 -->
-        <div class="absolute bottom-12 left-0 right-0 h-14 flex items-end pointer-events-none opacity-90">
-          <div class="w-full h-10 bg-[#15803d] rounded-t-full scale-y-125 transform translate-y-2"></div>
+        <!-- 日月天體與星象 (依據晨昏動態呈現) -->
+        <div class="absolute top-3 right-6 pointer-events-none z-10">
+          <!-- 晨曦朝日 (DAWN) -->
+          <div 
+            v-if="gameStore.currentTimeOfDay === 'DAWN'" 
+            class="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-amber-400 shadow-[0_0_30px_#f59e0b] animate-pulse"
+          ></div>
+          <!-- 烈日正午 (DAY) -->
+          <div 
+            v-else-if="gameStore.currentTimeOfDay === 'DAY'" 
+            class="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-yellow-300 shadow-[0_0_35px_#fde047]"
+          ></div>
+          <!-- 晚霞暮日 (DUSK) -->
+          <div 
+            v-else-if="gameStore.currentTimeOfDay === 'DUSK'" 
+            class="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-rose-500 shadow-[0_0_35px_#f43f5e]"
+          ></div>
+          <!-- 深夜明月與星辰 (NIGHT) -->
+          <div v-else-if="gameStore.currentTimeOfDay === 'NIGHT'" class="relative flex items-center justify-center">
+            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#fef08a] shadow-[0_0_25px_#fef08a]"></div>
+            <div class="absolute -top-1 -right-6 text-yellow-200 text-xs animate-ping">✨</div>
+            <div class="absolute top-8 -left-8 text-yellow-200 text-xs animate-pulse">⭐</div>
+            <div class="absolute -bottom-4 right-2 text-yellow-200 text-xs animate-pulse">✨</div>
+          </div>
         </div>
 
-        <!-- 三層樓高中校舍與中央高聳鐘樓 (致敬 map1.jpg) -->
-        <div class="absolute bottom-6 left-0 right-0 flex justify-center pointer-events-none">
-          <div class="w-11/12 max-w-4xl h-32 bg-[#f1f5f9] border-2 border-slate-700 shadow-md flex flex-col justify-between relative">
-            <!-- 中央高聳鐘樓 -->
-            <div class="absolute -top-8 left-1/2 -translate-x-1/2 w-20 h-10 bg-[#e2e8f0] border-t-2 border-x-2 border-slate-700 flex flex-col items-center justify-center">
-              <!-- 大時鐘 -->
+        <!-- 像素浮雲 (日間與晨間漂浮) -->
+        <div v-if="gameStore.currentTimeOfDay !== 'NIGHT'" class="absolute inset-0 pointer-events-none overflow-hidden">
+          <div class="pixel-cloud cloud-1 opacity-80"></div>
+          <div class="pixel-cloud cloud-2 opacity-60"></div>
+          <div class="pixel-cloud cloud-3 opacity-75"></div>
+        </div>
+
+        <!-- 遠景像素山脈 (隨天色動態切換色彩) -->
+        <div class="absolute bottom-12 left-0 right-0 h-14 flex items-end pointer-events-none opacity-85">
+          <div 
+            class="w-full h-10 rounded-t-full scale-y-125 transform translate-y-2 transition-colors duration-700"
+            :class="gameStore.currentTimeOfDay === 'NIGHT' ? 'bg-[#0f281e]' : gameStore.currentTimeOfDay === 'DUSK' ? 'bg-[#4a154b]' : 'bg-[#15803d]'"
+          ></div>
+        </div>
+
+        <!-- ================= 四大學程專屬校舍造型 (依 currentStage 切換) ================= -->
+
+        <!-- 1. 國民小學校舍 (矮平房紅瓦校舍 + 升旗台司令台 + 紅土跑道) -->
+        <div 
+          v-if="gameStore.currentStage === '國小'" 
+          class="absolute bottom-6 left-0 right-0 flex justify-center pointer-events-none"
+        >
+          <div class="w-11/12 max-w-4xl h-28 bg-[#fffbeb] border-2 border-amber-900 shadow-md flex flex-col justify-between relative">
+            <!-- 鮮明紅磚斜屋頂 -->
+            <div class="absolute -top-7 left-0 right-0 h-7 bg-[#dc2626] border-t-2 border-x-2 border-amber-950 flex items-center justify-between px-6">
+              <span class="text-xs text-yellow-200 font-black">🏫 快樂學習 快樂成長</span>
+              <!-- 屋頂小風車與小金鐘 -->
+              <div class="w-10 h-10 -top-6 left-1/2 -translate-x-1/2 absolute bg-[#f59e0b] border-2 border-black rounded-sm flex items-center justify-center text-xs">
+                🔔
+              </div>
+            </div>
+            <!-- 一樓教室排窗 (寬大活潑) -->
+            <div class="flex justify-around px-4 pt-3">
+              <div v-for="i in 8" :key="'elem-w1-'+i" class="w-9 sm:w-12 h-6 border-2 border-amber-950 flex flex-col justify-between p-0.5 transition-colors duration-700" :class="windowColorClass">
+                <span class="w-full h-0.5 bg-black/40"></span>
+              </div>
+            </div>
+            <!-- 綠樹花圃基底 -->
+            <div class="w-full h-4 bg-[#16a34a] border-t-2 border-black flex items-center justify-around">
+              <span v-for="i in 16" :key="'elem-t-'+i" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. 國民中學校舍 (經典 90 年代台灣三層洗石子教學大樓 + 時鐘樓 + 禮義廉恥) -->
+        <div 
+          v-else-if="gameStore.currentStage === '國中'" 
+          class="absolute bottom-6 left-0 right-0 flex justify-center pointer-events-none"
+        >
+          <div class="w-11/12 max-w-4xl h-32 bg-[#e2e8f0] border-2 border-slate-700 shadow-md flex flex-col justify-between relative">
+            <!-- 頂部方形時鐘大樓與校訓看板 -->
+            <div class="absolute -top-8 left-1/2 -translate-x-1/2 w-32 h-9 bg-[#cbd5e1] border-2 border-slate-700 flex items-center justify-between px-2">
+              <span class="text-[10px] font-black text-slate-800 tracking-widest">禮義廉恥</span>
               <div class="w-6 h-6 rounded-full bg-white border border-slate-800 flex items-center justify-center relative">
                 <span class="w-2 h-0.5 bg-black absolute top-2.5 right-2"></span>
                 <span class="w-0.5 h-2 bg-black absolute top-1.5 right-3"></span>
               </div>
             </div>
-
-            <!-- 校舍屋頂欄杆 -->
-            <div class="w-full h-2.5 bg-[#cbd5e1] border-b border-slate-400 flex justify-around">
-              <span v-for="i in 24" :key="i" class="w-0.5 h-2.5 bg-slate-500"></span>
-            </div>
-            <!-- 三樓教室排窗 -->
-            <div class="flex justify-around px-4">
-              <div v-for="i in 10" :key="'w3-'+i" class="w-7 sm:w-9 h-4 bg-[#93c5fd] border border-slate-600"></div>
+            <!-- 三樓教室排窗與藍白遮陽棚 -->
+            <div class="flex justify-around px-4 pt-2">
+              <div v-for="i in 10" :key="'jun-w3-'+i" class="w-7 sm:w-9 h-4 border border-slate-700 transition-colors duration-700" :class="windowColorClass"></div>
             </div>
             <!-- 二樓教室排窗 -->
             <div class="flex justify-around px-4">
-              <div v-for="i in 10" :key="'w2-'+i" class="w-7 sm:w-9 h-4 bg-[#bfdbfe] border border-slate-600"></div>
+              <div v-for="i in 10" :key="'jun-w2-'+i" class="w-7 sm:w-9 h-4 border border-slate-700 transition-colors duration-700" :class="windowColorClass"></div>
             </div>
-            <!-- 一樓教室排窗與大門 -->
+            <!-- 一樓穿堂與門口 -->
             <div class="flex justify-around px-4 mb-0.5">
-              <div v-for="i in 10" :key="'w1-'+i" class="w-7 sm:w-9 h-4 bg-[#bfdbfe] border border-slate-600"></div>
+              <div v-for="i in 10" :key="'jun-w1-'+i" class="w-7 sm:w-9 h-4 border border-slate-700 transition-colors duration-700" :class="windowColorClass"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. 高級中學校舍 (復古雙層深紅磚學院大樓 + 尖頂鐘樓) -->
+        <div 
+          v-else-if="gameStore.currentStage === '高中'" 
+          class="absolute bottom-6 left-0 right-0 flex justify-center pointer-events-none"
+        >
+          <div class="w-11/12 max-w-4xl h-32 bg-[#991b1b] border-2 border-slate-900 shadow-md flex flex-col justify-between relative">
+            <!-- 中央高聳尖頂鐘樓 -->
+            <div class="absolute -top-11 left-1/2 -translate-x-1/2 w-20 h-13 bg-[#7f1d1d] border-t-2 border-x-2 border-slate-900 flex flex-col items-center justify-between">
+              <!-- 銅綠尖塔頂 -->
+              <div class="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[10px] border-b-[#059669]"></div>
+              <div class="w-6 h-6 rounded-full bg-white border border-slate-900 flex items-center justify-center relative mb-1">
+                <span class="w-2 h-0.5 bg-black absolute top-2.5 right-2"></span>
+                <span class="w-0.5 h-2 bg-black absolute top-1.5 right-3"></span>
+              </div>
+            </div>
+            <!-- 二樓拱形排窗 -->
+            <div class="flex justify-around px-4 pt-3">
+              <div v-for="i in 10" :key="'high-w2-'+i" class="w-7 sm:w-9 h-5 rounded-t-md border border-slate-900 transition-colors duration-700" :class="windowColorClass"></div>
+            </div>
+            <!-- 一樓古典長廊門柱 -->
+            <div class="flex justify-around px-4 mb-1">
+              <div v-for="i in 10" :key="'high-w1-'+i" class="w-7 sm:w-9 h-5 border border-slate-900 transition-colors duration-700" :class="windowColorClass"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. 最高學府大學校舍 (巴洛克式校門羅馬柱列 + 椰林大道 + 圖書館圓頂) -->
+        <div 
+          v-else 
+          class="absolute bottom-6 left-0 right-0 flex justify-center pointer-events-none"
+        >
+          <div class="w-11/12 max-w-4xl h-32 bg-[#f8fafc] border-2 border-slate-800 shadow-md flex flex-col justify-between relative">
+            <!-- 中央總圖書館圓頂巨塔 (穹頂) -->
+            <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-28 h-12 bg-[#e2e8f0] border-t-2 border-x-2 border-slate-800 rounded-t-full flex items-center justify-center">
+              <div class="text-[11px] font-black text-slate-800">總圖書館</div>
+            </div>
+            <!-- 古典羅馬愛奧尼克柱列 -->
+            <div class="flex justify-around px-6 pt-3">
+              <div v-for="i in 12" :key="'univ-col-'+i" class="w-3.5 sm:w-5 h-14 bg-gradient-to-r from-slate-200 via-white to-slate-300 border border-slate-600 rounded-t-sm"></div>
+            </div>
+            <!-- 兩側椰林大道熱帶樹影裝飾 -->
+            <div class="flex justify-between px-4 pb-1">
+              <div class="text-lg">🌴 椰林大道</div>
+              <div class="text-sm font-black text-slate-700 tracking-wider">最高學術殿堂</div>
+              <div class="text-lg">🌴</div>
             </div>
           </div>
         </div>
 
         <!-- 校舍圍牆與校名名牌 (左側白底綠字) -->
-        <div class="absolute bottom-0 left-0 right-0 h-9 bg-gradient-to-r from-[#94a3b8] via-[#cbd5e1] to-[#94a3b8] border-t-2 border-slate-600 flex items-center px-6">
+        <div class="absolute bottom-0 left-0 right-0 h-9 bg-gradient-to-r from-[#94a3b8] via-[#cbd5e1] to-[#94a3b8] border-t-2 border-slate-600 flex items-center px-6 z-10">
           <div class="bg-[#f8fafc] border-2 border-slate-800 px-3.5 py-0.5 rounded shadow-pixel-sm flex items-center gap-2">
             <span class="w-3 h-3 bg-emerald-600 rounded-sm inline-block"></span>
             <span class="text-sm sm:text-base font-black text-emerald-800 tracking-wider">
@@ -430,7 +545,7 @@
  * @description 街機經典雙軌分叉地圖組件 (致敬 pic/map1.jpg)
  * 包含「離畢業還有 N 層次」頂部燈箱、三層校舍、大頭吉祥物骰子與上下分歧路線軌道
  */
-import { onMounted, onUnmounted } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import { useGameStore } from '../../stores/gameStore';
 import RetroTileIcon from './RetroTileIcon.vue';
 import { PIXEL_MASCOT_ON_DICE } from '../../assets/pixelArt';
@@ -440,6 +555,51 @@ const emit = defineEmits<{
 }>();
 
 const gameStore = useGameStore();
+
+/**
+ * 依據進度晨昏時段動態決定天空背景漸層
+ */
+const skyBackgroundClass = computed(() => {
+  switch (gameStore.currentTimeOfDay) {
+    case 'DAWN':
+      return 'bg-gradient-to-b from-[#ea580c] via-[#f59e0b] to-[#fef08a]';
+    case 'DAY':
+      return 'bg-gradient-to-b from-[#0284c7] via-[#38bdf8] to-[#bae6fd]';
+    case 'DUSK':
+      return 'bg-gradient-to-b from-[#581c87] via-[#be185d] to-[#f97316]';
+    case 'NIGHT':
+      return 'bg-gradient-to-b from-[#020617] via-[#0f172a] to-[#1e1b4b]';
+    default:
+      return 'bg-gradient-to-b from-[#0284c7] via-[#38bdf8] to-[#bae6fd]';
+  }
+});
+
+/**
+ * 晨昏中文標題
+ */
+const timeOfDayLabel = computed(() => {
+  switch (gameStore.currentTimeOfDay) {
+    case 'DAWN': return '🌅 清晨升旗時段 (DAWN)';
+    case 'DAY': return '☀️ 正午課堂時段 (DAY)';
+    case 'DUSK': return '🌇 傍晚放學時段 (DUSK)';
+    case 'NIGHT': return '🌙 深夜考前夜讀 (NIGHT)';
+    default: return '☀️ 正午課堂時段';
+  }
+});
+
+/**
+ * 教室窗戶光影 (夜間點亮全校暖燈，白天反射天光)
+ */
+const windowColorClass = computed(() => {
+  if (gameStore.currentTimeOfDay === 'NIGHT') {
+    return 'bg-[#fef08a] border-yellow-200 shadow-[0_0_8px_#fef08a]';
+  }
+  if (gameStore.currentTimeOfDay === 'DUSK') {
+    return 'bg-[#fed7aa] border-orange-400';
+  }
+  return 'bg-[#93c5fd] border-slate-600';
+});
+
 
 function getRankTitle(rankLV: number): string {
   if (rankLV <= 2) return '親民送分';

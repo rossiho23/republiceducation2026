@@ -13,7 +13,13 @@
           {{ gameStore.currentStage }}階段
         </span>
         <span class="px-2.5 py-1 bg-black border border-yellow-400 text-yellow-400 text-xs sm:text-sm font-black tracking-wider shadow-[2px_2px_0px_#000]">
-          {{ gameStore.gameLength === 5 ? '⚡ 5 關速通' : '🏆 10 關馬拉松' }}
+          {{ gameStore.gameLength === 20 ? '👑 20 關長征' : '🏆 10 關挑戰' }}
+        </span>
+        <span 
+          class="px-2.5 py-1 text-xs sm:text-sm font-black border border-black shadow-[2px_2px_0px_#000]"
+          :class="gameStore.currentTimeOfDay === 'NIGHT' ? 'bg-[#1e1b4b] text-yellow-300' : gameStore.currentTimeOfDay === 'DUSK' ? 'bg-[#701a75] text-white' : gameStore.currentTimeOfDay === 'DAWN' ? 'bg-[#ea580c] text-white' : 'bg-[#0284c7] text-white'"
+        >
+          {{ timeOfDayLabel }}
         </span>
         <div class="text-sm sm:text-base text-gray-200 font-bold">
           探索進度：<span class="text-yellow-400 font-black text-base sm:text-lg">第 {{ currentFloor + 1 }} 層 / 共 {{ totalFloors }} 層</span>
@@ -148,6 +154,17 @@ const currentFloor = ref<number>(0);
 const activeNodeId = ref<string>('');
 
 const totalFloors = computed(() => roguelikeFloors.value.length);
+
+const timeOfDayLabel = computed(() => {
+  switch (gameStore.currentTimeOfDay) {
+    case 'DAWN': return '🌅 晨曦升旗';
+    case 'DAY': return '☀️ 正午課堂';
+    case 'DUSK': return '🌇 傍晚放學';
+    case 'NIGHT': return '🌙 挑燈夜戰';
+    default: return '☀️ 正午課堂';
+  }
+});
+
 
 onMounted(() => {
   initMapForStage();

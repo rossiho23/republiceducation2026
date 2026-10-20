@@ -144,3 +144,17 @@
 - [x] 執行本地 `npm run build` 編譯檢驗確認 100% 通過
 - [x] 將新功能代碼提交並推送到遠端 GitHub 倉庫自動發布
 - [x] 產出重置退學日誌至 `log/20261020_10.md` 與更新 `report.md`
+
+
+## 階段二十五：20關終極長征、國小預設起步與日夜晨昏校舍系統實作 (方案 A)
+- [x] 在 `src/types/quiz.ts` 更新 `GameLengthMode = 10 | 20` 並定義 `TimeOfDay` 時段型別
+- [x] 在 `src/stores/gameStore.ts` 將初始學程與各處預設全面改為「國小」，並支援 10 關 / 20 關動態步數與進度時段計算
+- [x] 在 `src/assets/pixelArt.ts` 繪製國小、國中、高中、大學四套專屬 16-Bit 程式化向量像素校舍圖資
+- [x] 擴充肉鴿生成器 (`src/utils/roguelikeGenerator.ts`)：實作 20 層深度網絡 (`generateTwentyFloorMap`)
+- [x] 擴充雙軌棋盤生成器 (`src/utils/boardGenerator.ts`)：支援 20 步長卡匣軌道動態生成
+- [x] 更新首頁畫面 (`src/components/game/TitleScreen.vue`)：將 5 關更換為「🏆 10 關挑戰賽」與「👑 20 關終極大考驗」
+- [x] 在雙軌棋盤 (`src/components/game/GameBoard.vue`) 實現四大學程專屬校舍切換與晨昏光影漸層 (早晨/正午/黃昏/夜晚)
+- [x] 在肉鴿地圖 (`src/components/game/RoguelikeMap.vue`) 頂部橫幅連動當前時段光影標籤
+- [x] 執行本地 `npm run build` 編譯檢驗確認 100% 通過
+- [x] 將新功能代碼提交並推送到遠端 GitHub 倉庫自動發布
+- [x] 產出日誌至 `log/20261020_11.md` 與更新 `report.md`

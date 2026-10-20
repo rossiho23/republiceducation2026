@@ -582,3 +582,91 @@ sequenceDiagram
         Store-->>Player: 全新國小學程啟動！
     end
 ```
+
+
+---
+
+## 12. 「20關終極長征、國小預設起步與日夜晨昏校舍系統」規格 (Twenty Floors, Elementary Start & Day-Night Campus Spec)
+
+### 12.1 需求背景與核心目標
+依據最新教學與街機體驗需求進行三大系統重構：
+1. **關卡長度體系調整**：廢止「5 關速通」，保留「10 關標準挑戰」，並新增極具沉浸感與策略深度的「20 關終極大考驗 (`GameLengthMode = 10 | 20`)」。
+2. **起步學制重整**：網頁載入（F5 刷新）及全新開局全面校正為**【國民小學】**，確保學制晉升路徑（國小 ➔ 國中 ➔ 高中 ➔ 大學）之嚴謹與一致性。
+3. **四大學程專屬校舍**：告別單一校舍貼圖，為國小、國中、高中、大學繪製四款專屬 16-Bit 程式化向量像素建築。
+4. **進度演色日夜晨昏系統 (Day-Night Cycle)**：隨關卡推進動態流轉「早晨 ➔ 正午 ➔ 黃昏 ➔ 深夜」，呈現學子從清晨早自習奮戰至挑燈夜戰的完整情境。
+
+### 12.2 資料結構與參數定義
+
+```typescript
+/** 關卡長度模式：10 關標準挑戰 或 20 關終極長征 */
+export type GameLengthMode = 10 | 20;
+
+/** 晨昏時段列舉 */
+export type TimeOfDay = 'DAWN' | 'DAY' | 'DUSK' | 'NIGHT';
+
+/** 時段視覺配置介面 */
+export interface TimeOfDayVisualConfig {
+  id: TimeOfDay;
+  label: string;
+  skyGradient: string;    // 天空背景漸層 CSS
+  sunMoonIcon: string;    // 日月圖標
+  ambientFilter: string;  // 環境色調濾鏡
+  windowLight: boolean;   // 校舍窗戶是否點亮暖燈
+}
+```
+
+#### 關卡長度對照表
+| 關卡模式 | 總步數 / 總樓層 | 菁英挑戰次數 | 聽力/視覺特考 | 福利社整備 | Boss 戰時機 | 跑馬燈標示 |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **🏆 10 關標準挑戰** | 10 層 (Floor 0~9) | 1~2 次 | 各 1 次 | 1 次 (Floor 8) | 第 10 關 (Floor 9) | // 離畢業還有 10 層次。 // |
+| **👑 20 關終極長征** | 20 層 (Floor 0~19)| 3~4 次 | 各 2 次 | 2 次 (Floor 9, 18)| 第 20 關 (Floor 19)| // 離畢業還有 20 層次。 // |
+
+#### 進度時段演色演算法
+依當前進度比例 $P = rac{	ext{當前樓層}}{	ext{總樓層 - 1}}$ 計算：
+- $0% le P < 25%$：`DAWN`（早晨升旗：金橘漸層日出、朝陽初升）
+- $25% le P < 60%$：`DAY`（正午課堂：蔚藍天幕、浮雲飄動、烈日高照）
+- $60% le P < 85%$：`DUSK`（黃昏放學：紫紅漸層彩霞、斜陽晚照）
+- $85% le P le 100%$：`NIGHT`（深夜夜讀：深邃墨藍星空、銀月繁星、教室暖燈）
+
+### 12.3 系統架構流程圖 (Flowchart)
+```mermaid
+flowchart TD
+    A["玩家載入網頁 / F5 刷新"] --> B["初始化 currentStage = '國小'"]
+    B --> C["首頁呈現 [10 關挑戰] / [20 關長征] 長度選擇"]
+    C --> D{"玩家選擇模式並開局"}
+    D --> E["生成對應長度地圖 (10 層或 20 層)"]
+    E --> F["讀取當前學程 (國小/國中/高中/大學) 專屬校舍像素美術"]
+    F --> G["依據當前關卡進度計算時段 (DAWN/DAY/DUSK/NIGHT)"]
+    G --> H["動態渲染天空漸層、日月星辰與校舍窗光"]
+    H --> I["玩家推進關卡 ➔ 即時動態流轉時段光影"]
+```
+
+### 12.4 循序圖 (Sequence Diagram)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Player as 玩家 (Player)
+    participant Title as 標題首頁 (TitleScreen)
+    participant Store as 遊戲核心狀態 (gameStore)
+    participant Board as 棋盤組件 (GameBoard)
+    participant Rogue as 肉鴿組件 (RoguelikeMap)
+    participant Gen as 生成器模組 (board/rogue)
+
+    Player->>Title: 點選 [👑 20關終極大考驗]
+    Title->>Store: setGameLength(20)
+    Player->>Title: 點選 [開啟肉鴿冒險] 或 [經典雙軌模式]
+    Title->>Store: startNewGame('國小', 20)
+    Store->>Gen: generateTwentyFloorMap('國小') 或 generateBoardTiles('國小', 20)
+    Gen-->>Store: 返回 20 步長征網絡
+    Store->>Board: 載入國小校舍 (PIXEL_SCHOOL_ELEMENTARY)
+    Store->>Board: 計算時段: Floor 0 ➔ DAWN 晨曦金橘天色
+    Board-->>Player: 呈現清晨國小校園，開始挑戰！
+    loop 關卡推進
+        Player->>Board: 推進至中段 (Floor 8 / 20)
+        Board->>Store: 更新時段 ➔ DAY 正午蔚藍天幕
+        Player->>Board: 推進至後段 (Floor 15 / 20)
+        Board->>Store: 更新時段 ➔ DUSK 傍晚紫紅晚霞
+        Player->>Board: 抵達第 20 關 Boss 戰 (Floor 19 / 20)
+        Board->>Store: 更新時段 ➔ NIGHT 深夜挑燈夜戰
+    end
+```

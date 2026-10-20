@@ -140,36 +140,53 @@ export function generateBoardTiles(grade: StageGrade, length: GameLengthMode = 1
     stepNumber: 2
   });
 
-  // 根據 5 關或 10 關定義上下路格子
-  const upperTilesDef = length === 5
-    ? [
-        { type: 'QUIZ', subject: '自然', title: '理化隨堂考', desc: '實驗室化學分析測驗！' },
-        { type: 'CANTEEN', subject: undefined, title: 'LUCKY 校園福利社', desc: '旭日光芒補給站！購買戰略道具與養樂多！' }
-      ]
-    : [
-        { type: 'QUIZ', subject: '自然', title: '理化隨堂考', desc: '實驗室化學分析測驗！' },
-        { type: 'QUIZ', subject: '流行音樂', title: '音樂隨堂考', desc: '五線譜旋律與華語流行音樂題！' },
-        { type: 'THREE_CHOICE', subject: '時事冷知識', title: '三選一送分格', desc: '只有三個選項的送分題目！' },
-        { type: 'CANTEEN', subject: undefined, title: 'LUCKY 校園福利社', desc: '旭日光芒補給站！購買戰略道具與養樂多！' },
-        { type: 'QUIZ', subject: '社會', title: '文理小試', desc: '綜合歷史地理與社會人文測驗！' },
-        { type: 'TROUBLE', subject: undefined, title: 'TROUBLE 骷髏災難', desc: '校規記過警告！損失體力 20 點！' },
-        { type: 'RECOVERY', subject: undefined, title: '模擬考前自修', desc: '安靜溫習，體力與專注度完全回復！' }
-      ];
+  // 根據 10 關或 20 關定義上下路格子 (步數精準對齊總長度)
+  const branchCount = length === 20 ? 17 : 7; // 起點1 + 分叉1 + 分歧N + Boss1 = 10 或 20 步
 
-  const lowerTilesDef = length === 5
-    ? [
-        { type: 'HEALTH', subject: '健康教育', title: '健康教育護理', desc: '生理衛生保健常識，體力回復 +25 點！' },
-        { type: 'TALENT', subject: '數學', title: '天才問題挑戰', desc: '極限高難度題！答對可獲雙倍分數與大量學分！' }
-      ]
-    : [
-        { type: 'HEALTH', subject: '健康教育', title: '健康教育護理', desc: '生理衛生保健常識，體力回復 +25 點！' },
-        { type: 'QUIZ', subject: '美術', title: '美術色彩學', desc: '調色盤與西洋藝術史測驗！' },
-        { type: 'TALENT', subject: '數學', title: '天才問題挑戰', desc: '極限高難度題！答對可獲雙倍分數與大量學分！' },
-        { type: 'EVENT', subject: undefined, title: '？號校園突發事件', desc: '走廊上突然發生神祕意外事件！' },
-        { type: 'EXTRACURRICULAR', subject: '課外', title: '課外時事大百科', desc: '報章雜誌生活冷知識測驗！' },
-        { type: 'TALENT', subject: '常識', title: '奧林匹克競賽題', desc: '金牌挑戰！極高難度思維題目！' },
-        { type: 'CANTEEN', subject: undefined, title: '歷屆筆記傳授', desc: '向學長姐請益考試技巧與補充道具！' }
-      ];
+  const upperPool = [
+    { type: 'QUIZ', subject: '自然', title: '理化隨堂考', desc: '實驗室化學分析測驗！' },
+    { type: 'QUIZ', subject: '流行音樂', title: '音樂隨堂考', desc: '五線譜旋律與華語流行音樂題！' },
+    { type: 'THREE_CHOICE', subject: '時事冷知識', title: '三選一送分格', desc: '只有三個選項的送分題目！' },
+    { type: 'CANTEEN', subject: undefined, title: 'LUCKY 校園福利社', desc: '旭日光芒補給站！購買戰略道具與養樂多！' },
+    { type: 'QUIZ', subject: '社會', title: '文理小試', desc: '綜合歷史地理與社會人文測驗！' },
+    { type: 'TROUBLE', subject: undefined, title: 'TROUBLE 骷髏災難', desc: '校規記過警告！損失體力 20 點！' },
+    { type: 'RECOVERY', subject: undefined, title: '模擬考前自修', desc: '安靜溫習，體力與專注度完全回復！' },
+    // 20 關長征延伸格
+    { type: 'TALENT', subject: '數學', title: '代數極限挑戰', desc: '超微積分與聯考難題！' },
+    { type: 'EVENT', subject: undefined, title: '校園廣播尋人', desc: '廣播室突然插播重要尋人啟事！' },
+    { type: 'QUIZ', subject: '國文', title: '唐詩宋詞賞析', desc: '古典文采修辭填空！' },
+    { type: 'THREE_CHOICE', subject: '地理', title: '台灣鐵路三選一', desc: '縱貫鐵路車站大考驗！' },
+    { type: 'CANTEEN', subject: undefined, title: '福利社中途補給', desc: '補充提神飲料與答題文具！' },
+    { type: 'QUIZ', subject: '英文', title: '常春藤字彙測驗', desc: '文法克漏字大挑戰！' },
+    { type: 'HEALTH', subject: '體育', title: '體適能登階測驗', desc: '心肺耐力考驗，體力 +20 點！' },
+    { type: 'TROUBLE', subject: undefined, title: '突擊隨堂小考', desc: '未帶課本被記缺點！' },
+    { type: 'TALENT', subject: '自然', title: '全國科展金牌題', desc: '頂級科學競賽思維難題！' },
+    { type: 'RECOVERY', subject: undefined, title: '考前最後衝刺自修', desc: '全神貫注，進入最佳應考狀態！' }
+  ];
+
+  const lowerPool = [
+    { type: 'HEALTH', subject: '健康教育', title: '健康教育護理', desc: '生理衛生保健常識，體力回復 +25 點！' },
+    { type: 'QUIZ', subject: '美術', title: '美術色彩學', desc: '調色盤與西洋藝術史測驗！' },
+    { type: 'TALENT', subject: '數學', title: '天才問題挑戰', desc: '極限高難度題！答對可獲雙倍分數與大量學分！' },
+    { type: 'EVENT', subject: undefined, title: '？號校園突發事件', desc: '走廊上突然發生神祕意外事件！' },
+    { type: 'EXTRACURRICULAR', subject: '課外', title: '課外時事大百科', desc: '報章雜誌生活冷知識測驗！' },
+    { type: 'TALENT', subject: '常識', title: '奧林匹克競賽題', desc: '金牌挑戰！極高難度思維題目！' },
+    { type: 'CANTEEN', subject: undefined, title: '歷屆筆記傳授', desc: '向學長姐請益考試技巧與補充道具！' },
+    // 20 關長征延伸格
+    { type: 'QUIZ', subject: '歷史', title: '三國春秋戰史', desc: '歷史風雲英雄傳奇測驗！' },
+    { type: 'THREE_CHOICE', subject: '流行音樂', title: '金曲龍虎榜三選一', desc: '經典港台金曲年度冠軍題！' },
+    { type: 'EVENT', subject: undefined, title: '校長室喝茶談心', desc: '受到校長親切勉勵與加分！' },
+    { type: 'HEALTH', subject: '體育', title: '健康操大會操', desc: '伸展筋骨，體力回復 +20 點！' },
+    { type: 'TALENT', subject: '國文', title: '成語接龍大師', desc: '生僻成語形音義大挑戰！' },
+    { type: 'CANTEEN', subject: undefined, title: '舊書攤尋寶', desc: '淘到歷屆模擬試題密笈！' },
+    { type: 'QUIZ', subject: '公民', title: '三民主義與憲政', desc: '五權分立與法律常識考驗！' },
+    { type: 'TROUBLE', subject: undefined, title: '黑板值日生罰留', desc: '值日生擦黑板吸入粉筆灰！' },
+    { type: 'TALENT', subject: '課外', title: '百科全書狀元考', desc: '博古通今頂峰智力測驗！' },
+    { type: 'RECOVERY', subject: undefined, title: '圖書館文昌祈福', desc: '求取功名符令，心境沉穩！' }
+  ];
+
+  const upperTilesDef = upperPool.slice(0, branchCount);
+  const lowerTilesDef = lowerPool.slice(0, branchCount);
 
   upperTilesDef.forEach((item, i) => {
     tiles.push({
