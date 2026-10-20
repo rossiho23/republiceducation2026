@@ -36,6 +36,9 @@ export type GameLengthMode = 10 | 20;
 /** 晨昏時段列舉 (早晨升旗、正午課堂、黃昏放學、深夜夜讀) */
 export type TimeOfDay = 'DAWN' | 'DAY' | 'DUSK' | 'NIGHT';
 
+/** 遊戲介面視覺風格主題 (現代奢華旗艦版 或 1993 復古街機版) */
+export type VisualTheme = 'MODERN_LUXURY' | 'RETRO_ARCADE';
+
 /** 現代化題型列舉 */
 export type QuizQuestionType = 
   | 'STANDARD'      // 標準四選一文字考題

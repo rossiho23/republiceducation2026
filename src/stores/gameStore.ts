@@ -17,7 +17,8 @@ import {
   BranchType,
   SchoolRelic,
   GameLengthMode,
-  TimeOfDay
+  TimeOfDay,
+  VisualTheme
 } from '../types/quiz';
 import { 
   generateBoardTiles, 
@@ -124,7 +125,22 @@ export const useGameStore = defineStore('gameStore', () => {
   const continueCountdown = ref<number>(9);
   const continueTimer = ref<number | null>(null);
 
-  // 關卡長度模式 (5 關速通 或 10 關馬拉松，預設 10)
+  // 介面風格主題 (預設現代版 MODERN_LUXURY，可切換 RETRO_ARCADE)
+  const savedTheme = (typeof localStorage !== 'undefined' ? localStorage.getItem('REPUBLIC_QUIZ_THEME') : null) as VisualTheme | null;
+  const visualTheme = ref<VisualTheme>(savedTheme || 'MODERN_LUXURY');
+
+  /**
+   * 切換視覺風格主題 (現代旗艦版 ⇄ 1993 復古街機版)
+   */
+  function toggleVisualTheme(): void {
+    visualTheme.value = visualTheme.value === 'MODERN_LUXURY' ? 'RETRO_ARCADE' : 'MODERN_LUXURY';
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('REPUBLIC_QUIZ_THEME', visualTheme.value);
+    }
+    soundEngine.playCoin();
+  }
+
+  // 關卡長度模式 (10 關挑戰 或 20 關長征，預設 10)
   const gameLength = ref<GameLengthMode>(10);
 
   // ================= 輔助計算屬性 =================
@@ -971,7 +987,9 @@ export const useGameStore = defineStore('gameStore', () => {
     remainingLayers,
     currentTimeOfDay,
 
-    // 關卡長度模式
+    // 主題與長度模式
+    visualTheme,
+    toggleVisualTheme,
     gameLength,
 
     // 現代化博弈與肉鴿狀態

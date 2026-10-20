@@ -67,6 +67,15 @@
       <!-- 功能按鈕群 -->
       <div class="flex items-center gap-2">
         <button
+          @click="gameStore.toggleVisualTheme()"
+          class="neo-btn bg-[#ea580c] hover:bg-[#f97316] text-white text-xs sm:text-sm font-black py-1.5 px-3 neo-cut-sm tracking-wider shadow-[2px_2px_0px_#000] cursor-pointer flex items-center gap-1"
+          title="切換為現代版擬真介面"
+        >
+          <span>🎨</span>
+          <span>切換現代版</span>
+        </button>
+
+        <button
           @click="$emit('switch-to-roguelike')"
           class="neo-btn neo-btn-yellow text-black text-xs sm:text-sm font-black py-1.5 px-3.5 neo-cut-sm tracking-wider shadow-[2px_2px_0px_#000] cursor-pointer"
         >
@@ -548,6 +557,7 @@
 import { computed, onMounted, onUnmounted } from 'vue';
 import { useGameStore } from '../../stores/gameStore';
 import RetroTileIcon from './RetroTileIcon.vue';
+import ModernGameBoard from './ModernGameBoard.vue';
 import { PIXEL_MASCOT_ON_DICE } from '../../assets/pixelArt';
 
 const emit = defineEmits<{

@@ -670,3 +670,71 @@ sequenceDiagram
         Board->>Store: 更新時段 ➔ NIGHT 深夜挑燈夜戰
     end
 ```
+
+
+---
+
+## 13. 「現代旗艦版擬真金屬雙軌介面與雙風格切換系統」規格 (Modern Luxury Theme & Visual Style Switcher Spec)
+
+### 13.1 需求背景與核心目標
+依據使用者提供之高解析度現代版設計截圖 (`pic/國小.jfif`、`pic/國中.jfif`、`pic/高中.jfif`、`pic/大學.jfif`)，建立與截圖完全一致之現代旗艦級手遊視覺系統，並支援與 1993 復古街機版的一鍵無縫切換：
+1. **雙視覺風格切換機制**：
+   * `MODERN_LUXURY`（現代旗艦版）：100% 依據最新設計圖還原之奢華深酒紅暗紋金屬立體卡匣雙軌介面與學程專屬精緻校舍舞台。
+   * `RETRO_ARCADE`（1993 復古街機版）：保留原創 16-Bit 點陣像素手繪、黑黃警戒斑馬紋與日系新潮街機大字報介面。
+   * 玩家可在頂部隨時一鍵切換，狀態持久化儲存於瀏覽器 LocalStorage。
+2. **現代版視覺架構規範**：
+   * **上半部（學程專屬校舍與主角舞台）**：
+     - **國小**：木牌小雛菊鉛筆「國民小學」招牌、彩色小學校舍、鐘樓尖塔時鐘、遠山、操場溜滑梯與彩虹跑道，黃帽紅書包小學生趴在深藍 3D 骰子上，前方配備「🎲 X 步」金屬藍光膠囊指示器。
+     - **國中**：金屬深木牌「國民中學」招牌、現代三層水泥教學樓、藍紅運動場跑道、升旗台，立領短髮國中生。
+     - **高中**：典雅深木招牌「高級中學」、大型排窗教學大樓、校徽時鐘樓，高中青年學生。
+     - **大學**：綠藤校徽盾牌「綜合大學」木牌、巴洛克圓頂總圖書館、羅馬柱列門廊、歐式噴泉廣場與草坪，戴學士帽著學士袍夾著書本的大學畢業生。
+   * **下半部（奢華暗酒紅金屬立體卡匣棋盤）**：
+     - 底層：深邃奢華的暗酒紅幾何暗紋底板與暗光漸層。
+     - 左側：【起點 昇學】金色金屬凹槽立體卡匣 +【分叉點 雙箭頭】霓虹青藍發光卡匣。
+     - 中央雙軌：
+       * 上路「路線上」（深青色發光膠囊標籤）：自然（顯微鏡）、音樂（金音符）、三選一、福利社（立體小雨棚商店）、社會（地球儀）、TROUBLE（黑紅骷髏警告三角）。
+       * 下路「路線下」（深紫紅發光膠囊標籤）：健康教育（立體紅心）、美術（調色盤水彩筆）、天才問題（發光藍色人腦問號）、事件（紫色發光問號）、課外時事（書本問號）、天才問題（厚書本）、福利社。
+     - 右側：【終點 升學大考】超華麗金色雕花發光神聖大考卡匣，金色神聖光暈、金色雕花外框、發光試卷與羽毛筆。
+     - 步數指示器：玩家當前所在卡匣觸發呼吸金色/青藍微動霓虹光暈與立體浮起動畫。
+
+### 13.2 資料結構定義
+```typescript
+/** 遊戲介面視覺風格主題 */
+export type VisualTheme = 'MODERN_LUXURY' | 'RETRO_ARCADE';
+```
+
+### 13.3 系統架構流程圖 (Flowchart)
+```mermaid
+flowchart TD
+    A["玩家點擊頂部 [🎨 切換風格] 按鈕"] --> B["gameStore.toggleVisualTheme()"]
+    B --> C{"判斷目標主題"}
+    C -- "切換至 MODERN_LUXURY" --> D["載入各學程專屬現代校舍高清舞台"]
+    D --> E["載入深酒紅金屬立體雙軌卡匣棋盤 (ModernGameBoard)"]
+    D --> F["啟動現代金屬藍光膠囊步數指示器"]
+    C -- "切換至 RETRO_ARCADE" --> G["載入 16-Bit 程式化像素校舍與晨昏演色 (RetroGameBoard)"]
+    G --> H["載入 1993 經典街機日系大字報與戰術切角介面"]
+    E & H --> I["保存偏好至 LocalStorage，無縫保留當前題目與遊玩進度"]
+```
+
+### 13.4 循序圖 (Sequence Diagram)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Player as 玩家 (Player)
+    participant HUD as 地圖頂部資訊列 (HUD)
+    participant Store as 遊戲核心狀態 (gameStore)
+    participant Modern as 現代版組件 (ModernGameBoard)
+    participant Retro as 復古版組件 (RetroGameBoard)
+
+    Player->>HUD: 點選 [🎨 現代版 / 街機版]
+    HUD->>Store: toggleVisualTheme()
+    Store->>Store: visualTheme = 'MODERN_LUXURY'
+    alt 現代版啟動
+        Store-->>Modern: 渲染對應學程之現代版高清校舍背景
+        Store-->>Modern: 渲染暗酒紅立體金屬卡匣雙軌地圖
+        Modern-->>Player: 呈現與設計稿一模一樣之現代奢華旗艦介面
+    else 復古版啟動
+        Store-->>Retro: 渲染 16-Bit 像素校舍與晨昏流轉
+        Retro-->>Player: 呈現 1993 經典街機大型電玩介面
+    end
+```
