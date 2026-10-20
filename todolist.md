@@ -166,3 +166,10 @@
 - [x] 產出大字報重構日誌至 `/log` 目錄與更新 `report.md`
 
 
+
+
+## 階段二十二：依使用者反饋還原為日系新潮街機撞色與大字報版面 (Rollback to Neo-Arcade Style)
+- [x] 執行 Git Revert 撤銷 SaaS 風格，完整還原日系新潮街機撞色 (Neo-Arcade)、16-Bit 像素美術與寬屏沉浸大字報版面
+- [x] 執行本地 `npm run build` 編譯檢驗確認 100% 通過
+- [x] 更新 `spec.md`、`report.md` 與任務日誌 `log/20261020_8.md`
+- [x] 將還原代碼推送至遠端 GitHub 倉庫重新發布
