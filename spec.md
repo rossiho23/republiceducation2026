@@ -743,13 +743,14 @@ sequenceDiagram
 
 ## 14. 開頭映畫劇院與全域背景音樂架構 (Intro Cinema & Global BGM)
 
-### 14.1 設計理念與功能目標
-1. **開頭劇院全螢幕模式 (Intro Cinema)**：
-   - 玩家重整網頁 (F5) 或初次進入遊戲首頁時，以黑底大型街機劇院全螢幕播放 `開頭.mp4` 片頭動畫。
-   - 畫面右下方提供「⏩ 跳過片頭 (SPACE / 點擊)」戰術按鈕，供熟練玩家迅速跳過。
-   - 瀏覽器 Autoplay 解鎖相容：若瀏覽器阻擋無手勢音訊自動播放，中央呈現日系街機「▶ 點擊啟動街機映畫」提示，點擊即解鎖影片與音訊上下文。
+### 14.1 設計理念與功能目標 (方案 A：街機投幣式啟動門 Coin Start)
+1. **街機投幣式開場映畫劇院 (Intro Cinema)**：
+   - 玩家重整網頁 (F5) 或初次進入遊戲首頁時，以黑底大型街機劇院全螢幕呈現日系霓虹「🪙 INSERT COIN · PRESS START TO WATCH INTRO」啟動門。
+   - 玩家點擊螢幕任一處或按下任意按鍵（<kbd>SPACE</kbd> / <kbd>ENTER</kbd>），瞬間解鎖瀏覽器最高等級的音訊與視訊播放授權（User Gesture），同時觸發投幣音效。
+   - 即刻滿版有聲播放 `開頭.mp4` 片頭動畫，右下方提供「⏩ 跳過片頭 [SPACE / 點擊]」戰術按鈕。
+   - 雙重路徑備援解析：優先使用 `import.meta.env.BASE_URL + 'media/intro.mp4'`，若解析失敗自動備援為相對路徑 `./media/intro.mp4`。
 2. **全域 BGM 智慧循環調度 (`The_Final_Question.mp3`)**：
-   - 開頭影片播畢或玩家跳過時，平滑淡出並切換至首頁，同時無縫自動啟動 `The_Final_Question.mp3` 背景音樂無限循環播放。
+   - 開頭影片播畢或玩家跳過時，平滑淡出並切換至首頁，同時**保證 100% 無縫自動啟動 `The_Final_Question.mp3` 背景音樂無限循環播放**。
    - 建立獨立音訊引擎 `bgmEngine.ts`，支援全域音量微調（預設 0.35 避免蓋過 Web Audio 答題音效）與靜音開關。
    - 街機框體 HUD 與地圖上方增設「🎵 BGM」控制按鈕，隨時可切換靜音或繼續播放。
 
@@ -765,53 +766,60 @@ export interface BgmState {
 
 /** 開頭片頭映畫狀態介面 */
 export interface IntroVideoState {
+  hasStarted: boolean; // 是否已投幣/點擊啟動
   isPlaying: boolean;
   hasEnded: boolean;
   isMuted: boolean;
-  requireUserInteraction: boolean;
 }
 ```
 
-### 14.3 開頭映畫與背景音樂流程圖 (Flowchart)
+### 14.3 開頭映畫與背景音樂流程圖 (Flowchart - 方案 A)
 ```mermaid
 flowchart TD
-    A["使用者打開網頁 / F5 重整"] --> B["載入 IntroCinema 開頭映畫組件"]
-    B --> C{"瀏覽器自動播放檢測"}
-    C -- "允許自動播放" --> D["滿版播放 開頭.mp4 (含聲音)"]
-    C -- "阻擋無互動音訊" --> E["顯示 [▶ 點擊啟動街機映畫] 互動解鎖層"]
-    E -->|點擊螢幕 / 按 SPACE| D
+    A["使用者打開網頁 / F5 重整"] --> B["滿版呈現 [🪙 INSERT COIN / PRESS START] 啟動門"]
+    B --> C["玩家點擊任意處 / 按 SPACE / 按 ENTER"]
+    C --> D["播放投幣音效 + 獲取瀏覽器最高等級 User Gesture"]
+    D --> E["100% 保證全螢幕有聲播放 開頭.mp4"]
 
-    D --> F{"影片播放狀態"}
-    F -- "影片播放完畢 (ended)" --> G["平滑淡出開頭劇院"]
+    E --> F{"影片播放狀態"}
+    F -- "影片播放完畢 (ended)" --> G["400ms 黑屏平滑淡出"]
     F -- "玩家點擊 [⏩ 跳過片頭]" --> G
 
     G --> H["顯示街機標題首頁 (TitleScreen)"]
-    G --> I["bgmEngine.play() 啟動 The_Final_Question.mp3 循環播放"]
-    I --> J["全域音量控制 (預設 35% 混音平衡)"]
-    J --> K["頂部 HUD 支援 [🎵 音樂開關] 隨時靜音/續播"]
+    G --> I["100% 保證 bgmEngine.play() 無縫循環播放 The_Final_Question.mp3"]
+    I --> J["全域音量平衡 (預設 35%)"]
+    J --> K["頂部 HUD 支援 [🎵 BGM] 即時靜音/續播"]
 ```
 
-### 14.4 開頭映畫與背景音樂循序圖 (Sequence Diagram)
+### 14.4 開頭映畫與背景音樂循序圖 (Sequence Diagram - 方案 A)
 ```mermaid
 sequenceDiagram
     autonumber
     actor Player as 玩家 (Player)
-    participant Cinema as 開頭映畫 (IntroCinema.vue)
+    participant Cinema as 開頭映畫門 (IntroCinema.vue)
+    participant AudioUtil as 投幣音效 (audioEngine)
     participant Video as 原生影片核心 (HTMLVideoElement)
     participant App as 主應用容器 (App.vue)
     participant BGM as 背景音樂引擎 (bgmEngine)
     participant Title as 標題首頁 (TitleScreen.vue)
 
-    Player->>App: 進入網站或重整頁面
+    Player->>App: 進入網站或 F5 重整頁面
     App->>Cinema: 掛載開頭映畫組件 (showIntro = true)
-    Cinema->>Video: 執行 video.play()
-    alt 瀏覽器允許播放
-        Video-->>Cinema: 開始播放片頭視訊
-    else 瀏覽器阻擋
-        Cinema-->>Player: 呈現「點擊啟動街機映畫」提示
-        Player->>Cinema: 點擊螢幕
-        Cinema->>Video: video.play() 解鎖播放
+    Cinema-->>Player: 呈現日系霓虹「🪙 INSERT COIN / PRESS START」
+    Player->>Cinema: 點擊螢幕任意處或按 SPACE
+    Cinema->>AudioUtil: 播放投幣音效 (playCoin)
+    Cinema->>Video: video.play() (取得瀏覽器授權，100% 原聲播放)
+    Video-->>Player: 滿版播放開頭影片
+
+    alt 玩家點擊跳過或影片播畢
+        Player->>Cinema: 點擊 [⏩ 跳過片頭] (或 video.onended)
     end
+    Cinema->>App: 觸發 complete 事件
+    App->>App: showIntro = false (卸載劇院)
+    App->>BGM: bgmEngine.play()
+    BGM-->>Player: 100% 無縫循環播放 The_Final_Question.mp3
+    App->>Title: 渲染日系街機標題首頁
+```
 
     alt 玩家點擊跳過或影片播畢
         Player->>Cinema: 點擊 [⏩ 跳過片頭] (或 video.onended)

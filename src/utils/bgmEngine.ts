@@ -2,7 +2,7 @@
  * @file bgmEngine.ts
  * @description 全域背景音樂 (BGM) 智慧循環播放引擎
  * 專為《民國教育委員會》設計，負責 The_Final_Question.mp3 之無縫循環播放、
- * 音量平衡、靜音控制以及瀏覽器 Autoplay 自動解鎖策略。
+ * 多重路徑備援容錯、音量平衡、靜音控制以及瀏覽器 Autoplay 自動解鎖策略。
  */
 
 import { reactive } from 'vue';
@@ -25,6 +25,8 @@ class BgmEngine {
   });
 
   private isInitialized = false;
+  private candidateIndex = 0;
+  private candidateSources: string[] = [];
 
   constructor() {
     // 從 LocalStorage 載入玩家靜音偏好
@@ -34,6 +36,15 @@ class BgmEngine {
         this.state.isMuted = savedMute === 'true';
       }
     }
+
+    const baseUrl = ((import.meta as any).env?.BASE_URL as string) || '/';
+    const cleanBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+    this.candidateSources = [
+      `${cleanBase}media/the_final_question.mp3`,
+      `${cleanBase}the_final_question.mp3`,
+      './media/the_final_question.mp3',
+      './the_final_question.mp3',
+    ];
   }
 
   /**
@@ -42,10 +53,7 @@ class BgmEngine {
   private initAudio(): void {
     if (this.isInitialized || typeof window === 'undefined') return;
 
-    const baseUrl = ((import.meta as any).env?.BASE_URL as string) || '/';
-    const cleanBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
-    const audioSrc = `${cleanBase}media/the_final_question.mp3`;
-
+    const audioSrc = this.candidateSources[this.candidateIndex];
     this.audio = new Audio(audioSrc);
     this.audio.loop = true; // 無限循環播放
     this.audio.volume = this.state.isMuted ? 0 : this.state.volume;
@@ -56,6 +64,18 @@ class BgmEngine {
 
     this.audio.addEventListener('pause', () => {
       this.state.isPlaying = false;
+    });
+
+    this.audio.addEventListener('error', () => {
+      console.warn(`BGM 來源載入失敗 [${this.candidateIndex}]: ${this.candidateSources[this.candidateIndex]}`);
+      if (this.candidateIndex < this.candidateSources.length - 1) {
+        this.candidateIndex += 1;
+        if (this.audio) {
+          this.audio.src = this.candidateSources[this.candidateIndex];
+          this.audio.load();
+          this.audio.play().catch(e => console.warn('BGM 備援路徑播放重試:', e));
+        }
+      }
     });
 
     this.isInitialized = true;
@@ -127,7 +147,7 @@ class BgmEngine {
   }
 
   /**
-   * 註冊玩家任意點擊或按鍵之手勢互動以解鎖播放
+   * 註冊玩家任意點擊或按鍵之手勢互動以解鎖播放 (使用 capture 事件監聽確保不被 stopPropagation 吞噬)
    */
   private setupUnlockOnInteraction(): void {
     const unlockHandler = async () => {
@@ -140,14 +160,14 @@ class BgmEngine {
           // 忽略二次攔截
         }
       }
-      window.removeEventListener('click', unlockHandler);
-      window.removeEventListener('keydown', unlockHandler);
-      window.removeEventListener('touchstart', unlockHandler);
+      window.removeEventListener('click', unlockHandler, true);
+      window.removeEventListener('keydown', unlockHandler, true);
+      window.removeEventListener('touchstart', unlockHandler, true);
     };
 
-    window.addEventListener('click', unlockHandler, { once: true });
-    window.addEventListener('keydown', unlockHandler, { once: true });
-    window.addEventListener('touchstart', unlockHandler, { once: true });
+    window.addEventListener('click', unlockHandler, { once: true, capture: true });
+    window.addEventListener('keydown', unlockHandler, { once: true, capture: true });
+    window.addEventListener('touchstart', unlockHandler, { once: true, capture: true });
   }
 }
 

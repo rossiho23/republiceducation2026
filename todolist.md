@@ -194,3 +194,14 @@
 - [x] 產出日誌至 `log/20261020_14.md` 與更新 `report.md`
 
 
+## 階段二十九：街機投幣式開場映畫與全域 BGM 雙重解鎖實作 (方案 A)
+- [x] 重構 `src/components/game/IntroCinema.vue`：採用街機投幣式啟動門 (INSERT COIN / PRESS START)，玩家手勢瞬間解鎖音訊與視訊
+- [x] 強化路徑雙重備援解析：在 `IntroCinema.vue` 與 `bgmEngine.ts` 支援 Base URL 與相對路徑備援，徹底杜絕 404
+- [x] 移除視訊載入錯誤時的瞬間閃退，改為顯示錯誤重試或友善提示
+- [x] 確保 `App.vue` 於開頭映畫完成後 100% 觸發 `bgmEngine.play()` 原聲播放
+- [x] 執行本地 `npm run build` 編譯檢驗確認 100% 通過
+- [x] 將修復代碼提交並推送到遠端 GitHub 倉庫自動發布
+- [x] 產出修復日誌至 `log/20261020_15.md` 與更新 `report.md`
+
+
+
