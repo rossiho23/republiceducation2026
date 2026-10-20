@@ -1,11 +1,17 @@
 /**
  * @file bgmEngine.ts
- * @description 全域背景音樂 (BGM) 與標題語音智慧混音引擎
- * 專為《民國教育委員會》設計，負責 The_Final_Question.mp3 之無縫循環播放、
- * 首頁「念標題.mp3」領銜播放與專業音訊避讓 (Audio Ducking) 漸強混音。
+ * @description 全域背景音樂 (BGM) 雙曲佇列播放電台與標題語音智慧混音引擎
+ * 專為《民國教育委員會》設計，負責 The_Final_Question.mp3 與 Ten_Second_Countdown.mp3 雙曲無縫交替輪播、
+ * 手動切歌 (Next Track)、首頁「念標題.mp3」音訊避讓 (Audio Ducking) 漸強混音。
  */
 
 import { reactive } from 'vue';
+
+export interface BgmTrack {
+  id: string;
+  title: string;
+  sources: string[];
+}
 
 export interface BgmState {
   /** 是否正在播放中 */
@@ -16,24 +22,29 @@ export interface BgmState {
   volume: number;
   /** 是否處於音訊避讓狀態 (降低襯底) */
   isDucking: boolean;
+  /** 當前播放曲目索引 */
+  currentTrackIndex: number;
+  /** 當前播放曲目名稱 */
+  currentTrackTitle: string;
 }
 
 class BgmEngine {
   private audio: HTMLAudioElement | null = null;
   private titleVoiceAudio: HTMLAudioElement | null = null;
+  private playlist: BgmTrack[] = [];
+  private titleVoiceSources: string[] = [];
+  private isInitialized = false;
+  private currentSourceFallbackIndex = 0;
+  private duckingTimer: number | null = null;
 
   public state: BgmState = reactive<BgmState>({
     isPlaying: false,
     isMuted: false,
     volume: 0.35, // 預設 35% 混音平衡
     isDucking: false,
+    currentTrackIndex: 0,
+    currentTrackTitle: 'The Final Question',
   });
-
-  private isInitialized = false;
-  private candidateIndex = 0;
-  private candidateSources: string[] = [];
-  private titleVoiceSources: string[] = [];
-  private duckingTimer: number | null = null;
 
   constructor() {
     // 從 LocalStorage 載入玩家靜音偏好
@@ -47,11 +58,28 @@ class BgmEngine {
     const baseUrl = ((import.meta as any).env?.BASE_URL as string) || '/';
     const cleanBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
 
-    this.candidateSources = [
-      `${cleanBase}media/the_final_question.mp3`,
-      `${cleanBase}the_final_question.mp3`,
-      './media/the_final_question.mp3',
-      './the_final_question.mp3',
+    // 雙曲播放佇列 (依序輪播：The Final Question ⇄ Ten Second Countdown)
+    this.playlist = [
+      {
+        id: 'THE_FINAL_QUESTION',
+        title: 'The Final Question',
+        sources: [
+          `${cleanBase}media/the_final_question.mp3`,
+          `${cleanBase}the_final_question.mp3`,
+          './media/the_final_question.mp3',
+          './the_final_question.mp3',
+        ],
+      },
+      {
+        id: 'TEN_SECOND_COUNTDOWN',
+        title: 'Ten Second Countdown',
+        sources: [
+          `${cleanBase}media/ten_second_countdown.mp3`,
+          `${cleanBase}ten_second_countdown.mp3`,
+          './media/ten_second_countdown.mp3',
+          './ten_second_countdown.mp3',
+        ],
+      },
     ];
 
     this.titleVoiceSources = [
@@ -60,18 +88,18 @@ class BgmEngine {
       './media/title_voice.mp3',
       './title_voice.mp3',
     ];
+
+    this.state.currentTrackTitle = this.playlist[0].title;
   }
 
   /**
-   * 初始化音訊元素與事件監聽
+   * 初始化當前曲目的音訊實例與事件監聽
    */
   private initAudio(): void {
     if (this.isInitialized || typeof window === 'undefined') return;
 
-    const audioSrc = this.candidateSources[this.candidateIndex];
-    this.audio = new Audio(audioSrc);
-    this.audio.loop = true; // 無限循環播放
-    this.audio.volume = this.state.isMuted ? 0 : this.state.volume;
+    this.audio = new Audio();
+    this.loadTrackByIndex(this.state.currentTrackIndex);
 
     this.audio.addEventListener('play', () => {
       this.state.isPlaying = true;
@@ -81,14 +109,22 @@ class BgmEngine {
       this.state.isPlaying = false;
     });
 
+    // 當前曲目播畢時，自動交替輪播下一首！
+    this.audio.addEventListener('ended', () => {
+      console.log(`曲目 [${this.state.currentTrackTitle}] 播畢，自動輪播下一首曲目！`);
+      this.nextTrack(true);
+    });
+
+    // 錯誤時自動切換備援路徑
     this.audio.addEventListener('error', () => {
-      console.warn(`BGM 來源載入失敗 [${this.candidateIndex}]: ${this.candidateSources[this.candidateIndex]}`);
-      if (this.candidateIndex < this.candidateSources.length - 1) {
-        this.candidateIndex += 1;
+      const currentTrack = this.playlist[this.state.currentTrackIndex];
+      console.warn(`BGM 來源載入失敗 [${this.currentSourceFallbackIndex}]: ${currentTrack.sources[this.currentSourceFallbackIndex]}`);
+      if (this.currentSourceFallbackIndex < currentTrack.sources.length - 1) {
+        this.currentSourceFallbackIndex += 1;
         if (this.audio) {
-          this.audio.src = this.candidateSources[this.candidateIndex];
+          this.audio.src = currentTrack.sources[this.currentSourceFallbackIndex];
           this.audio.load();
-          this.audio.play().catch(e => console.warn('BGM 備援路徑播放重試:', e));
+          this.audio.play().catch(e => console.warn('BGM 備援路徑播放重試中:', e));
         }
       }
     });
@@ -97,7 +133,22 @@ class BgmEngine {
   }
 
   /**
-   * 啟動背景音樂循環播放
+   * 載入指定索引的曲目
+   * @param {number} index 曲目索引
+   */
+  private loadTrackByIndex(index: number): void {
+    if (!this.audio) return;
+    this.state.currentTrackIndex = index;
+    const track = this.playlist[index];
+    this.state.currentTrackTitle = track.title;
+    this.currentSourceFallbackIndex = 0;
+    this.audio.src = track.sources[0];
+    this.audio.loop = false; // 由 ended 事件自動輪播下一首，而非單曲重複
+    this.audio.volume = this.state.isMuted ? 0 : (this.state.isDucking ? 0.12 : this.state.volume);
+  }
+
+  /**
+   * 啟動背景音樂播放
    */
   public async play(): Promise<void> {
     this.initAudio();
@@ -116,7 +167,6 @@ class BgmEngine {
 
   /**
    * 播放標題語音「念標題.mp3」，並同時執行 BGM 音訊避讓 (Audio Ducking)
-   * 在念標題期間將 BGM 壓低至 12% 襯底，語音結束後平滑回復至 35%
    */
   public async playTitleVoiceWithDucking(): Promise<void> {
     this.initAudio();
@@ -137,10 +187,9 @@ class BgmEngine {
 
     if (this.titleVoiceAudio) {
       try {
-        this.titleVoiceAudio.volume = this.state.isMuted ? 0 : 1.0; // 標題大聲清晰
+        this.titleVoiceAudio.volume = this.state.isMuted ? 0 : 1.0;
         this.titleVoiceAudio.currentTime = 0;
 
-        // 監聽播畢事件以回復 BGM 音量
         const onVoiceEnded = () => {
           this.fadeRestoreBgmVolume();
           this.titleVoiceAudio?.removeEventListener('ended', onVoiceEnded);
@@ -154,11 +203,31 @@ class BgmEngine {
       }
     }
 
-    // 安全計時器：即使 ended 事件未觸發，2 秒後也強行漸強回復
     if (this.duckingTimer) clearTimeout(this.duckingTimer);
     this.duckingTimer = window.setTimeout(() => {
       this.fadeRestoreBgmVolume();
     }, 2000);
+  }
+
+  /**
+   * 切換至下一首曲目 (支援雙曲無限輪流切換)
+   * @param {boolean} autoPlay 是否在切換後立即自動播放
+   */
+  public nextTrack(autoPlay = true): void {
+    this.initAudio();
+    if (!this.audio) return;
+
+    // 雙曲索引切換 (0 -> 1 -> 0 -> 1 ...)
+    const nextIndex = (this.state.currentTrackIndex + 1) % this.playlist.length;
+    this.loadTrackByIndex(nextIndex);
+
+    if (autoPlay && !this.state.isMuted) {
+      this.audio.play().then(() => {
+        this.state.isPlaying = true;
+      }).catch(err => {
+        console.warn('切換下一首播放失敗:', err);
+      });
+    }
   }
 
   /**

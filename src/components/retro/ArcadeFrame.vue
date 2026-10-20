@@ -60,17 +60,32 @@
             {{ isCrtActive ? 'ON' : 'OFF' }}
           </span>
         </button>
-        <!-- 背景音樂開關 (The Final Question) -->
-        <button 
-          @click="toggleBgm"
-          class="neo-btn bg-[#121620] hover:bg-[#1a2130] text-gray-200 py-1.5 px-3 flex items-center gap-1.5 text-xs sm:text-sm tracking-wider font-bold"
-          :title="bgmEngine.state.isMuted ? '開啟背景音樂 (The Final Question)' : '靜音背景音樂'"
-        >
-          <span class="text-rose-400 font-mono">BGM:</span>
-          <span :class="!bgmEngine.state.isMuted ? 'text-emerald-400 font-black' : 'text-red-500'">
-            {{ !bgmEngine.state.isMuted ? 'ON ♫' : 'MUTE' }}
-          </span>
-        </button>
+        <!-- 背景音樂控制組合鍵 (雙曲佇列電台：The Final Question ⇄ Ten Second Countdown) -->
+        <div class="flex items-center gap-1 bg-[#121620] border border-black p-0.5 neo-cut-sm">
+          <!-- 播放/靜音開關 -->
+          <button 
+            @click="toggleBgm"
+            class="neo-btn bg-transparent hover:bg-[#1a2130] text-gray-200 py-1 px-2.5 flex items-center gap-1.5 text-xs tracking-wider font-bold cursor-pointer"
+            :title="bgmEngine.state.isMuted ? '開啟背景音樂' : '靜音背景音樂'"
+          >
+            <span class="text-rose-400 font-mono">BGM:</span>
+            <span :class="!bgmEngine.state.isMuted ? 'text-emerald-400 font-black' : 'text-red-500'">
+              {{ !bgmEngine.state.isMuted ? `[♫ ${bgmEngine.state.currentTrackIndex + 1}/2]` : 'MUTE' }}
+            </span>
+            <span class="text-gray-300 hidden md:inline text-[11px] truncate max-w-[130px]">
+              {{ bgmEngine.state.currentTrackTitle }}
+            </span>
+          </button>
+
+          <!-- 切換下一首按鈕 -->
+          <button
+            @click="handleNextBgmTrack"
+            class="neo-btn bg-[#182030] hover:bg-yellow-400 hover:text-black text-yellow-300 py-1 px-2 text-xs font-black cursor-pointer transition-colors"
+            title="手動切換下一首背景音樂 (The Final Question ⇄ Ten Second Countdown)"
+          >
+            <span>⏭️</span>
+          </button>
+        </div>
 
 
 
@@ -185,6 +200,13 @@ function toggleBgm(): void {
   if (!bgmEngine.state.isMuted && !bgmEngine.state.isPlaying) {
     bgmEngine.play();
   }
+}
+
+/**
+ * 手動切換下一首背景音樂 (The Final Question ⇄ Ten Second Countdown)
+ */
+function handleNextBgmTrack(): void {
+  bgmEngine.nextTrack(true);
 }
 
 function toggleMute(): void {

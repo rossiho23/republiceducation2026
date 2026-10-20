@@ -214,5 +214,16 @@
 - [x] 產出日誌至 `log/20261020_16.md` 與更新 `report.md`
 
 
+## 階段三十一：雙曲佇列交替輪播與現代版最新校舍圖全面升級 (方案 A)
+- [x] 部署多媒體資產：將 `pic/Ten_Second_Countdown.mp3` 與最新四張校舍 (`國小.jfif`, `國中.jfif`, `高中.jfif`, `大學.jfif`) 同步部署至 `public/media/` 與 `public/modern/`
+- [x] 重構 `src/utils/bgmEngine.ts`：實作 Playlist 雙曲播放清單佇列 (`The_Final_Question` ⇄ `Ten_Second_Countdown`)，曲目播畢自動無縫切換下一首，支援手動切歌 `nextTrack()`
+- [x] 升級街機外框頂部 HUD (`src/components/retro/ArcadeFrame.vue`)：呈現當前曲名狀態標籤並增設「⏭️ 下一首」手動切換按鈕
+- [x] 更新現代版地圖組件 (`src/components/game/ModernGameBoard.vue`)：校舍背景載入全面對齊 2026-10-20 最新版 `.jfif` 格式
+- [x] 執行本地 `npm run build` 編譯檢驗確認 100% 通過
+- [x] 將新功能代碼提交並推送到遠端 GitHub 倉庫自動發布
+- [x] 產出日誌至 `log/20261020_17.md` 與更新 `report.md`
+
+
+
 
 

@@ -330,8 +330,8 @@ const currentModernSchoolBg = computed(() => {
   switch (gameStore.currentStage) {
     case '國小': return `${cleanBase}modern/school_elementary.jfif`;
     case '國中': return `${cleanBase}modern/school_junior.jfif`;
-    case '高中': return `${cleanBase}modern/school_high.png`;
-    case '大學': return `${cleanBase}modern/school_university.png`;
+    case '高中': return `${cleanBase}modern/school_high.jfif`;
+    case '大學': return `${cleanBase}modern/school_university.jfif`;
     default: return `${cleanBase}modern/school_elementary.jfif`;
   }
 });

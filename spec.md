@@ -741,29 +741,46 @@ sequenceDiagram
 
 ---
 
-## 14. 開頭映畫劇院、標題語音與全域背景音樂架構 (Intro Cinema, Title Voice & Global BGM)
+## 14. 開頭映畫劇院、標題語音與雙曲輪播背景音樂架構 (Intro Cinema, Title Voice & Dual BGM Playlist)
 
-### 14.1 設計理念與功能目標 (方案 A：標題語音領銜 + BGM 音訊避讓漸強)
+### 14.1 設計理念與功能目標 (方案 A：智慧雙曲輪播電台 + HUD 切歌器 + 最新校舍)
 1. **街機投幣式開場映畫劇院 (Intro Cinema)**：
    - 玩家重整網頁 (F5) 或初次進入遊戲首頁時，以黑底大型街機劇院全螢幕呈現日系霓虹「🪙 INSERT COIN · PRESS START TO WATCH INTRO」啟動門。
    - 玩家點擊螢幕任一處或按下任意按鍵（<kbd>SPACE</kbd> / <kbd>ENTER</kbd>），瞬間解鎖瀏覽器最高等級的音訊與視訊播放授權（User Gesture），同時觸發投幣音效。
-   - 即刻滿版有聲播放最新片頭動畫 `pic/1020.mp4`，右下方提供「⏩ 跳過片頭 [SPACE / 點擊]」戰術按鈕。
-   - 多重備援解析：依序備援 `media/1020.mp4` ➔ `1020.mp4`，徹底杜絕 404。
+   - 滿版有聲播放最新片頭動畫 `pic/1020.mp4`，右下方提供「⏩ 跳過片頭 [SPACE / 點擊]」戰術按鈕。
 2. **首頁標題語音大吼 (`念標題.mp3`)**：
    - 片頭動畫播畢或玩家跳過進入首頁瞬間，**立即以最高清晰度播放 `念標題.mp3`（街機主標題語音「民國教育委員會！」）**。
-3. **全域 BGM 智慧循環調度與音訊避讓 (`The_Final_Question.mp3`)**：
-   - 背景音樂 `The_Final_Question.mp3` 與標題語音同步啟動，但引入專業「**音訊避讓 (Audio Ducking)**」機制：在念標題的 1.5 秒期間，BGM 音量先微降至 15% 襯底，避免掩蓋標題大喊；語音播畢後平滑漸強回復至 35% 常駐循環播放。
-   - 街機框體 HUD 頂部維持「🎵 BGM」控制按鈕，隨時可切換靜音或繼續播放。
+3. **智慧雙曲交替輪播背景音樂 (`bgmEngine.ts`)**：
+   - 內建播放清單佇列：
+     - 曲目 1：`The_Final_Question.mp3` (最後審判大考曲)
+     - 曲目 2：`Ten_Second_Countdown.mp3` (十秒命運倒數曲)
+   - 監聽曲目播畢事件（`ended`），自動接續播放下一首，達到「雙曲交替無限輪播」。
+   - 支援「**音訊避讓 (Audio Ducking)**」：在首頁念標題的 1.5 秒期間，BGM 音量先微降至 12% 襯底，語音播畢後平滑漸強回復至 35% 常駐播放。
+   - 街機框體頂部 HUD 升級：顯示當前曲名狀態（如 `[♫ 1/2] The Final Question`），並新增「⏭️ 下一首」按鈕，玩家可隨時手動換歌。
+4. **現代旗艦版校舍圖全面升級 (`ModernGameBoard.vue`)**：
+   - 國小、國中、高中、大學四大學程全面採用 2026-10-20 最新版 `.jfif` 圖資：
+     - `public/modern/school_elementary.jfif`
+     - `public/modern/school_junior.jfif`
+     - `public/modern/school_high.jfif`
+     - `public/modern/school_university.jfif`
 
 ### 14.2 資料結構定義
 ```typescript
+/** 背景音樂曲目定義 */
+export interface BgmTrack {
+  id: string;
+  title: string;
+  sources: string[];
+}
+
 /** 背景音樂引擎狀態介面 */
 export interface BgmState {
   isPlaying: boolean;
   isMuted: boolean;
   volume: number; // 0.0 ~ 1.0
   isDucking: boolean; // 是否正在進行音訊避讓 (降低襯底)
-  currentTrack: string;
+  currentTrackIndex: number;
+  currentTrackTitle: string;
 }
 
 /** 開頭片頭映畫狀態介面 */
@@ -776,7 +793,7 @@ export interface IntroVideoState {
 }
 ```
 
-### 14.3 開頭映畫、標題語音與背景音樂流程圖 (Flowchart - 方案 A)
+### 14.3 開頭映畫、標題語音與雙曲輪播流程圖 (Flowchart - 方案 A)
 ```mermaid
 flowchart TD
     A["使用者打開網頁 / F5 重整"] --> B["滿版呈現 [🪙 INSERT COIN / PRESS START] 啟動門"]
@@ -790,13 +807,20 @@ flowchart TD
 
     G --> H["進入首頁 (TitleScreen)"]
     G --> I["前景立即大聲播放 念標題.mp3 ('民國教育委員會！')"]
-    G --> J["背景啟動 The_Final_Question.mp3 (啟動 Ducking: 音量微降至 15% 襯底)"]
+    G --> J["背景啟動曲目一 The_Final_Question (啟動 Ducking: 音量微降至 12% 襯底)"]
     
-    I -->|語音播畢 (ended)| K["BGM 平滑漸強回復至 35% 常駐循環播放"]
-    K --> L["頂部 HUD 支援 [🎵 BGM] 即時靜音/續播"]
+    I -->|語音播畢 (ended)| K["BGM 平滑漸強回復至 35% 常駐播放"]
+    
+    J --> M{"曲目播放結束判定"}
+    M -- "曲目一播放完畢 (ended)" --> N["自動切換播放 曲目二 Ten_Second_Countdown"]
+    M -- "曲目二播放完畢 (ended)" --> O["自動切換回 曲目一 The_Final_Question"]
+    M -- "玩家手動點擊 HUD [⏭️ 下一首]" --> P["立即淡出並切換至下一首曲目"]
+    N & O & P --> M
+
+    K --> L["頂部 HUD 呈現 [♫ 曲目] + [⏭️ 下一首] + [MUTE 開關]"]
 ```
 
-### 14.4 開頭映畫、標題語音與背景音樂循序圖 (Sequence Diagram - 方案 A)
+### 14.4 開頭映畫、標題語音與雙曲輪播循序圖 (Sequence Diagram - 方案 A)
 ```mermaid
 sequenceDiagram
     autonumber
@@ -806,24 +830,31 @@ sequenceDiagram
     participant App as 主應用容器 (App.vue)
     participant TitleVoice as 標題語音 (念標題.mp3)
     participant BGM as 背景音樂引擎 (bgmEngine)
-    participant Title as 標題首頁 (TitleScreen.vue)
+    participant ModernBoard as 現代版校舍 (ModernGameBoard.vue)
 
     Player->>App: 進入網站或 F5 重整頁面
     App->>Cinema: 掛載開頭映畫組件 (showIntro = true)
     Cinema-->>Player: 呈現日系霓虹「🪙 INSERT COIN / PRESS START」
     Player->>Cinema: 點擊螢幕任意處或按 SPACE
-    Cinema->>Video: video.play() (取得瀏覽器授權，100% 原聲播放 1020.mp4)
-    Video-->>Player: 滿版播放最新開頭影片
+    Cinema->>Video: video.play() (原聲放映 1020.mp4)
+    Video-->>Player: 滿版播放片頭影片
 
     alt 玩家點擊跳過或影片播畢
         Player->>Cinema: 點擊 [⏩ 跳過片頭] (或 video.onended)
     end
     Cinema->>App: 觸發 complete 事件
-    App->>App: showIntro = false (卸載劇院)
-    App->>Title: 渲染日系街機標題首頁
     App->>TitleVoice: 播放「念標題.mp3」(前景高音量)
-    App->>BGM: bgmEngine.playWithDucking() (背景音量 15% 襯底)
-    TitleVoice-->>App: 語音播放結束
-    App->>BGM: bgmEngine.restoreVolume() (平滑回復至 35% 循環)
+    App->>BGM: bgmEngine.playTitleVoiceWithDucking() (曲目一，音量 12% 襯底)
+    TitleVoice-->>BGM: 語音播放結束，平滑回復至 35%
+    
+    loop 雙曲無限輪流播放
+        BGM->>BGM: 曲目一結束 -> 自動播放曲目二
+        BGM->>BGM: 曲目二結束 -> 自動播放曲目一
+    end
+
+    opt 進入現代旗艦版
+        App->>ModernBoard: 載入最新校舍圖 (.jfif 國小/國中/高中/大學)
+        ModernBoard-->>Player: 呈現最新校舍美學
+    end
 ```
 
