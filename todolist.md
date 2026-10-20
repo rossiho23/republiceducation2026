@@ -241,6 +241,15 @@
 - [x] 產出日誌至 `log/20261020_19.md` 與更新 `report.md`
 
 
+## 階段三十四：GitHub 官方 Releases 頁面正式發布 (方案 A)
+- [ ] 提取 `RELEASE_NOTES.md` 中 `v2.5.0` 之完整發布日誌正文
+- [ ] 使用 GitHub CLI (`gh release create v2.5.0`) 於遠端倉庫正式建立發布與 Git Tag
+- [ ] 驗證 GitHub Releases 專頁發布成功，取得官方 Release URL
+- [ ] 執行本地 `npm run build` 編譯檢驗確認 100% 通過
+- [ ] 產出日誌至 `log/20261020_20.md` 與更新 `report.md`
+
+
+
 
 
 

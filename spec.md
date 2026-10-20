@@ -872,6 +872,7 @@ sequenceDiagram
    - 🎨 **視覺風格與街機美學優化 (UI / UX)**
    - 🎵 **音效多媒體與混音控制 (Audio / Media)**
 4. **語言強制**：所有 Release Notes 內容**強制使用繁體中文 (Traditional Chinese)**。
+5. **GitHub 官方 Releases 同步發布**：每次推送完成後，系統同步透過 GitHub CLI (`gh release create <tag>`) 於 GitHub 官方專頁發布對應版本的正式 Release，確保專案首頁右側 Releases 標籤與版本公告完整呈現。
 
 ### 15.2 版本發布工作流程圖 (Flowchart)
 ```mermaid
@@ -880,7 +881,8 @@ flowchart TD
     B --> C["編寫 / 更新根目錄 RELEASE_NOTES.md"]
     C --> D["同步更新 todolist.md 與 report.md"]
     D --> E["執行 git commit -m '...'"]
-    E --> F["執行 git push origin main 發布"]
-    F --> G["回報使用者時附上當次 Release Note 摘要"]
+    E --> F["執行 git push origin main 發布代碼"]
+    F --> G["執行 gh release create 發布 GitHub 官方版本"]
+    G --> H["回報使用者時附上當次 Release Note 摘要與官方連結"]
 ```
 
