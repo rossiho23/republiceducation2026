@@ -1,145 +1,153 @@
 <template>
-  <!-- 現代極簡 SaaS 風格 首頁標題與模式選擇組件 (Linear / Vercel Hero & Mode Cards) -->
-  <div class="flex flex-col items-center justify-center flex-1 py-8 px-4 text-center select-none">
+  <!-- 日系新潮街機風 標題畫面組件 (Neo-Arcade Title Screen) -->
+  <div class="flex flex-col items-center justify-center flex-1 py-4 px-2 text-center font-mono select-none">
     
-    <!-- 頂部微膠囊標籤 (Linear 經典微光) -->
-    <div class="mb-4">
-      <span class="saas-pill saas-pill-indigo text-xs">
-        ★ Spec-Driven Web Architecture · 2026 Edition
+    <!-- 頂部日系街機系列副標題 -->
+    <div class="inline-block bg-black border-2 border-yellow-400 px-3 py-1 mb-3 shadow-[3px_3px_0px_#ffe600] transform -rotate-1">
+      <span class="text-xs font-black tracking-widest text-yellow-400">
+        // TAIWAN ARCADE 1993 · NEO WEB REMAKE 2026 //
       </span>
     </div>
 
-    <!-- 主視覺 Hero 大標題 (極簡無襯線緊湊大字) -->
-    <div class="max-w-3xl mx-auto mb-3">
-      <h1 class="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-zinc-100 leading-tight">
+    <!-- 主視覺粗黑大字報標題 (Persona 5 式斜體立體字) -->
+    <div class="relative my-2">
+      <h1 class="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-yellow-400 neo-skew-title neo-text-stroke leading-none">
         民國教育委員會
       </h1>
-      <p class="text-sm sm:text-base md:text-lg text-zinc-400 mt-4 leading-relaxed max-w-2xl mx-auto">
-        將 1993 街機經典問答昇華為當代現代化知識測驗套件。支援輕度肉鴿樹狀選路、雙軌卡匣軌道與全自訂題庫。
-      </p>
+      <!-- 疊層裝飾副標 -->
+      <div class="mt-2 text-xs sm:text-sm font-black tracking-widest text-white uppercase bg-[#ff0055] inline-block px-3 py-1 border-2 border-black shadow-[4px_4px_0px_#000] transform rotate-1">
+        CLASSIC ARCADE × SLAY THE SPIRE ROGUELIKE
+      </div>
     </div>
 
-    <!-- 模式選擇卡片 (Bento Grid 現代卡片 · 8px 倍數留白 · p-6 內距) -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl w-full my-8">
+    <!-- 投幣警示條 (黑黃警戒斑馬條紋 · 尺寸放大) -->
+    <div class="my-5 w-full max-w-xl neo-hazard-yellow p-1 neo-cut-sm border-2 border-black shadow-[4px_4px_0px_#000]">
+      <div class="bg-black py-2 px-5 text-center">
+        <span class="text-yellow-400 font-black text-sm sm:text-base tracking-widest animate-pulse">
+          ▶ 1 COIN 1 PLAY · 請選擇入學推進模式 ◀
+        </span>
+      </div>
+    </div>
+
+    <!-- 模式選擇卡片 (三張日系戰術斜切卡片 · 寬屏加大版) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl w-full my-4">
       
-      <!-- 模式一：輕度肉鴿選路 (推薦主推模式) -->
+      <!-- 模式一：輕度肉鴿選路 (現代主推) -->
       <div 
         @click="startRoguelike"
-        class="saas-card saas-card-interactive p-6 sm:p-8 text-left flex flex-col justify-between group"
+        class="bg-[#0c0f17] border-[3px] border-yellow-400 p-6 text-left cursor-pointer neo-cut shadow-[6px_6px_0px_#ffe600] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_#ffe600] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#ffe600] transition-all flex flex-col justify-between group relative overflow-hidden"
       >
+        <!-- 背景裝飾暗紋 -->
+        <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-yellow-400/10 rounded-full pointer-events-none"></div>
+
         <div>
           <!-- 卡片頂部標籤 -->
-          <div class="flex items-center justify-between mb-4 pb-3 border-b border-white/[0.08]">
-            <span class="saas-pill saas-pill-indigo text-xs font-semibold">
-              推薦首選
+          <div class="flex items-center justify-between mb-3 border-b-2 border-yellow-400/40 pb-2.5">
+            <span class="px-2.5 py-1 bg-yellow-400 text-black text-xs font-black uppercase tracking-wider">
+              [RECOMMENDED]
             </span>
-            <span class="text-xs font-mono text-zinc-500">
+            <span class="text-sm font-mono font-bold text-yellow-300">
               MODE 01
             </span>
           </div>
 
           <!-- 卡片標題 -->
-          <h3 class="text-xl sm:text-2xl font-semibold text-zinc-100 group-hover:text-indigo-400 transition-colors tracking-tight">
+          <h3 class="text-xl sm:text-2xl font-black text-white group-hover:text-yellow-400 transition-colors neo-skew-title">
             輕度肉鴿選路模式
           </h3>
-          <div class="text-xs text-indigo-400/80 font-mono mt-1">
-            Roguelike Branching Tree
+          <div class="text-xs sm:text-sm font-bold text-yellow-400/90 tracking-wide mt-1">
+            // SLAY THE SPIRE ARCHITECTURE //
           </div>
 
           <!-- 說明內文 -->
-          <p class="text-sm text-zinc-400 mt-4 leading-relaxed">
-            告別純擲骰運氣。自選樹狀分支路線，整合 8-Bit 懷舊聽力題、局部照片破案、信心下注、留級補考與稀有被動裝備。
+          <p class="text-xs sm:text-sm text-gray-200 mt-3 leading-relaxed">
+            告別純擲骰運氣！自選透明分支路線。整合 <strong>8-bit 聽力猜歌、局部照片破案、信心下注、留級期中補考與稀有被動裝備</strong>！
           </p>
         </div>
 
-        <!-- 底部前進按鈕 -->
-        <div class="mt-8 pt-4 border-t border-white/[0.08] flex items-center justify-between text-sm font-medium text-zinc-300 group-hover:text-indigo-400 transition-colors">
-          <span>進入肉鴿冒險</span>
-          <span class="text-base group-hover:translate-x-1 transition-transform">➔</span>
+        <!-- 底部前進按鈕標示 -->
+        <div class="mt-6 pt-3.5 border-t-2 border-dashed border-gray-800 flex items-center justify-between text-sm sm:text-base font-black text-yellow-400">
+          <span>開啟肉鴿冒險</span>
+          <span class="text-lg group-hover:translate-x-1.5 transition-transform">➔</span>
         </div>
       </div>
 
-      <!-- 模式二：經典雙軌棋盤模式 -->
+      <!-- 模式二：經典街機大富翁雙軌模式 -->
       <div 
         @click="startClassic"
-        class="saas-card saas-card-interactive p-6 sm:p-8 text-left flex flex-col justify-between group"
+        class="bg-[#0c0f17] border-[3px] border-cyan-400 p-6 text-left cursor-pointer neo-cut shadow-[6px_6px_0px_#00f0ff] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_#00f0ff] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#00f0ff] transition-all flex flex-col justify-between group relative overflow-hidden"
       >
+        <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-cyan-400/10 rounded-full pointer-events-none"></div>
+
         <div>
-          <div class="flex items-center justify-between mb-4 pb-3 border-b border-white/[0.08]">
-            <span class="saas-pill text-xs font-mono text-zinc-400">
-              經典復刻
+          <div class="flex items-center justify-between mb-3 border-b-2 border-cyan-400/40 pb-2.5">
+            <span class="px-2.5 py-1 bg-cyan-400 text-black text-xs font-black uppercase tracking-wider">
+              [AUTHENTIC 1993]
             </span>
-            <span class="text-xs font-mono text-zinc-500">
+            <span class="text-sm font-mono font-bold text-cyan-300">
               MODE 02
             </span>
           </div>
 
-          <h3 class="text-xl sm:text-2xl font-semibold text-zinc-100 group-hover:text-indigo-400 transition-colors tracking-tight">
-            經典雙軌地圖模式
+          <h3 class="text-xl sm:text-2xl font-black text-white group-hover:text-cyan-400 transition-colors neo-skew-title">
+            經典街機雙軌模式
           </h3>
-          <div class="text-xs text-zinc-400 font-mono mt-1">
-            Dual-Track Cartridge Board
+          <div class="text-xs sm:text-sm font-bold text-cyan-400/90 tracking-wide mt-1">
+            // DUAL-TRACK CARTRIDGE BOARD //
           </div>
 
-          <p class="text-sm text-zinc-400 mt-4 leading-relaxed">
-            重現 1993 橫向卷軸雙軌卡匣軌道。大頭吉祥物擲骰、三選一送分格、留級轉學命運、福利社商城與升學期末檢定考。
+          <p class="text-xs sm:text-sm text-gray-200 mt-3 leading-relaxed">
+            重現 1993 大型電玩橫向卷軸雙軌卡匣軌道！大頭吉祥物骰子、三選一送分格、TROUBLE 骷髏災難與升學 Boss 戰！
           </p>
         </div>
 
-        <div class="mt-8 pt-4 border-t border-white/[0.08] flex items-center justify-between text-sm font-medium text-zinc-300 group-hover:text-indigo-400 transition-colors">
-          <span>開始擲骰闖關</span>
-          <span class="text-base group-hover:translate-x-1 transition-transform">➔</span>
+        <div class="mt-6 pt-3.5 border-t-2 border-dashed border-gray-800 flex items-center justify-between text-sm sm:text-base font-black text-cyan-400">
+          <span>投幣開始擲骰</span>
+          <span class="text-lg group-hover:translate-x-1.5 transition-transform">➔</span>
         </div>
       </div>
 
-      <!-- 模式三：題庫與名師管理 CMS -->
+      <!-- 模式三：題庫與人物 CMS 管理後台 -->
       <div 
         @click="$emit('open-cms')"
-        class="saas-card saas-card-interactive p-6 sm:p-8 text-left flex flex-col justify-between group"
+        class="bg-[#0c0f17] border-[3px] border-[#bd00ff] p-6 text-left cursor-pointer neo-cut shadow-[6px_6px_0px_#bd00ff] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0px_#bd00ff] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#bd00ff] transition-all flex flex-col justify-between group relative overflow-hidden"
       >
+        <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-[#bd00ff]/10 rounded-full pointer-events-none"></div>
+
         <div>
-          <div class="flex items-center justify-between mb-4 pb-3 border-b border-white/[0.08]">
-            <span class="saas-pill text-xs font-mono text-zinc-400">
-              資料庫管理
+          <div class="flex items-center justify-between mb-3 border-b-2 border-purple-400/40 pb-2.5">
+            <span class="px-2.5 py-1 bg-[#bd00ff] text-white text-xs font-black uppercase tracking-wider">
+              [DATABASE CMS]
             </span>
-            <span class="text-xs font-mono text-zinc-500">
-              DATABASE
+            <span class="text-sm font-mono font-bold text-purple-300">
+              CUSTOM
             </span>
           </div>
 
-          <h3 class="text-xl sm:text-2xl font-semibold text-zinc-100 group-hover:text-indigo-400 transition-colors tracking-tight">
-            題庫與名師後台
+          <h3 class="text-xl sm:text-2xl font-black text-white group-hover:text-purple-300 transition-colors neo-skew-title">
+            題庫與名師主播台
           </h3>
-          <div class="text-xs text-zinc-400 font-mono mt-1">
-            Excel / CSV / JSON CMS
+          <div class="text-xs sm:text-sm font-bold text-purple-400/90 tracking-wide mt-1">
+            // EXCEL / CSV / JSON IMPORT //
           </div>
 
-          <p class="text-sm text-zinc-400 mt-4 leading-relaxed">
-            高度自訂化。支援 Excel/CSV 題庫批次匯入匯出、題目即時線上編輯、以及考官名師與主播台頭像彈性更換。
+          <p class="text-xs sm:text-sm text-gray-200 mt-3 leading-relaxed">
+            自由自訂！支援 Excel/CSV/JSON 題庫批次拖曳匯入匯出、線上視覺化編輯、以及授課名師與雙主播相片更換。
           </p>
         </div>
 
-        <div class="mt-8 pt-4 border-t border-white/[0.08] flex items-center justify-between text-sm font-medium text-zinc-300 group-hover:text-indigo-400 transition-colors">
-          <span>開啟題庫管理</span>
-          <span class="text-base group-hover:translate-x-1 transition-transform">➔</span>
+        <div class="mt-6 pt-3.5 border-t-2 border-dashed border-gray-800 flex items-center justify-between text-sm sm:text-base font-black text-purple-300">
+          <span>進入出題中心</span>
+          <span class="text-lg group-hover:translate-x-1.5 transition-transform">➔</span>
         </div>
       </div>
     </div>
 
-    <!-- 底部功能微標籤 (Subtle Badges) -->
-    <div class="flex flex-wrap items-center justify-center gap-6 text-xs text-zinc-500 font-mono mt-2">
-      <span class="flex items-center gap-1.5">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-        動態難度 RANK 0~10
-      </span>
-      <span class="flex items-center gap-1.5">
-        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-        多態動態題型 (聽力 / 視覺 / 盲答)
-      </span>
-      <span class="flex items-center gap-1.5">
-        <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
-        期末升學檢定 BOSS 戰
-      </span>
+    <!-- 底部硬核數值特色說明條 -->
+    <div class="mt-4 px-4 py-2 bg-black border-2 border-gray-800 text-[11px] text-gray-400 flex flex-wrap items-center justify-center gap-4 neo-cut-sm">
+      <span>★ 街機動態難度 RANK 0~10 機制</span>
+      <span>★ 福利社道具背包 (放大鏡/懷錶/Pass券/養樂多)</span>
+      <span>★ 期末升學 BOSS 檢定考 & 9秒投幣續關</span>
     </div>
   </div>
 </template>
@@ -147,8 +155,8 @@
 <script setup lang="ts">
 /**
  * @file TitleScreen.vue
- * @description 現代極簡 SaaS 風格 首頁標題與模式選擇組件 (Linear / Vercel Modern Hero)
- * 提供極簡無襯線大標題、Bento Grid 模式卡片與乾淨典雅的選路入口。
+ * @description 日系新潮街機風 標題畫面組件 (Neo-Arcade Title Screen)
+ * 提供日系大字報斜體排版、Persona 5 風格戰術斜切卡片與乾淨去 AI 化的選路入口。
  */
 import { soundEngine } from '../../utils/audioEngine';
 

@@ -1,63 +1,61 @@
 <template>
-  <!-- 現代極簡 SaaS 風格 路線分歧選擇彈窗 -->
-  <div v-if="gameStore.activeModal === 'FORK_SELECT'" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 select-none">
-    <div class="w-full max-w-2xl 2xl:max-w-3xl bg-zinc-900/95 backdrop-blur-2xl border border-white/[0.1] rounded-2xl p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col items-center text-center gap-6">
+  <div v-if="gameStore.activeModal === 'FORK_SELECT'" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-2xl 2xl:max-w-3xl bg-arcade-dark border-4 border-arcade-yellow rounded-3xl p-6 sm:p-8 shadow-arcade-yellow flex flex-col items-center text-center gap-5">
       <!-- 標頭 -->
-      <div class="flex flex-col items-center gap-2">
-        <span class="saas-pill saas-pill-indigo text-xs font-mono">BRANCH SELECTION</span>
-        <h2 class="text-2xl sm:text-3xl font-semibold text-zinc-100 tracking-tight">
-          學業路線分歧抉擇
+      <div class="flex items-center gap-3">
+        <span class="text-4xl animate-bounce-short">🔀</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-arcade-yellow tracking-wider">
+          路線分叉抉擇！
         </h2>
-        <p class="text-xs sm:text-sm text-zinc-400 max-w-md">
-          前方出現分支道路，請依擅長領域選擇欲踏入的修煉路線：
-        </p>
       </div>
 
+      <p class="text-sm sm:text-base text-gray-200 font-bold">
+        前方出現學業分歧道路！請選擇接下來要踏入的修煉路線：
+      </p>
+
       <!-- 兩條分叉選項卡片 (上路 vs 下路) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full my-2">
         <!-- 上路線選項 -->
         <button 
           @click="choose('UPPER')"
-          class="saas-card saas-card-interactive p-6 text-left flex flex-col justify-between gap-5 group border border-white/[0.08]"
+          class="btn-arcade bg-gradient-to-b from-blue-900 to-slate-900 hover:from-blue-800 hover:to-slate-800 border-2 border-sky-400 p-5 rounded-2xl text-left flex flex-col justify-between gap-4 group transition-all"
         >
           <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-base font-semibold text-zinc-100 group-hover:text-indigo-400 transition-colors">⬆️ 上路線</span>
-              <span class="saas-pill saas-pill-indigo text-[11px]">理科·幸運</span>
+            <div class="flex items-center justify-between text-arcade-cyan font-black text-base sm:text-lg mb-2">
+              <span>⬆️ 上路線</span>
+              <span class="text-xs sm:text-sm bg-sky-950 px-2.5 py-1 rounded border border-sky-600">理科·幸運</span>
             </div>
-            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-              涵蓋：自然理化、流行音樂、<strong class="text-indigo-300">三選一送分格</strong>、<strong class="text-amber-300">LUCKY 福利社</strong>（留意 TROUBLE 危機格）。
+            <p class="text-xs sm:text-sm text-gray-200 leading-relaxed">
+              包含：自然理化、流行音樂、<strong class="text-arcade-yellow">三選一送分格</strong>、<strong class="text-amber-300">LUCKY 福利社</strong>（但小心 TROUBLE 骷髏災難！）
             </p>
           </div>
-          <div class="flex items-center justify-between text-xs font-medium text-zinc-300 group-hover:text-indigo-400 pt-3 border-t border-white/[0.06] transition-colors">
-            <span>選擇上路線</span>
-            <span class="saas-kbd text-[10px]">按 1 或 ↑</span>
-          </div>
+          <span class="text-xs sm:text-sm text-arcade-cyan font-black pt-3 border-t border-slate-700/60 group-hover:translate-x-1 transition-transform">
+            選擇走上路 [按 1 或 ↑] ➔
+          </span>
         </button>
 
         <!-- 下路線選項 -->
         <button 
           @click="choose('LOWER')"
-          class="saas-card saas-card-interactive p-6 text-left flex flex-col justify-between gap-5 group border border-white/[0.08]"
+          class="btn-arcade bg-gradient-to-b from-rose-950 to-slate-900 hover:from-rose-900 hover:to-slate-800 border-2 border-rose-500 p-5 rounded-2xl text-left flex flex-col justify-between gap-4 group transition-all"
         >
           <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-base font-semibold text-zinc-100 group-hover:text-indigo-400 transition-colors">⬇️ 下路線</span>
-              <span class="saas-pill saas-pill-rose text-[11px]">文藝·挑戰</span>
+            <div class="flex items-center justify-between text-rose-300 font-black text-base sm:text-lg mb-2">
+              <span>⬇️ 下路線</span>
+              <span class="text-xs sm:text-sm bg-rose-950 px-2.5 py-1 rounded border border-rose-600">文藝·挑戰</span>
             </div>
-            <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-              涵蓋：<strong class="text-emerald-300">健康教育 (+25 HP)</strong>、美術、<strong class="text-rose-300">天才問題 (雙倍學分)</strong>、校園突發事件與課外常識。
+            <p class="text-xs sm:text-sm text-gray-200 leading-relaxed">
+              包含：<strong class="text-emerald-300">健康教育 (+25 HP)</strong>、美術、<strong class="text-arcade-red">天才問題 (雙倍學分)</strong>、校園突發事件與課外常識！
             </p>
           </div>
-          <div class="flex items-center justify-between text-xs font-medium text-zinc-300 group-hover:text-indigo-400 pt-3 border-t border-white/[0.06] transition-colors">
-            <span>選擇下路線</span>
-            <span class="saas-kbd text-[10px]">按 2 或 ↓</span>
-          </div>
+          <span class="text-xs sm:text-sm text-rose-300 font-black pt-3 border-t border-slate-700/60 group-hover:translate-x-1 transition-transform">
+            選擇走下路 [按 2 或 ↓] ➔
+          </span>
         </button>
       </div>
 
-      <div class="text-xs text-zinc-500 font-mono">
-        提示：走完所選路線後，皆會匯流至該階段的期末升學檢定大考 (Boss 戰)
+      <div class="text-xs sm:text-sm text-gray-400 font-mono">
+        提示：走完所選路線之關卡後，皆會匯流至該階段的「升學檢定大考 (Boss 戰)」！
       </div>
     </div>
   </div>
@@ -66,7 +64,7 @@
 <script setup lang="ts">
 /**
  * @file ForkModal.vue
- * @description 現代極簡 SaaS 風格 路線分歧選擇彈窗 (Linear Modern Fork Modal)
+ * @description 分叉路線選擇彈窗，支援上路線 (理組/幸運) 與下路線 (文藝/天才) 選擇
  */
 import { onMounted, onUnmounted } from 'vue';
 import { useGameStore } from '../../stores/gameStore';

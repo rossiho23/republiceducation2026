@@ -1,126 +1,126 @@
 <template>
-  <div class="w-full h-full flex flex-col items-center justify-center relative overflow-hidden select-none font-medium p-1 rounded-lg">
-    <!-- 1. 起點「昇學」大格 -->
-    <div v-if="tileIndex === 0" class="w-full h-full flex flex-col items-center justify-center p-1 bg-indigo-950/40 border border-indigo-500/30 rounded-lg">
-      <img :src="PIXEL_ICON_START" alt="昇學起點" class="w-9 h-9 sm:w-11 sm:h-11 object-contain select-none" />
-      <span class="text-xs sm:text-sm font-semibold text-indigo-300 tracking-wider mt-1">
-        起點
+  <div class="w-full h-full flex flex-col items-center justify-center relative overflow-hidden select-none font-bold p-1">
+    <!-- 1. 起點「昇學」大格 (致敬 map1.jpg 最左側大格) -->
+    <div v-if="tileIndex === 0" class="w-full h-full flex flex-col items-center justify-center p-1 bg-[#b91c1c] border-2 border-yellow-300 shadow-inner">
+      <img :src="PIXEL_ICON_START" alt="昇學起點" class="w-10 h-10 sm:w-12 sm:h-12 object-contain select-none" />
+      <span class="text-xs sm:text-sm font-black text-yellow-300 drop-shadow-[0_1px_0_#000] tracking-wider mt-1">
+        昇學
       </span>
     </div>
 
-    <!-- 2. 分叉選擇點 (FORK) -->
-    <div v-else-if="type === 'FORK'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-zinc-800/80 border border-white/[0.12] rounded-lg text-zinc-100">
+    <!-- 2. 分叉選擇點 (FORK 雙向箭頭與街機斜紋) -->
+    <div v-else-if="type === 'FORK'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-gradient-to-br from-blue-700 via-purple-700 to-red-600 text-white relative">
       <div class="flex items-center gap-1.5 my-1">
-        <span class="text-xs sm:text-sm">⬆️</span>
-        <span class="text-xs sm:text-sm">⬇️</span>
+        <span class="text-base sm:text-lg animate-bounce-short">⬆️</span>
+        <span class="text-base sm:text-lg animate-bounce-short">⬇️</span>
       </div>
-      <span class="text-[11px] sm:text-xs font-semibold text-zinc-300">
+      <span class="text-xs sm:text-sm font-black text-yellow-300 drop-shadow-[0_1px_0_#000] uppercase">
         路線分叉
       </span>
     </div>
 
-    <!-- 3. 三選一格 (THREE_CHOICE) -->
-    <div v-else-if="type === 'THREE_CHOICE'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-sky-950/40 border border-sky-500/30 rounded-lg">
-      <img :src="PIXEL_ICON_THREE_CHOICE" alt="三選一" class="w-8 h-8 sm:w-10 sm:h-10 object-contain select-none" />
-      <span class="text-xs sm:text-sm font-semibold text-sky-300 mt-1">
+    <!-- 3. 三選一格 (THREE_CHOICE 藍底金字，100% 致敬 map1.jpg 上路) -->
+    <div v-else-if="type === 'THREE_CHOICE'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-[#1e40af] border-2 border-yellow-300 shadow-md">
+      <img :src="PIXEL_ICON_THREE_CHOICE" alt="三選一" class="w-9 h-9 sm:w-11 sm:h-11 object-contain select-none" />
+      <span class="text-xs sm:text-sm font-black text-yellow-300 mt-1 tracking-wider">
         三選一
       </span>
     </div>
 
-    <!-- 4. TROUBLE 骷髏危險格 -->
-    <div v-else-if="type === 'TROUBLE'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-rose-950/30 border border-rose-500/30 rounded-lg">
-      <img :src="PIXEL_ICON_TROUBLE" alt="TROUBLE" class="w-8 h-8 sm:w-10 sm:h-10 object-contain select-none opacity-90" />
-      <span class="text-xs sm:text-sm font-semibold text-rose-300 mt-1">
-        危機格
+    <!-- 4. TROUBLE 骷髏危險格 (黑底骷髏頭骨，100% 致敬 map1.jpg 上路) -->
+    <div v-else-if="type === 'TROUBLE'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-black border-2 border-amber-500 shadow-md">
+      <img :src="PIXEL_ICON_TROUBLE" alt="TROUBLE" class="w-9 h-9 sm:w-11 sm:h-11 object-contain select-none animate-pulse" />
+      <span class="text-xs sm:text-sm font-black text-amber-400 mt-1 tracking-wider">
+        TROUBLE
       </span>
     </div>
 
-    <!-- 5. 天才問題格 (TALENT) -->
-    <div v-else-if="type === 'TALENT'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-amber-950/30 border border-amber-500/30 rounded-lg">
-      <img :src="PIXEL_ICON_TALENT" alt="天才問題" class="w-8 h-8 sm:w-10 sm:h-10 object-contain select-none" />
-      <span class="text-xs sm:text-sm font-semibold text-amber-300 mt-1">
-        天才雙倍
+    <!-- 5. 天才問題格 (TALENT 紅底白字大框，100% 致敬 map1.jpg 下路) -->
+    <div v-else-if="type === 'TALENT'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-[#991b1b] border-2 border-yellow-300 shadow-md">
+      <img :src="PIXEL_ICON_TALENT" alt="天才問題" class="w-9 h-9 sm:w-11 sm:h-11 object-contain select-none" />
+      <span class="text-xs sm:text-sm font-black text-white mt-1 tracking-wider">
+        天才問題
       </span>
     </div>
 
-    <!-- 6. 健康教育格 (HEALTH) -->
-    <div v-else-if="type === 'HEALTH' || (type === 'QUIZ' && subject === '健康教育')" class="w-full h-full flex flex-col items-center justify-center p-1 bg-emerald-950/30 border border-emerald-500/30 rounded-lg">
-      <img :src="PIXEL_ICON_HEALTH" alt="健康教育" class="w-8 h-8 sm:w-10 sm:h-10 object-contain select-none" />
-      <span class="text-xs sm:text-sm font-semibold text-emerald-300 mt-1">
-        健康恢復
+    <!-- 6. 健康教育格 (HEALTH 黑影發光紅心，100% 致敬 map1.jpg 下路) -->
+    <div v-else-if="type === 'HEALTH' || (type === 'QUIZ' && subject === '健康教育')" class="w-full h-full flex flex-col items-center justify-center p-1 bg-[#1e3a8a] border-2 border-red-500 shadow-md">
+      <img :src="PIXEL_ICON_HEALTH" alt="健康教育" class="w-9 h-9 sm:w-11 sm:h-11 object-contain select-none animate-pulse" />
+      <span class="text-xs sm:text-sm font-black text-white mt-1 tracking-wider">
+        健康教育
       </span>
     </div>
 
-    <!-- 7. 美術格 -->
-    <div v-else-if="subject === '美術' || (type === 'QUIZ' && subject === '藝能')" class="w-full h-full flex flex-col items-center justify-center p-1 bg-zinc-900/80 border border-white/[0.08] rounded-lg">
-      <img :src="PIXEL_ICON_ART" alt="美術" class="w-8 h-8 sm:w-10 sm:h-10 object-contain select-none" />
-      <span class="text-xs sm:text-sm font-medium text-zinc-300 mt-1">美術</span>
+    <!-- 7. 美術格 (調色盤水彩筆，100% 16-Bit 手繪像素) -->
+    <div v-else-if="subject === '美術' || (type === 'QUIZ' && subject === '藝能')" class="w-full h-full flex flex-col items-center justify-center p-1 bg-[#c2410c] border border-black shadow">
+      <img :src="PIXEL_ICON_ART" alt="美術" class="w-9 h-9 sm:w-11 sm:h-11 object-contain select-none" />
+      <span class="text-xs sm:text-sm font-black text-white mt-1">美術</span>
     </div>
 
-    <!-- 8. 音樂格 -->
-    <div v-else-if="subject === '流行音樂'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-zinc-900/80 border border-white/[0.08] rounded-lg">
-      <img :src="PIXEL_ICON_MUSIC" alt="音樂" class="w-8 h-8 sm:w-10 sm:h-10 object-contain select-none" />
-      <span class="text-xs sm:text-sm font-medium text-indigo-300 mt-1">音樂</span>
+    <!-- 8. 音樂格 (五線譜金色音符，100% 16-Bit 手繪像素) -->
+    <div v-else-if="subject === '流行音樂'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-[#0f172a] border border-yellow-400/80 shadow">
+      <img :src="PIXEL_ICON_MUSIC" alt="音樂" class="w-9 h-9 sm:w-11 sm:h-11 object-contain select-none" />
+      <span class="text-xs sm:text-sm font-black text-yellow-300 mt-1">音樂</span>
     </div>
 
-    <!-- 9. 國文格 -->
-    <div v-else-if="type === 'QUIZ' && subject === '國文'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-zinc-900/80 border border-white/[0.08] rounded-lg">
-      <img :src="PIXEL_ICON_CHINESE" alt="國文" class="w-8 h-8 sm:w-10 sm:h-10 object-contain select-none" />
-      <span class="text-xs sm:text-sm font-medium text-zinc-300 mt-1">國文</span>
+    <!-- 9. 國文格 (線裝書毛筆，100% 16-Bit 手繪像素) -->
+    <div v-else-if="type === 'QUIZ' && subject === '國文'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-[#92400e] border border-black shadow">
+      <img :src="PIXEL_ICON_CHINESE" alt="國文" class="w-9 h-9 sm:w-11 sm:h-11 object-contain select-none" />
+      <span class="text-xs sm:text-sm font-black text-amber-200 mt-1">國文</span>
     </div>
 
-    <!-- 10. 自然/理化格 -->
-    <div v-else-if="type === 'QUIZ' && subject === '自然'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-zinc-900/80 border border-white/[0.08] rounded-lg">
-      <img :src="PIXEL_ICON_SCIENCE" alt="自然" class="w-8 h-8 sm:w-10 sm:h-10 object-contain select-none" />
-      <span class="text-xs sm:text-sm font-medium text-zinc-300 mt-1">自然</span>
+    <!-- 10. 自然/理化格 (燒瓶藥水，100% 16-Bit 手繪像素) -->
+    <div v-else-if="type === 'QUIZ' && subject === '自然'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-[#4d7c0f] border border-black shadow">
+      <img :src="PIXEL_ICON_SCIENCE" alt="自然" class="w-9 h-9 sm:w-11 sm:h-11 object-contain select-none" />
+      <span class="text-xs sm:text-sm font-black text-lime-100 mt-1">自然</span>
     </div>
 
-    <!-- 11. 數學格 -->
-    <div v-else-if="type === 'QUIZ' && subject === '數學'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-zinc-900/80 border border-white/[0.08] rounded-lg">
-      <img :src="PIXEL_ICON_MATH" alt="數學" class="w-8 h-8 sm:w-10 sm:h-10 object-contain select-none" />
-      <span class="text-xs sm:text-sm font-medium text-zinc-300 mt-1">數學</span>
+    <!-- 11. 數學格 (三角板圓規，100% 16-Bit 手繪像素) -->
+    <div v-else-if="type === 'QUIZ' && subject === '數學'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-[#065f46] border border-black shadow">
+      <img :src="PIXEL_ICON_MATH" alt="數學" class="w-9 h-9 sm:w-11 sm:h-11 object-contain select-none" />
+      <span class="text-xs sm:text-sm font-black text-emerald-100 mt-1">數學</span>
     </div>
 
-    <!-- 12. 社會/地理格 -->
-    <div v-else-if="type === 'QUIZ' && subject === '社會'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-zinc-900/80 border border-white/[0.08] rounded-lg">
-      <img :src="PIXEL_ICON_GEOGRAPHY" alt="社會地理" class="w-8 h-8 sm:w-10 sm:h-10 object-contain select-none" />
-      <span class="text-xs sm:text-sm font-medium text-zinc-300 mt-1">社會</span>
+    <!-- 12. 社會/地理格 (地球儀經緯，100% 16-Bit 手繪像素) -->
+    <div v-else-if="type === 'QUIZ' && subject === '社會'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-[#0369a1] border border-black shadow">
+      <img :src="PIXEL_ICON_GEOGRAPHY" alt="社會地理" class="w-9 h-9 sm:w-11 sm:h-11 object-contain select-none" />
+      <span class="text-xs sm:text-sm font-black text-sky-100 mt-1">社會</span>
     </div>
 
-    <!-- 13. 課外常識格 -->
-    <div v-else-if="type === 'EXTRACURRICULAR' || subject === '課外'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-zinc-900/80 border border-white/[0.08] rounded-lg">
-      <span class="text-sm sm:text-base font-semibold text-zinc-100 tracking-wider">
+    <!-- 13. 課外常識格 (藍底白字，致敬 map1.jpg 下路) -->
+    <div v-else-if="type === 'EXTRACURRICULAR' || subject === '課外'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-[#0284c7] border-2 border-white/80 shadow-md">
+      <span class="text-sm sm:text-base font-black text-white drop-shadow-[0_1px_0_#000] tracking-widest">
         課外
       </span>
-      <span class="text-[10px] sm:text-xs text-zinc-400 mt-1">常識</span>
+      <span class="text-[10px] sm:text-xs text-amber-200 mt-1">時事常識</span>
     </div>
 
-    <!-- 14. 福利社格 (CANTEEN) -->
-    <div v-else-if="type === 'CANTEEN'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-amber-950/20 border border-amber-500/30 rounded-lg">
-      <img :src="PIXEL_ICON_CANTEEN" alt="福利社" class="w-8 h-8 sm:w-10 sm:h-10 object-contain select-none" />
-      <span class="text-xs sm:text-sm font-semibold text-amber-300 mt-1">福利社</span>
+    <!-- 14. 幸運福利社格 (LUCKY 養樂多菠蘿麵包，100% 16-Bit 手繪像素) -->
+    <div v-else-if="type === 'CANTEEN'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-[#d97706] border-2 border-yellow-300 shadow-md">
+      <img :src="PIXEL_ICON_CANTEEN" alt="福利社" class="w-9 h-9 sm:w-11 sm:h-11 object-contain select-none animate-bounce-short" />
+      <span class="text-xs sm:text-sm font-black text-yellow-200 mt-1">福利社</span>
     </div>
 
-    <!-- 15. 事件/命運格 -->
-    <div v-else-if="type === 'EVENT' || type === 'FATE'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-zinc-900/80 border border-white/[0.08] rounded-lg">
-      <span class="text-xl sm:text-2xl font-bold font-mono text-zinc-300">?</span>
-      <span class="text-xs sm:text-sm font-medium text-zinc-400 mt-1">
+    <!-- 15. 事件/命運格 (問號方塊) -->
+    <div v-else-if="type === 'EVENT' || type === 'FATE'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-[#334155] border border-slate-400 shadow">
+      <span class="text-2xl sm:text-3xl font-black font-mono text-yellow-300 drop-shadow-[0_2px_0_#000]">?</span>
+      <span class="text-xs sm:text-sm font-black text-slate-200 mt-1 uppercase">
         {{ type === 'EVENT' ? '事件' : '命運' }}
       </span>
     </div>
 
-    <!-- 16. 升學大考 BOSS 終點格 -->
-    <div v-else-if="type === 'EXAM'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-indigo-950/40 border border-indigo-500/40 rounded-lg">
-      <img :src="PIXEL_ICON_EXAM_BOSS" alt="升學大考" class="w-8 h-8 sm:w-10 sm:h-10 object-contain select-none animate-pulse" />
-      <span class="text-xs sm:text-sm font-semibold text-indigo-300 mt-1">
-        大考檢定
+    <!-- 16. 升學大考 BOSS 終點格 (博士帽，100% 16-Bit 手繪像素) -->
+    <div v-else-if="type === 'EXAM'" class="w-full h-full flex flex-col items-center justify-center p-1 bg-[#881337] border-2 border-amber-400 shadow-md">
+      <img :src="PIXEL_ICON_EXAM_BOSS" alt="升學大考" class="w-9 h-9 sm:w-11 sm:h-11 object-contain select-none animate-pulse" />
+      <span class="text-xs sm:text-sm font-black text-amber-300 uppercase mt-1">
+        升學大考
       </span>
     </div>
 
     <!-- 17. 預設其他測驗 -->
-    <div v-else class="w-full h-full flex flex-col items-center justify-center p-1 bg-zinc-900/80 border border-white/[0.08] rounded-lg text-zinc-200">
-      <span class="text-xs sm:text-sm font-medium">測驗</span>
-      <span class="text-[10px] text-zinc-400 mt-1">{{ subject || '一般' }}</span>
+    <div v-else class="w-full h-full flex flex-col items-center justify-center p-1 bg-indigo-700 text-white">
+      <span class="text-sm font-black">測驗</span>
+      <span class="text-xs text-yellow-300 mt-1">{{ subject || '一般' }}</span>
     </div>
   </div>
 </template>
@@ -128,8 +128,8 @@
 <script setup lang="ts">
 /**
  * @file RetroTileIcon.vue
- * @description 現代極簡雙軌卡匣格子圖標組件 (Modern Minimalist Tile Icon)
- * 採用低飽和冷調 Zinc 底色搭配半透明微邊框，保留 16-Bit 精緻手繪像素圖標。
+ * @description 街機經典雙軌卡匣格子圖標組件 (100% 依據 pic/map1.jpg 與 16-Bit 像素手繪重製)
+ * 涵蓋三選一送分、TROUBLE 骷髏災難、天才問題、健康教育以及國英數理化全學科卡匣。
  */
 import { TileType, SubjectType } from '../../types/quiz';
 import {

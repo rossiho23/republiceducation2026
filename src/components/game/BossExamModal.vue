@@ -1,134 +1,133 @@
 <template>
-  <!-- 現代極簡 SaaS 風格 升學檢定大考 (BOSS 戰) 彈窗 (Linear Modern Boss Exam) -->
+  <!-- 日系新潮街機風 升學檢定大考 (BOSS 戰) 彈窗 (Neo-Arcade Boss Exam) -->
   <div 
     v-if="gameStore.activeModal === 'BOSS_EXAM' && gameStore.bossExam.currentQuestion" 
-    class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 select-none"
+    class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-3 sm:p-4 font-mono select-none"
   >
-    <!-- 主彈窗容器 (Bento Grid 圓角卡片) -->
-    <div class="w-full max-w-4xl 2xl:max-w-5xl bg-zinc-900/95 backdrop-blur-2xl border border-white/[0.1] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-6 sm:p-8 flex flex-col gap-5 relative overflow-hidden">
+    <!-- 主彈窗容器 (粗黑 4px 邊框、8px 實心紅陰影、日系戰術切角 · 寬屏放寬) -->
+    <div class="w-full max-w-4xl 2xl:max-w-5xl bg-[#090b10] border-[4px] border-black shadow-[8px_8px_0px_#ff0055] p-5 sm:p-8 flex flex-col gap-4 relative overflow-hidden neo-cut">
       
-      <!-- 頂部 Boss 戰標頭 -->
-      <div class="flex items-center justify-between border-b border-white/[0.08] pb-4">
+      <!-- 頂部黑紅警戒條 -->
+      <div class="w-full h-2 neo-hazard-red border-b border-black -mt-2 mb-1"></div>
+
+      <!-- 頂部 Boss 戰警報標頭 -->
+      <div class="flex items-center justify-between border-b-2 border-black pb-3">
         <div class="flex items-center gap-3">
-          <div class="w-3 h-3 rounded-full bg-rose-500 animate-pulse"></div>
+          <span class="w-4 h-4 bg-[#ff0055] animate-ping inline-block"></span>
           <div>
-            <h2 class="text-xl sm:text-2xl font-semibold text-zinc-100 tracking-tight flex items-center gap-2">
-              <span>【{{ gameStore.currentStageConfig.title }}】升學檢定大考</span>
-              <span class="saas-pill saas-pill-rose text-xs font-mono">BOSS EXAM</span>
+            <h2 class="text-xl sm:text-2xl md:text-3xl font-black text-[#ff0055] tracking-wider neo-skew-title neo-text-stroke">
+              【{{ gameStore.currentStageConfig.title }}】升學檢定大考 (BOSS 戰)
             </h2>
-            <p class="text-xs text-zinc-400 mt-1 font-mono">
-              {{ gameStore.bossExam.isConsecutiveMode ? '頂級考驗：必須連續答對方可晉級，答錯進度重置' : `及格標準：需累計答對 ${gameStore.bossExam.targetCount} 題，剩餘容錯 ${gameStore.bossExam.maxAllowedMistakes - gameStore.bossExam.mistakesCount} 次` }}
+            <p class="text-xs sm:text-sm text-gray-300 font-bold mt-0.5">
+              {{ gameStore.bossExam.isConsecutiveMode ? '// 頂級考驗：必須連續答對方可晉級！答錯進度倒扣！ //' : `// 及格標準：需累計答對 ${gameStore.bossExam.targetCount} 題，剩餘容錯 ${gameStore.bossExam.maxAllowedMistakes - gameStore.bossExam.mistakesCount} 次 //` }}
             </p>
           </div>
         </div>
 
-        <span class="saas-pill text-xs font-mono text-zinc-400">
-          STAGE FINALE
+        <span class="text-xs sm:text-sm bg-[#ff0055] text-white font-mono font-black px-3 py-1 border border-black transform rotate-1 shadow-[2px_2px_0px_#000]">
+          BOSS EXAM
         </span>
       </div>
 
-      <!-- 及格進度條與限時作答條 (雙 Bento 進度列) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <!-- 合格進度 -->
-        <div class="bg-zinc-950/60 p-4 border border-white/[0.08] rounded-xl flex flex-col gap-2">
-          <div class="flex items-center justify-between text-xs text-zinc-400 font-mono">
-            <span>合格進度</span>
-            <span class="text-indigo-400 font-semibold text-sm">
-              {{ gameStore.bossExam.passedCount }} / {{ gameStore.bossExam.targetCount }} 題
-            </span>
-          </div>
-          <div class="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-            <div 
-              class="h-full transition-all duration-300 rounded-full bg-indigo-500"
-              :style="{ width: `${(gameStore.bossExam.passedCount / gameStore.bossExam.targetCount) * 100}%` }"
-            ></div>
-          </div>
+      <!-- 及格合格進度條 (高對比方塊 · 字級加大) -->
+      <div class="bg-[#121620] p-3.5 sm:p-4 border-2 border-black neo-cut-sm shadow-[3px_3px_0px_#000] flex flex-col gap-2">
+        <div class="flex items-center justify-between text-xs sm:text-sm font-mono font-bold">
+          <span class="text-gray-200">升學合格進度:</span>
+          <span class="text-yellow-400 text-base sm:text-lg font-black">
+            {{ gameStore.bossExam.passedCount }} / {{ gameStore.bossExam.targetCount }} 題
+          </span>
         </div>
+        <div class="w-full h-4 bg-black border border-gray-700 overflow-hidden p-0.5">
+          <div 
+            class="h-full transition-all duration-300 bg-yellow-400"
+            :style="{ width: `${(gameStore.bossExam.passedCount / gameStore.bossExam.targetCount) * 100}%` }"
+          ></div>
+        </div>
+      </div>
 
-        <!-- 倒數計時 -->
-        <div class="bg-zinc-950/60 p-4 border border-white/[0.08] rounded-xl flex flex-col gap-2">
-          <div class="flex items-center justify-between text-xs text-zinc-400 font-mono">
-            <span>限時作答</span>
-            <span 
-              class="font-semibold text-sm font-mono"
-              :class="gameStore.timeRemaining <= 3 ? 'text-rose-400 animate-pulse' : 'text-zinc-200'"
-            >
-              {{ gameStore.timeRemaining }} 秒
-            </span>
-          </div>
-          <div class="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-            <div 
-              class="h-full transition-all duration-150 rounded-full"
-              :class="gameStore.timeRemaining <= 3 ? 'bg-rose-500' : 'bg-indigo-500'"
-              :style="{ width: `${(gameStore.timeRemaining / gameStore.maxTimeLimit) * 100}%` }"
-            ></div>
-          </div>
+      <!-- 倒數計時條 -->
+      <div class="flex flex-col gap-1.5">
+        <div class="flex justify-between text-xs sm:text-sm font-mono">
+          <span class="text-gray-300 font-bold">限時作答:</span>
+          <span 
+            class="font-black text-sm sm:text-base px-2 py-0.5 border border-black"
+            :class="gameStore.timeRemaining <= 3 ? 'bg-[#ff0055] text-white animate-pulse' : 'bg-yellow-400 text-black'"
+          >
+            {{ gameStore.timeRemaining }} 秒
+          </span>
+        </div>
+        <div class="w-full h-3 bg-black border border-gray-700 overflow-hidden">
+          <div 
+            class="h-full transition-all duration-150"
+            :class="gameStore.timeRemaining <= 3 ? 'bg-[#ff0055]' : 'bg-yellow-400'"
+            :style="{ width: `${(gameStore.timeRemaining / gameStore.maxTimeLimit) * 100}%` }"
+          ></div>
         </div>
       </div>
 
       <!-- 題目內容 (大字題幹) -->
       <div class="py-2">
         <div class="flex items-center gap-2 mb-2">
-          <span class="saas-pill saas-pill-indigo text-xs">
+          <span class="text-xs sm:text-sm font-black px-2.5 py-0.5 bg-yellow-400 text-black border border-black">
             {{ gameStore.bossExam.currentQuestion.subject }}
           </span>
         </div>
-        <h3 class="text-xl sm:text-2xl font-semibold text-zinc-100 leading-snug tracking-tight">
+        <h3 class="text-xl sm:text-2xl md:text-3xl font-black text-yellow-300 leading-snug tracking-wide min-h-[55px]">
           {{ gameStore.bossExam.currentQuestion.question }}
         </h3>
       </div>
 
-      <!-- 四個作答選項 (Modern Bento 互動按鈕 · 16px~20px 大字) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 my-1">
+      <!-- 四個作答選項 (Neo-Arcade 按鈕 · 16px~19px 大字) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 my-1">
         <button 
           v-for="(option, idx) in gameStore.bossExam.currentQuestion.options" 
           :key="idx"
           @click="selectBossAnswer(idx)"
           :disabled="gameStore.isAnswered || isOptionDisabled(idx)"
-          class="p-4 sm:p-5 rounded-xl border text-left flex items-center justify-between text-base sm:text-lg transition-all duration-200"
+          class="neo-btn p-3.5 sm:p-4 text-left flex items-center justify-between text-base sm:text-lg md:text-xl font-bold neo-cut-sm"
           :class="getBossOptionClass(idx)"
         >
           <div class="flex items-center gap-3">
-            <span class="saas-kbd w-7 h-7 sm:w-8 sm:h-8 flex-shrink-0 text-xs sm:text-sm font-semibold">
+            <span class="w-8 h-8 bg-black border-2 border-yellow-400 flex items-center justify-center font-black font-mono text-yellow-400 text-sm sm:text-base flex-shrink-0 shadow-[2px_2px_0px_#000]">
               {{ ['A', 'B', 'C', 'D'][idx] }}
             </span>
-            <span :class="{ 'line-through text-zinc-600': isOptionDisabled(idx) }" class="font-normal text-zinc-100 tracking-wide leading-snug">
+            <span :class="{ 'line-through text-gray-500': isOptionDisabled(idx) }" class="font-sans font-black tracking-wide leading-tight">
               {{ option }}
             </span>
           </div>
 
           <div v-if="gameStore.isAnswered">
-            <span v-if="idx === gameStore.bossExam.currentQuestion.correctIndex" class="saas-pill saas-pill-emerald text-xs font-semibold whitespace-nowrap ml-2">
-              ✓ 正解
+            <span v-if="idx === gameStore.bossExam.currentQuestion.correctIndex" class="px-2 py-0.5 bg-yellow-400 text-black text-xs font-black border border-black">
+              ⭕ 正解
             </span>
-            <span v-else-if="idx === gameStore.lastSelectedChoice" class="saas-pill saas-pill-rose text-xs font-semibold whitespace-nowrap ml-2">
-              ✗ 錯誤
+            <span v-else-if="idx === gameStore.lastSelectedChoice" class="px-2 py-0.5 bg-[#ff0055] text-white text-xs font-black border border-black">
+              ❌ 錯誤
             </span>
           </div>
         </button>
       </div>
 
       <!-- 道具輔助列 -->
-      <div class="flex items-center justify-between pt-4 border-t border-white/[0.08]">
+      <div class="flex items-center justify-between pt-2 border-t-2 border-black">
         <div class="flex items-center gap-2 text-xs">
           <button 
             @click="gameStore.useItem('MAGNIFIER')"
             :disabled="(gameStore.inventory.MAGNIFIER || 0) <= 0 || gameStore.disabledOptionIndices.length >= 2 || gameStore.isAnswered"
-            class="saas-btn saas-btn-secondary py-1.5 px-3 text-xs"
+            class="neo-btn bg-[#121620] hover:bg-[#1a2130] text-gray-200 px-2 py-1 text-xs disabled:opacity-40"
           >
-            放大鏡: {{ gameStore.inventory.MAGNIFIER || 0 }}
+            [放大鏡: {{ gameStore.inventory.MAGNIFIER || 0 }}]
           </button>
           <button 
             @click="gameStore.useItem('CLOCK')"
             :disabled="(gameStore.inventory.CLOCK || 0) <= 0 || gameStore.isAnswered"
-            class="saas-btn saas-btn-secondary py-1.5 px-3 text-xs"
+            class="neo-btn bg-[#121620] hover:bg-[#1a2130] text-gray-200 px-2 py-1 text-xs disabled:opacity-40"
           >
-            加時: {{ gameStore.inventory.CLOCK || 0 }}
+            [加時: {{ gameStore.inventory.CLOCK || 0 }}]
           </button>
         </div>
 
-        <span class="text-xs text-zinc-400 font-mono">
-          剩餘容錯：<strong class="text-zinc-200">{{ gameStore.bossExam.maxAllowedMistakes - gameStore.bossExam.mistakesCount }}</strong> 次
+        <span class="text-xs text-gray-400 font-mono font-bold">
+          容錯機會：{{ gameStore.bossExam.maxAllowedMistakes - gameStore.bossExam.mistakesCount }} 次
         </span>
       </div>
     </div>
@@ -138,8 +137,8 @@
 <script setup lang="ts">
 /**
  * @file BossExamModal.vue
- * @description 現代極簡 SaaS 風格 升學檢定大考 (BOSS 戰) 彈窗組件 (Linear Modern Boss Exam)
- * 具備 Bento 雙進度條、微光邊框、平滑選項過渡與容錯次數指示。
+ * @description 日系新潮街機風 升學檢定大考 (BOSS 戰) 彈窗組件 (Neo-Arcade Boss Exam)
+ * 具備黑紅警戒條紋、戰術粗黑邊框、實心陰影按鈕、倒數計時與嚴苛連對扣血考驗。
  */
 import { useGameStore } from '../../stores/gameStore';
 
@@ -156,19 +155,19 @@ function selectBossAnswer(index: number): void {
 
 function getBossOptionClass(index: number): string {
   if (isOptionDisabled(index)) {
-    return 'opacity-35 cursor-not-allowed bg-zinc-950/40 text-zinc-500 border-zinc-800/50';
+    return 'opacity-30 cursor-not-allowed bg-black text-gray-600 border-gray-800';
   }
 
   if (gameStore.isAnswered) {
     if (index === gameStore.bossExam.currentQuestion?.correctIndex) {
-      return 'bg-emerald-500/15 border-emerald-500/50 text-emerald-200 shadow-[0_0_20px_rgba(16,185,129,0.18)] scale-[1.01]';
+      return 'bg-yellow-400 text-black border-black shadow-[4px_4px_0px_#000] scale-[1.02]';
     }
     if (index === gameStore.lastSelectedChoice) {
-      return 'bg-rose-500/15 border-rose-500/50 text-rose-200 shadow-[0_0_20px_rgba(244,63,94,0.18)]';
+      return 'bg-[#ff0055] text-white border-black shadow-[4px_4px_0px_#000]';
     }
-    return 'opacity-40 bg-zinc-950/40 text-zinc-500 border-zinc-800/40';
+    return 'opacity-40 bg-[#090b10] text-gray-400 border-black';
   }
 
-  return 'bg-zinc-800/40 hover:bg-zinc-800/80 border-white/[0.08] hover:border-indigo-500/50 hover:shadow-[0_0_20px_rgba(99,102,241,0.15)] cursor-pointer';
+  return 'bg-[#121620] hover:bg-[#1a2130] text-white border-black hover:border-yellow-400';
 }
 </script>

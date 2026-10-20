@@ -1,63 +1,57 @@
 <template>
-  <!-- 現代極簡 SaaS 風格 期中留級挽救補考彈窗 (Linear Modern Remedial Exam Modal) -->
+  <!-- 日系新潮街機風 期中留級挽救補考彈窗 (Neo-Arcade Remedial Exam Modal) -->
   <div 
     v-if="isOpen" 
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md select-none"
+    class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/90 font-mono select-none"
   >
-    <!-- 主彈窗容器 (Bento Grid 圓角卡片) -->
-    <div class="relative w-full max-w-3xl 2xl:max-w-4xl bg-zinc-900/95 backdrop-blur-2xl border border-white/[0.1] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-6 sm:p-8 flex flex-col gap-5 overflow-hidden">
+    <!-- 主彈窗容器 (粗黑 4px 邊框、8px 實心紅陰影、日系戰術切角 · 寬屏放大) -->
+    <div class="relative w-full max-w-3xl 2xl:max-w-4xl bg-[#090b10] border-[4px] border-black shadow-[8px_8px_0px_#ff0055] neo-cut flex flex-col overflow-hidden">
       
-      <!-- 頂部飾條 -->
-      <div class="flex items-center justify-between pb-4 border-b border-white/[0.08]">
-        <div class="flex items-center gap-2.5">
-          <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
-          <div>
-            <h2 class="text-xl font-semibold tracking-tight text-zinc-100 flex items-center gap-2">
-              <span>期中留級補考</span>
-              <span class="saas-pill saas-pill-rose text-xs font-mono">REMEDIAL</span>
-            </h2>
-            <p class="text-xs text-zinc-400 mt-0.5 font-mono">
-              連續答對 3 題即可化解留級危機並獲得傳奇聖物
-            </p>
-          </div>
-        </div>
+      <!-- 頂部黑紅警戒斑馬紋 -->
+      <div class="w-full h-2.5 neo-hazard-red border-b-2 border-black"></div>
 
-        <div class="saas-pill saas-pill-indigo text-xs font-mono">
+      <!-- 頂部警報飾條 -->
+      <div class="bg-[#121620] px-4 py-3 border-b-2 border-black flex items-center justify-between text-white font-black">
+        <div class="flex items-center gap-2.5 text-base sm:text-lg tracking-wider neo-skew-title">
+          <span class="w-3 h-3 bg-yellow-400 animate-ping inline-block"></span>
+          <span>// RETENTION NOTICE // 教務處留級通告</span>
+        </div>
+        <div class="text-xs sm:text-sm bg-[#ff0055] text-white px-3 py-1 border border-black font-black shadow-[2px_2px_0px_#000]">
           連對考驗: {{ currentStreak }} / {{ targetStreak }}
         </div>
       </div>
 
       <!-- 主體內容區塊 -->
-      <div class="flex flex-col gap-4">
+      <div class="p-5 sm:p-7 flex flex-col gap-4 bg-[#090b10]">
         <!-- 狀態 A: 補考成功，選擇稀有被動聖物裝備 -->
-        <div v-if="isPassed" class="flex flex-col items-center text-center gap-5 py-4">
-          <div class="w-14 h-14 rounded-2xl bg-indigo-950/60 border border-indigo-500/40 flex items-center justify-center text-3xl shadow-[0_0_20px_rgba(99,102,241,0.25)]">
+        <div v-if="isPassed" class="flex flex-col items-center text-center gap-4 py-3">
+          <div class="w-16 h-16 bg-yellow-400 border-2 border-black flex items-center justify-center text-4xl shadow-[3px_3px_0px_#000] transform -rotate-3">
             🎓
           </div>
           <div>
-            <h2 class="text-2xl font-semibold text-zinc-100 tracking-tight">
-              期中補考全面及格！
+            <h2 class="text-2xl sm:text-3xl font-black text-yellow-400 neo-skew-title neo-text-stroke">
+              期中補考全面合格！
             </h2>
-            <p class="text-sm text-zinc-400 mt-1 max-w-md">
-              成功逆境求生，體力補回 +50 點。請挑選一項校園傳奇被動聖物裝備：
+            <p class="text-xs sm:text-sm text-gray-200 mt-1 font-bold">
+              教官對你的逆境求生表示讚許，體力回復 +50 點！請挑選一項校園傳奇被動聖物裝備：
             </p>
           </div>
 
-          <!-- 聖物三選一卡片 (Modern Bento Grid) -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full mt-2">
+          <!-- 聖物三選一卡片 (Neo-Arcade 切角卡片 · 尺寸放大) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 w-full mt-1">
             <button
               v-for="relic in AVAILABLE_RELICS"
               :key="relic.id"
               @click="claimRelicAndResume(relic)"
-              class="saas-card saas-card-interactive p-5 flex flex-col items-center text-center gap-3 group"
+              class="neo-btn bg-[#121620] hover:bg-[#1a2130] p-4 border-2 border-black neo-cut-sm flex flex-col items-center text-center gap-2.5 transition-all shadow-[4px_4px_0px_#ffe600]"
             >
-              <span class="text-3xl">{{ relic.icon }}</span>
-              <span class="text-base font-semibold text-zinc-100 group-hover:text-indigo-400 transition-colors">{{ relic.name }}</span>
-              <p class="text-xs text-zinc-400 leading-relaxed">
+              <span class="text-4xl">{{ relic.icon }}</span>
+              <span class="text-base font-black text-yellow-400 neo-skew-title">{{ relic.name }}</span>
+              <p class="text-xs sm:text-sm text-gray-200 leading-normal">
                 {{ relic.description }}
               </p>
-              <span class="mt-auto saas-btn saas-btn-primary w-full py-1.5 text-xs">
-                選取裝備
+              <span class="mt-auto px-2.5 py-1 bg-yellow-400 text-black text-xs font-black border border-black">
+                點擊裝備
               </span>
             </button>
           </div>
@@ -65,60 +59,60 @@
 
         <!-- 狀態 B: 補考進行中 -->
         <div v-else class="flex flex-col gap-4">
-          <!-- 教官提示看板 -->
-          <div class="p-4 bg-zinc-950/60 border border-white/[0.08] rounded-xl flex items-center gap-4">
-            <div class="w-10 h-10 rounded-xl bg-zinc-850 border border-white/[0.08] flex-shrink-0 flex items-center justify-center text-xl">
+          <!-- 教官訓示看板 -->
+          <div class="p-3.5 sm:p-4 bg-[#121620] border-2 border-black neo-cut-sm shadow-[3px_3px_0px_#000] flex items-center gap-3.5">
+            <div class="w-12 h-12 border-2 border-black bg-yellow-400 flex-shrink-0 flex items-center justify-center text-2xl shadow-[2px_2px_0px_#000]">
               👮
             </div>
-            <div class="text-xs sm:text-sm text-zinc-300 leading-relaxed font-sans">
-              <strong class="text-indigo-400">【生活輔導組提示】：</strong>
-              必須連續答對 3 題補考題才能解除留級處分；答錯連對進度將立即歸零，請謹慎應對。
+            <div class="text-xs sm:text-sm text-gray-200 leading-relaxed">
+              <strong class="text-yellow-400 text-sm sm:text-base">【生輔組鐵血教官】：</strong>
+              「同學！你的平時失誤已達退學邊緣！必須連續答對 3 題補考題才能化解留級危機，一旦答錯連對進度直接歸零！」
             </div>
           </div>
 
-          <!-- 連對進度條 -->
-          <div class="flex flex-col gap-2">
-            <div class="flex items-center justify-between text-xs text-zinc-400 font-mono">
-              <span>連對進度</span>
-              <span class="text-indigo-400 font-semibold">{{ currentStreak }} / {{ targetStreak }} 題</span>
+          <!-- 連對進度條 (高對比方塊) -->
+          <div class="flex flex-col gap-1.5">
+            <div class="flex items-center justify-between text-xs sm:text-sm text-gray-300 font-bold">
+              <span>補考連對進度：</span>
+              <span class="font-black text-yellow-400 font-mono text-sm sm:text-base">{{ currentStreak }} / {{ targetStreak }} 題</span>
             </div>
-            <div class="grid grid-cols-3 gap-3">
+            <div class="grid grid-cols-3 gap-2.5">
               <div 
                 v-for="step in [1, 2, 3]" 
                 :key="step"
-                class="h-2 rounded-full transition-all duration-300"
-                :class="currentStreak >= step ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.4)]' : 'bg-zinc-800'"
+                class="h-4 border-2 border-black transition-all"
+                :class="currentStreak >= step ? 'bg-yellow-400 shadow-[2px_2px_0px_#000]' : 'bg-[#121620]'"
               ></div>
             </div>
           </div>
 
-          <!-- 補考題目卡片 -->
-          <div v-if="currentRemedialQuestion" class="p-5 bg-zinc-950/60 border border-white/[0.08] rounded-xl flex flex-col gap-4">
-            <div class="flex items-center justify-between text-xs">
-              <span class="saas-pill saas-pill-indigo text-xs">
-                {{ currentRemedialQuestion.subject }}
+          <!-- 補考題目卡片 (大字題幹) -->
+          <div v-if="currentRemedialQuestion" class="p-4 sm:p-5 bg-[#121620] border-2 border-black neo-cut-sm shadow-[4px_4px_0px_#000] flex flex-col gap-3">
+            <div class="flex items-center justify-between text-xs sm:text-sm">
+              <span class="px-2.5 py-0.5 bg-yellow-400 text-black font-black border border-black">
+                【{{ currentRemedialQuestion.subject }}】
               </span>
-              <span class="text-xs font-mono text-zinc-400">
-                剩餘時間: <strong class="text-rose-400 font-mono">{{ timerSeconds }}s</strong>
+              <span class="font-black text-[#ff0055] font-mono border border-black px-2 py-0.5 bg-black text-xs sm:text-sm">
+                作答剩餘: {{ timerSeconds }}s
               </span>
             </div>
 
-            <h4 class="text-lg sm:text-xl font-semibold text-zinc-100 leading-snug tracking-tight">
+            <h4 class="text-lg sm:text-xl font-black text-yellow-300 leading-snug tracking-wide">
               {{ currentRemedialQuestion.question }}
             </h4>
 
-            <!-- 四個選項 (Modern 卡片按鈕) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+            <!-- 四個選項 (Neo-Arcade 按鈕 · 16px 大字) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 mt-1">
               <button
                 v-for="(option, idx) in currentRemedialQuestion.options"
                 :key="idx"
                 @click="submitRemedialAnswer(idx)"
-                class="p-3.5 sm:p-4 rounded-xl border border-white/[0.08] bg-zinc-900/60 hover:bg-zinc-800/80 hover:border-indigo-500/50 text-left text-sm text-zinc-100 flex items-center gap-3 transition-all duration-200 cursor-pointer"
+                class="neo-btn bg-[#090b10] hover:bg-[#182030] p-3 sm:p-3.5 text-left text-sm sm:text-base text-white font-bold flex items-center gap-2.5 neo-cut-sm"
               >
-                <span class="saas-kbd w-6 h-6 flex items-center justify-center text-xs font-semibold flex-shrink-0">
+                <span class="w-6 h-6 sm:w-7 sm:h-7 bg-black border border-yellow-400 text-yellow-400 flex items-center justify-center font-mono font-black text-xs sm:text-sm flex-shrink-0">
                   {{ idx + 1 }}
                 </span>
-                <span class="font-normal">{{ option }}</span>
+                <span class="font-black">{{ option }}</span>
               </button>
             </div>
           </div>
@@ -131,8 +125,8 @@
 <script setup lang="ts">
 /**
  * @file RemedialExamModal.vue
- * @description 現代極簡 SaaS 風格 期中留級重修補考彈窗 (Linear Modern Remedial Exam)
- * 具備 Bento 聖物選擇卡片、細緻進度條、教官提示與連對機制。
+ * @description 日系新潮街機風 期中留級重修補考彈窗 (Neo-Arcade Remedial Exam)
+ * 具備黑紅警戒斑馬條紋、日系戰術切角按鈕、生輔組教官訓示與聖物裝備獎勵。
  */
 import { ref, computed, watch, onUnmounted } from 'vue';
 import { useGameStore } from '../../stores/gameStore';
@@ -181,50 +175,44 @@ watch(isOpen, (newVal) => {
   if (newVal) {
     currentStreak.value = 0;
     isPassed.value = false;
+    soundEngine.playWrong();
     loadNextRemedialQuestion();
-    startTimer();
   } else {
-    stopTimer();
+    clearInterval(timerId);
   }
 });
 
 onUnmounted(() => {
-  stopTimer();
+  clearInterval(timerId);
 });
 
-function startTimer(): void {
-  stopTimer();
+function loadNextRemedialQuestion(): void {
+  clearInterval(timerId);
+  const q = questionStore.pickQuestion(gameStore.currentStage);
+  currentRemedialQuestion.value = q;
   timerSeconds.value = 10;
+
   timerId = setInterval(() => {
     if (timerSeconds.value > 1) {
       timerSeconds.value -= 1;
+      if (timerSeconds.value <= 3) {
+        soundEngine.playTick(true);
+      }
     } else {
+      clearInterval(timerId);
       handleRemedialTimeout();
     }
   }, 1000);
 }
 
-function stopTimer(): void {
-  clearInterval(timerId);
-}
-
-function loadNextRemedialQuestion(): void {
-  const subjects = ['國文', '自然', '數學', '社會'] as const;
-  const s = subjects[Math.floor(Math.random() * subjects.length)];
-  const q = questionStore.pickQuestion(gameStore.currentStage, s);
-  currentRemedialQuestion.value = q;
-  startTimer();
-}
-
-function submitRemedialAnswer(choiceIdx: number): void {
+function submitRemedialAnswer(idx: number): void {
   if (!currentRemedialQuestion.value) return;
+  clearInterval(timerId);
 
-  const isCorrect = choiceIdx === currentRemedialQuestion.value.correctIndex;
-  if (isCorrect) {
+  if (idx === currentRemedialQuestion.value.correctIndex) {
     soundEngine.playCorrect();
     currentStreak.value += 1;
     if (currentStreak.value >= targetStreak) {
-      stopTimer();
       isPassed.value = true;
       soundEngine.playFanfare();
     } else {
