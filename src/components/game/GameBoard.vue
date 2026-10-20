@@ -17,6 +17,9 @@
         >
           {{ gameStore.currentStageConfig.title }}
         </span>
+        <span class="px-2 py-0.5 bg-black border border-yellow-400 text-yellow-400 text-xs font-black">
+          {{ gameStore.gameLength === 5 ? '⚡ 5 關速通' : '🏆 10 關馬拉松' }}
+        </span>
         <span class="text-xs sm:text-sm text-yellow-400 font-bold">
           路線: {{ gameStore.currentBranch === 'UPPER' ? '上路 (理科冒險)' : gameStore.currentBranch === 'LOWER' ? '下路 (文藝挑戰)' : '主線起點' }}
         </span>

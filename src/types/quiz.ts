@@ -29,6 +29,9 @@ export type StageGrade = '國小' | '國中' | '高中' | '大學' | '通用';
 /** 路線分支列舉 (經典模式) */
 export type BranchType = 'MAIN' | 'UPPER' | 'LOWER';
 
+/** 關卡長度模式 (5 關速通 vs 10 關馬拉松) */
+export type GameLengthMode = 5 | 10;
+
 /** 現代化題型列舉 */
 export type QuizQuestionType = 
   | 'STANDARD'      // 標準四選一文字考題

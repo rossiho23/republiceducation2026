@@ -21,11 +21,80 @@
     </div>
 
     <!-- 投幣警示條 (黑黃警戒斑馬條紋 · 尺寸放大) -->
-    <div class="my-5 w-full max-w-xl neo-hazard-yellow p-1 neo-cut-sm border-2 border-black shadow-[4px_4px_0px_#000]">
+    <div class="my-4 w-full max-w-xl neo-hazard-yellow p-1 neo-cut-sm border-2 border-black shadow-[4px_4px_0px_#000]">
       <div class="bg-black py-2 px-5 text-center">
         <span class="text-yellow-400 font-black text-sm sm:text-base tracking-widest animate-pulse">
           ▶ 1 COIN 1 PLAY · 請選擇入學推進模式 ◀
         </span>
+      </div>
+    </div>
+
+    <!-- 關卡長度自選模式 (5 關速通 vs 10 關馬拉松) -->
+    <div class="my-3 w-full max-w-2xl bg-[#121620] border-2 border-yellow-400 p-3.5 neo-cut-sm shadow-[5px_5px_0px_#000]">
+      <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-800 text-left">
+        <div class="flex items-center gap-2">
+          <span class="px-2 py-0.5 bg-yellow-400 text-black text-xs font-black uppercase">
+            LENGTH SELECT
+          </span>
+          <span class="text-xs sm:text-sm font-bold text-gray-200">
+            請選擇關卡長度模式
+          </span>
+        </div>
+        <span class="text-xs sm:text-sm text-yellow-400 font-mono font-black">
+          當前：{{ gameStore.gameLength === 5 ? '⚡ 五關速通賽 (5 關短程)' : '🏆 十關馬拉松 (10 關深度)' }}
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <!-- 5 關速通賽按鈕 -->
+        <button
+          type="button"
+          @click="selectGameLength(5)"
+          class="p-3.5 border-2 transition-all neo-cut-sm text-left flex flex-col justify-between cursor-pointer"
+          :class="gameStore.gameLength === 5 
+            ? 'bg-yellow-400 text-black border-black shadow-[4px_4px_0px_#000] scale-[1.02]' 
+            : 'bg-[#0a0d14] text-gray-300 border-gray-700 hover:border-yellow-400 hover:text-white'"
+        >
+          <div class="flex items-center justify-between">
+            <span class="text-base sm:text-lg font-black neo-skew-title flex items-center gap-1.5">
+              ⚡ 五關速通賽
+            </span>
+            <span 
+              class="text-[11px] font-bold px-2 py-0.5 border"
+              :class="gameStore.gameLength === 5 ? 'bg-black text-yellow-400 border-black' : 'bg-gray-800 text-gray-400 border-gray-700'"
+            >
+              3~5 分鐘短程
+            </span>
+          </div>
+          <p class="text-xs mt-2 leading-relaxed opacity-90">
+            5 步地圖直通 Boss 檢定考！適合零碎時間、節奏明快爽快通關！
+          </p>
+        </button>
+
+        <!-- 10 關馬拉松按鈕 -->
+        <button
+          type="button"
+          @click="selectGameLength(10)"
+          class="p-3.5 border-2 transition-all neo-cut-sm text-left flex flex-col justify-between cursor-pointer"
+          :class="gameStore.gameLength === 10 
+            ? 'bg-cyan-400 text-black border-black shadow-[4px_4px_0px_#000] scale-[1.02]' 
+            : 'bg-[#0a0d14] text-gray-300 border-gray-700 hover:border-cyan-400 hover:text-white'"
+        >
+          <div class="flex items-center justify-between">
+            <span class="text-base sm:text-lg font-black neo-skew-title flex items-center gap-1.5">
+              🏆 十關馬拉松
+            </span>
+            <span 
+              class="text-[11px] font-bold px-2 py-0.5 border"
+              :class="gameStore.gameLength === 10 ? 'bg-black text-cyan-400 border-black' : 'bg-gray-800 text-gray-400 border-gray-700'"
+            >
+              完整深度挑戰
+            </span>
+          </div>
+          <p class="text-xs mt-2 leading-relaxed opacity-90">
+            10 步完整探索！包含菁英難題、深層突發事件與最高學位畢業考！
+          </p>
+        </button>
       </div>
     </div>
 
@@ -156,8 +225,10 @@
 /**
  * @file TitleScreen.vue
  * @description 日系新潮街機風 標題畫面組件 (Neo-Arcade Title Screen)
- * 提供日系大字報斜體排版、Persona 5 風格戰術斜切卡片與乾淨去 AI 化的選路入口。
+ * 提供日系大字報斜體排版、Persona 5 風格戰術斜切卡片、五關/十關長度自選與乾淨去 AI 化的選路入口。
  */
+import { useGameStore } from '../../stores/gameStore';
+import { GameLengthMode } from '../../types/quiz';
 import { soundEngine } from '../../utils/audioEngine';
 
 const emit = defineEmits<{
@@ -165,6 +236,16 @@ const emit = defineEmits<{
   (e: 'start-roguelike'): void;
   (e: 'start-classic'): void;
 }>();
+
+const gameStore = useGameStore();
+
+/**
+ * 切換關卡長度模式 (5 關速通 或 10 關馬拉松)
+ * @param {GameLengthMode} length 模式步數
+ */
+function selectGameLength(length: GameLengthMode): void {
+  gameStore.setGameLength(length);
+}
 
 function startRoguelike(): void {
   soundEngine.playCoin();

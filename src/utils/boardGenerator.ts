@@ -4,7 +4,7 @@
  * 依據各升學階段配置起點、分叉選擇點 (FORK)、上分歧路線 (UPPER) 與下分歧路線 (LOWER)，並匯流至升學大考 Boss 關卡。
  */
 
-import { MapTile, StageGrade, StageConfig, RandomEvent, GameItem } from '../types/quiz';
+import { MapTile, StageGrade, StageConfig, RandomEvent, GameItem, GameLengthMode } from '../types/quiz';
 
 /** 各學程設定參數表 */
 export const STAGE_CONFIGS: Record<StageGrade, StageConfig> = {
@@ -107,13 +107,14 @@ export const CANTEEN_ITEMS: GameItem[] = [
  * 5. 終點「升學大考 Boss 關卡」
  * 
  * @param {StageGrade} grade 學程階段
+ * @param {GameLengthMode} length 關卡長度模式 (5 關速通 或 10 關馬拉松，預設 10)
  * @returns {MapTile[]} 格子資料陣列
  */
-export function generateBoardTiles(grade: StageGrade): MapTile[] {
+export function generateBoardTiles(grade: StageGrade, length: GameLengthMode = 10): MapTile[] {
   const config = STAGE_CONFIGS[grade] || STAGE_CONFIGS['高中'];
   const tiles: MapTile[] = [];
 
-  // 第 0 格：起點「昇學」格 (MAIN)
+  // 第 0 格：起點「昇學」格 (MAIN) - 步驟 1
   tiles.push({
     index: 0,
     type: 'RECOVERY',
@@ -126,7 +127,7 @@ export function generateBoardTiles(grade: StageGrade): MapTile[] {
     stepNumber: 1
   });
 
-  // 第 1 格：分叉選擇點 (FORK)
+  // 第 1 格：分叉選擇點 (FORK) - 步驟 2
   tiles.push({
     index: 1,
     type: 'FORK',
@@ -139,14 +140,36 @@ export function generateBoardTiles(grade: StageGrade): MapTile[] {
     stepNumber: 2
   });
 
-  // 上分歧路線 (UPPER BRANCH - trackRow: 0)
-  const upperTilesDef = [
-    { type: 'QUIZ', subject: '自然', title: '理化隨堂考', desc: '實驗室化學分析測驗！' },
-    { type: 'QUIZ', subject: '流行音樂', title: '音樂隨堂考', desc: '五線譜旋律與華語流行音樂題！' },
-    { type: 'THREE_CHOICE', subject: '時事冷知識', title: '三選一送分格', desc: '只有三個選項的送分題目！' },
-    { type: 'CANTEEN', subject: undefined, title: 'LUCKY 校園福利社', desc: '旭日光芒補給站！購買戰略道具與養樂多！' },
-    { type: 'TROUBLE', subject: undefined, title: 'TROUBLE 骷髏災難', desc: '校規記過警告！損失體力 20 點！' }
-  ];
+  // 根據 5 關或 10 關定義上下路格子
+  const upperTilesDef = length === 5
+    ? [
+        { type: 'QUIZ', subject: '自然', title: '理化隨堂考', desc: '實驗室化學分析測驗！' },
+        { type: 'CANTEEN', subject: undefined, title: 'LUCKY 校園福利社', desc: '旭日光芒補給站！購買戰略道具與養樂多！' }
+      ]
+    : [
+        { type: 'QUIZ', subject: '自然', title: '理化隨堂考', desc: '實驗室化學分析測驗！' },
+        { type: 'QUIZ', subject: '流行音樂', title: '音樂隨堂考', desc: '五線譜旋律與華語流行音樂題！' },
+        { type: 'THREE_CHOICE', subject: '時事冷知識', title: '三選一送分格', desc: '只有三個選項的送分題目！' },
+        { type: 'CANTEEN', subject: undefined, title: 'LUCKY 校園福利社', desc: '旭日光芒補給站！購買戰略道具與養樂多！' },
+        { type: 'QUIZ', subject: '社會', title: '文理小試', desc: '綜合歷史地理與社會人文測驗！' },
+        { type: 'TROUBLE', subject: undefined, title: 'TROUBLE 骷髏災難', desc: '校規記過警告！損失體力 20 點！' },
+        { type: 'RECOVERY', subject: undefined, title: '模擬考前自修', desc: '安靜溫習，體力與專注度完全回復！' }
+      ];
+
+  const lowerTilesDef = length === 5
+    ? [
+        { type: 'HEALTH', subject: '健康教育', title: '健康教育護理', desc: '生理衛生保健常識，體力回復 +25 點！' },
+        { type: 'TALENT', subject: '數學', title: '天才問題挑戰', desc: '極限高難度題！答對可獲雙倍分數與大量學分！' }
+      ]
+    : [
+        { type: 'HEALTH', subject: '健康教育', title: '健康教育護理', desc: '生理衛生保健常識，體力回復 +25 點！' },
+        { type: 'QUIZ', subject: '美術', title: '美術色彩學', desc: '調色盤與西洋藝術史測驗！' },
+        { type: 'TALENT', subject: '數學', title: '天才問題挑戰', desc: '極限高難度題！答對可獲雙倍分數與大量學分！' },
+        { type: 'EVENT', subject: undefined, title: '？號校園突發事件', desc: '走廊上突然發生神祕意外事件！' },
+        { type: 'EXTRACURRICULAR', subject: '課外', title: '課外時事大百科', desc: '報章雜誌生活冷知識測驗！' },
+        { type: 'TALENT', subject: '常識', title: '奧林匹克競賽題', desc: '金牌挑戰！極高難度思維題目！' },
+        { type: 'CANTEEN', subject: undefined, title: '歷屆筆記傳授', desc: '向學長姐請益考試技巧與補充道具！' }
+      ];
 
   upperTilesDef.forEach((item, i) => {
     tiles.push({
@@ -161,15 +184,6 @@ export function generateBoardTiles(grade: StageGrade): MapTile[] {
       stepNumber: 3 + i
     });
   });
-
-  // 下分歧路線 (LOWER BRANCH - trackRow: 1)
-  const lowerTilesDef = [
-    { type: 'HEALTH', subject: '健康教育', title: '健康教育護理', desc: '生理衛生保健常識，體力回復 +25 點！' },
-    { type: 'QUIZ', subject: '美術', title: '美術色彩學', desc: '調色盤與西洋藝術史測驗！' },
-    { type: 'TALENT', subject: '數學', title: '天才問題挑戰', desc: '極限高難度題！答對可獲雙倍分數與大量學分！' },
-    { type: 'EVENT', subject: undefined, title: '？號校園突發事件', desc: '走廊上突然發生神祕意外事件！' },
-    { type: 'EXTRACURRICULAR', subject: '課外', title: '課外時事大百科', desc: '報章雜誌生活冷知識測驗！' }
-  ];
 
   lowerTilesDef.forEach((item, i) => {
     tiles.push({

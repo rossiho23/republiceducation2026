@@ -8,9 +8,12 @@
     <!-- 頂部學程狀態與聖物裝備列 (字級放大) -->
     <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 sm:p-4 bg-[#121620] border-2 border-black shadow-[3px_3px_0px_#000] neo-cut-sm">
       <!-- 學程與樓層指標 -->
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-3">
         <span class="px-3 py-1 bg-yellow-400 text-black text-xs sm:text-sm font-black uppercase tracking-wider transform -rotate-1 border border-black shadow-[2px_2px_0px_#000]">
           {{ gameStore.currentStage }}階段
+        </span>
+        <span class="px-2.5 py-1 bg-black border border-yellow-400 text-yellow-400 text-xs sm:text-sm font-black tracking-wider shadow-[2px_2px_0px_#000]">
+          {{ gameStore.gameLength === 5 ? '⚡ 5 關速通' : '🏆 10 關馬拉松' }}
         </span>
         <div class="text-sm sm:text-base text-gray-200 font-bold">
           探索進度：<span class="text-yellow-400 font-black text-base sm:text-lg">第 {{ currentFloor + 1 }} 層 / 共 {{ totalFloors }} 層</span>
@@ -102,7 +105,7 @@
 /**
  * @file RoguelikeMap.vue
  * @description 日系新潮街機風 樹狀分支地圖組件 (Neo-Arcade Roguelike Map)
- * 具備粗黑 4px 邊框、日系戰術切角按鈕、半色調波點網底與俐落乾淨的選路回饋。
+ * 具備粗黑 4px 邊框、日系戰術切角按鈕、半色調波點網底與俐落乾淨的選路回饋，支援 5 關與 10 關模式。
  */
 import { ref, computed, onMounted, watch } from 'vue';
 import { useGameStore } from '../../stores/gameStore';
@@ -139,12 +142,12 @@ onMounted(() => {
   initMapForStage();
 });
 
-watch(() => gameStore.currentStage, () => {
+watch(() => [gameStore.currentStage, gameStore.gameLength], () => {
   initMapForStage();
 });
 
 function initMapForStage(): void {
-  roguelikeFloors.value = generateRoguelikeMap(gameStore.currentStage);
+  roguelikeFloors.value = generateRoguelikeMap(gameStore.currentStage, gameStore.gameLength);
   currentFloor.value = 0;
   if (roguelikeFloors.value.length > 0 && roguelikeFloors.value[0].length > 0) {
     activeNodeId.value = roguelikeFloors.value[0][0].id;

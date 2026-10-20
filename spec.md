@@ -447,3 +447,57 @@ sequenceDiagram
     end
 ```
 
+
+
+---
+
+## 10. 「五關速通賽 vs 十關馬拉松」關卡長度自選系統規格 (Game Length Selection Spec)
+
+### 10.1 模式定位與設計理念
+為滿足不同場景與玩家節奏偏好，於開局首頁與遊戲中提供「五關速通賽」與「十關馬拉松」雙長度自選機制：
+
+1. **⚡ 五關速通賽 (`GameLengthMode = 5`)**：
+   * **適用場景**：碎片時間、快速單局試玩、課堂即時測驗競賽（約 3~5 分鐘通關）。
+   * **肉鴿地圖樓層**：精縮為 5 個樓層（Floor 0 開學檢定 ➔ Floor 1 雙軌初試 ➔ Floor 2 聽力/視覺特考 ➔ Floor 3 福利社/奇遇補給 ➔ Floor 4 升學大考 Boss 戰）。
+   * **經典雙軌棋盤**：精縮為 5 步關鍵節點（起點 ➔ 路線分叉 ➔ 2 關學科卡匣 ➔ 升學 Boss 終點），跑馬燈同步顯示「離畢業還有 5 層次」。
+2. **🏆 十關馬拉松 (`GameLengthMode = 10`)**：
+   * **適用場景**：完整沉浸、深度修煉、挑戰全學科與被動聖物（約 8~12 分鐘通關）。
+   * **肉鴿地圖樓層**：展開為完整 10 個樓層（Floor 0~9），涵蓋隨堂考、菁英考、聽力猜歌、局部照片、多次福利社與留級補考機制。
+   * **經典雙軌棋盤**：完整雙軌長軌道，還原大型街機「離畢業還有 10 層次」。
+
+### 10.2 資料結構與參數對照表
+
+```typescript
+/** 關卡長度模式 */
+export type GameLengthMode = 5 | 10;
+```
+
+| 關卡長度模式 | 肉鴿地圖總樓層 | 經典棋盤總格數 | 預估通關時間 | Boss 戰出現時機 | 跑馬燈標語 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **⚡ 5 關速通賽** | 5 層 (Floor 0~4) | 5 步關鍵節點 | 3 ~ 5 分鐘 | 第 5 關 (Floor 4) | // 離畢業還有 5 層次。 // |
+| **🏆 10 關馬拉松** | 10 層 (Floor 0~9) | 12~14 步完整雙軌 | 8 ~ 12 分鐘 | 第 10 關 (Floor 9) | // 離畢業還有 10 層次。 // |
+
+### 10.3 關卡長度切換與地圖生成循序圖 (Sequence Diagram)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Player as 玩家 (Player)
+    participant Title as 標題首頁 (TitleScreen)
+    participant Store as 遊戲狀態庫 (gameStore)
+    participant GenRogue as 肉鴿生成器 (roguelikeGenerator)
+    participant GenBoard as 棋盤生成器 (boardGenerator)
+
+    Player->>Title: 點擊切換 [⚡ 5關速通 / 🏆 10關馬拉松]
+    Title->>Store: setGameLength(5 或 10)
+    Store-->>Title: 播放切換音效，高亮選中狀態按鈕
+    Player->>Title: 點選模式 (如：輕度肉鴿選路)
+    Title->>Store: startNewGame('國小' 或 '高中')
+    alt 肉鴿模式
+        Store->>GenRogue: generateRoguelikeMap(stage, gameLength)
+        GenRogue-->>Store: 返回 5 層或 10 層之動態分支節點網絡
+    else 經典模式
+        Store->>GenBoard: generateBoardTiles(stage, gameLength)
+        GenBoard-->>Store: 返回 5 步或 10 步之雙軌卡匣軌道
+    end
+    Store-->>Player: 進入對應長度之地圖，開始闖關！
+```

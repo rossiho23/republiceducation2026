@@ -15,7 +15,8 @@ import {
   GameItem, 
   BossExamState,
   BranchType,
-  SchoolRelic
+  SchoolRelic,
+  GameLengthMode
 } from '../types/quiz';
 import { 
   generateBoardTiles, 
@@ -121,6 +122,9 @@ export const useGameStore = defineStore('gameStore', () => {
   const continueCountdown = ref<number>(9);
   const continueTimer = ref<number | null>(null);
 
+  // 關卡長度模式 (5 關速通 或 10 關馬拉松，預設 10)
+  const gameLength = ref<GameLengthMode>(10);
+
   // ================= 輔助計算屬性 =================
   const currentStageConfig = computed(() => STAGE_CONFIGS[currentStage.value]);
   const currentTile = computed(() => tiles.value[currentTileIndex.value] || null);
@@ -132,9 +136,9 @@ export const useGameStore = defineStore('gameStore', () => {
   const mainForkTile = computed(() => tiles.value.find(t => t.index === 1));
   const mainExamTile = computed(() => tiles.value.find(t => t.type === 'EXAM'));
 
-  // 離畢業還有幾層次
+  // 離畢業還有幾層次 (依據長度模式動態計算)
   const remainingLayers = computed(() => {
-    const base = currentStageConfig.value.layerCount;
+    const base = gameLength.value === 5 ? 5 : (currentStageConfig.value?.layerCount || 10);
     const progress = Math.min(base, currentTileIndex.value);
     return Math.max(1, base - progress);
   });
@@ -142,16 +146,32 @@ export const useGameStore = defineStore('gameStore', () => {
   // ================= 核心方法 =================
 
   /**
+   * 設定遊戲長度模式 (5 關速通 或 10 關馬拉松)
+   * @param {GameLengthMode} length 關卡長度模式
+   */
+  function setGameLength(length: GameLengthMode): void {
+    gameLength.value = length;
+    // 同步重整棋盤格子以符合長度模式
+    tiles.value = generateBoardTiles(currentStage.value, length);
+    soundEngine.playCoin();
+  }
+
+  /**
    * 初始化並啟動新局遊戲
    * @param {StageGrade} [stage='高中'] 起始學程
+   * @param {GameLengthMode} [length] 關卡長度模式 (若未帶則維持既有設定)
    */
-  function startNewGame(stage: StageGrade = '高中'): void {
+  function startNewGame(stage: StageGrade = '高中', length?: GameLengthMode): void {
     questionStore.initQuestions();
     questionStore.clearUsedQuestions();
     soundEngine.playCoin();
 
+    if (length) {
+      gameLength.value = length;
+    }
+
     currentStage.value = stage;
-    tiles.value = generateBoardTiles(stage);
+    tiles.value = generateBoardTiles(stage, gameLength.value);
     currentTileIndex.value = 0;
     currentBranch.value = 'MAIN';
     playerHp.value = 100;
@@ -766,12 +786,13 @@ export const useGameStore = defineStore('gameStore', () => {
       return;
     }
 
-    tiles.value = generateBoardTiles(currentStage.value);
+    tiles.value = generateBoardTiles(currentStage.value, gameLength.value);
     currentTileIndex.value = 0;
     currentBranch.value = 'MAIN';
     playerHp.value = 100;
     rank.value = STAGE_CONFIGS[currentStage.value].baseRank;
-    hostComment.value = `恭喜榮升【${STAGE_CONFIGS[currentStage.value].title}】！離畢業還有 ${STAGE_CONFIGS[currentStage.value].layerCount} 層次！`;
+    const remainingCount = gameLength.value === 5 ? 5 : STAGE_CONFIGS[currentStage.value].layerCount;
+    hostComment.value = `恭喜榮升【${STAGE_CONFIGS[currentStage.value].title}】！離畢業還有 ${remainingCount} 層次！`;
   }
 
   function triggerGameOver(): void {
@@ -899,6 +920,9 @@ export const useGameStore = defineStore('gameStore', () => {
     mainExamTile,
     remainingLayers,
 
+    // 關卡長度模式
+    gameLength,
+
     // 現代化博弈與肉鴿狀態
     currentWagerAmount,
     stageMistakeCount,
@@ -907,6 +931,7 @@ export const useGameStore = defineStore('gameStore', () => {
     remedialStreak,
 
     // 方法
+    setGameLength,
     startNewGame,
     rollDice,
     chooseBranch,
