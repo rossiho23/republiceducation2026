@@ -859,3 +859,28 @@ sequenceDiagram
     end
 ```
 
+---
+
+## 15. 版本發布管理與 Release Notes 規範 (Release Management Specification)
+
+### 15.1 發布理念與核心要求
+1. **強制發布日誌原則**：未來每一次功能開發、介面調整或 Bug 修復推送到 GitHub 遠端倉庫前，**必須先於根目錄 `RELEASE_NOTES.md` 追加該版本的完整 Release Note**。
+2. **語意化版本號 (SemVer)**：採用 `v主版本.次版本.修訂號`（例如 `v2.5.0`），搭配詳細發布日期與時間。
+3. **分類結構化規範**：
+   - 🚀 **新功能與機制升級 (New Features)**
+   - 🐛 **問題修復與相容性強化 (Bug Fixes)**
+   - 🎨 **視覺風格與街機美學優化 (UI / UX)**
+   - 🎵 **音效多媒體與混音控制 (Audio / Media)**
+4. **語言強制**：所有 Release Notes 內容**強制使用繁體中文 (Traditional Chinese)**。
+
+### 15.2 版本發布工作流程圖 (Flowchart)
+```mermaid
+flowchart TD
+    A["完成功能開發 / 修復驗證"] --> B["執行本地 npm run build 通過"]
+    B --> C["編寫 / 更新根目錄 RELEASE_NOTES.md"]
+    C --> D["同步更新 todolist.md 與 report.md"]
+    D --> E["執行 git commit -m '...'"]
+    E --> F["執行 git push origin main 發布"]
+    F --> G["回報使用者時附上當次 Release Note 摘要"]
+```
+
