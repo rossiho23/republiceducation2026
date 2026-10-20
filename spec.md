@@ -738,3 +738,88 @@ sequenceDiagram
         Retro-->>Player: 呈現 1993 經典街機大型電玩介面
     end
 ```
+
+---
+
+## 14. 開頭映畫劇院與全域背景音樂架構 (Intro Cinema & Global BGM)
+
+### 14.1 設計理念與功能目標
+1. **開頭劇院全螢幕模式 (Intro Cinema)**：
+   - 玩家重整網頁 (F5) 或初次進入遊戲首頁時，以黑底大型街機劇院全螢幕播放 `開頭.mp4` 片頭動畫。
+   - 畫面右下方提供「⏩ 跳過片頭 (SPACE / 點擊)」戰術按鈕，供熟練玩家迅速跳過。
+   - 瀏覽器 Autoplay 解鎖相容：若瀏覽器阻擋無手勢音訊自動播放，中央呈現日系街機「▶ 點擊啟動街機映畫」提示，點擊即解鎖影片與音訊上下文。
+2. **全域 BGM 智慧循環調度 (`The_Final_Question.mp3`)**：
+   - 開頭影片播畢或玩家跳過時，平滑淡出並切換至首頁，同時無縫自動啟動 `The_Final_Question.mp3` 背景音樂無限循環播放。
+   - 建立獨立音訊引擎 `bgmEngine.ts`，支援全域音量微調（預設 0.35 避免蓋過 Web Audio 答題音效）與靜音開關。
+   - 街機框體 HUD 與地圖上方增設「🎵 BGM」控制按鈕，隨時可切換靜音或繼續播放。
+
+### 14.2 資料結構定義
+```typescript
+/** 背景音樂引擎狀態介面 */
+export interface BgmState {
+  isPlaying: boolean;
+  isMuted: boolean;
+  volume: number; // 0.0 ~ 1.0
+  currentTrack: string;
+}
+
+/** 開頭片頭映畫狀態介面 */
+export interface IntroVideoState {
+  isPlaying: boolean;
+  hasEnded: boolean;
+  isMuted: boolean;
+  requireUserInteraction: boolean;
+}
+```
+
+### 14.3 開頭映畫與背景音樂流程圖 (Flowchart)
+```mermaid
+flowchart TD
+    A["使用者打開網頁 / F5 重整"] --> B["載入 IntroCinema 開頭映畫組件"]
+    B --> C{"瀏覽器自動播放檢測"}
+    C -- "允許自動播放" --> D["滿版播放 開頭.mp4 (含聲音)"]
+    C -- "阻擋無互動音訊" --> E["顯示 [▶ 點擊啟動街機映畫] 互動解鎖層"]
+    E -->|點擊螢幕 / 按 SPACE| D
+
+    D --> F{"影片播放狀態"}
+    F -- "影片播放完畢 (ended)" --> G["平滑淡出開頭劇院"]
+    F -- "玩家點擊 [⏩ 跳過片頭]" --> G
+
+    G --> H["顯示街機標題首頁 (TitleScreen)"]
+    G --> I["bgmEngine.play() 啟動 The_Final_Question.mp3 循環播放"]
+    I --> J["全域音量控制 (預設 35% 混音平衡)"]
+    J --> K["頂部 HUD 支援 [🎵 音樂開關] 隨時靜音/續播"]
+```
+
+### 14.4 開頭映畫與背景音樂循序圖 (Sequence Diagram)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Player as 玩家 (Player)
+    participant Cinema as 開頭映畫 (IntroCinema.vue)
+    participant Video as 原生影片核心 (HTMLVideoElement)
+    participant App as 主應用容器 (App.vue)
+    participant BGM as 背景音樂引擎 (bgmEngine)
+    participant Title as 標題首頁 (TitleScreen.vue)
+
+    Player->>App: 進入網站或重整頁面
+    App->>Cinema: 掛載開頭映畫組件 (showIntro = true)
+    Cinema->>Video: 執行 video.play()
+    alt 瀏覽器允許播放
+        Video-->>Cinema: 開始播放片頭視訊
+    else 瀏覽器阻擋
+        Cinema-->>Player: 呈現「點擊啟動街機映畫」提示
+        Player->>Cinema: 點擊螢幕
+        Cinema->>Video: video.play() 解鎖播放
+    end
+
+    alt 玩家點擊跳過或影片播畢
+        Player->>Cinema: 點擊 [⏩ 跳過片頭] (或 video.onended)
+    end
+    Cinema->>App: 觸發 complete 事件
+    App->>App: showIntro = false (卸載劇院)
+    App->>BGM: bgmEngine.startBgm()
+    BGM-->>Player: 循環播放 The_Final_Question.mp3
+    App->>Title: 渲染日系街機標題首頁
+```
+

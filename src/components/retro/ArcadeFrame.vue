@@ -60,6 +60,19 @@
             {{ isCrtActive ? 'ON' : 'OFF' }}
           </span>
         </button>
+        <!-- 背景音樂開關 (The Final Question) -->
+        <button 
+          @click="toggleBgm"
+          class="neo-btn bg-[#121620] hover:bg-[#1a2130] text-gray-200 py-1.5 px-3 flex items-center gap-1.5 text-xs sm:text-sm tracking-wider font-bold"
+          :title="bgmEngine.state.isMuted ? '開啟背景音樂 (The Final Question)' : '靜音背景音樂'"
+        >
+          <span class="text-rose-400 font-mono">BGM:</span>
+          <span :class="!bgmEngine.state.isMuted ? 'text-emerald-400 font-black' : 'text-red-500'">
+            {{ !bgmEngine.state.isMuted ? 'ON ♫' : 'MUTE' }}
+          </span>
+        </button>
+
+
 
         <!-- 靜音開關 -->
         <button 
@@ -109,6 +122,7 @@
  */
 import { ref, onMounted, onUnmounted } from 'vue';
 import { soundEngine } from '../../utils/audioEngine';
+import { bgmEngine } from '../../utils/bgmEngine';
 
 defineEmits<{
   (e: 'open-cms'): void;
@@ -162,6 +176,17 @@ function toggleCrt(): void {
 /**
  * 切換全局音效靜音
  */
+
+/**
+ * 切換背景音樂播放或靜音
+ */
+function toggleBgm(): void {
+  bgmEngine.toggleMute();
+  if (!bgmEngine.state.isMuted && !bgmEngine.state.isPlaying) {
+    bgmEngine.play();
+  }
+}
+
 function toggleMute(): void {
   isMuted.value = soundEngine.toggleMute();
 }

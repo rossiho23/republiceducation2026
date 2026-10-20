@@ -182,3 +182,15 @@
 - [x] 將修復與新功能代碼提交並推送到遠端 GitHub 倉庫自動發布
 - [x] 產出修復日誌至 `log/20261020_13.md` 與更新 `report.md`
 
+
+## 階段二十八：開頭映畫劇院全螢幕模式與全域 BGM 智慧循環調度實作 (方案 A)
+- [x] 部署多媒體檔案：將 `pic/The_Final_Question.mp3` 與 `pic/開頭.mp4` 部署至公開資產目錄 (`public/media/`)
+- [x] 建立獨立全域背景音樂引擎：`src/utils/bgmEngine.ts`，支援自動無限循環播放、音量調整、靜音開關與狀態監聽
+- [x] 實作電影級開頭映畫組件：`src/components/game/IntroCinema.vue`，支援黑底全螢幕、Autoplay 點擊解鎖提示、跳過按鍵 (SPACE / 點擊) 與淡出過場
+- [x] 在主應用入口 (`src/App.vue`) 掛載開頭映畫組件，於網頁載入或重整時優先播放，結束後平滑過渡並啟動 BGM 循環
+- [x] 在街機外框組件 (`src/components/retro/ArcadeFrame.vue`) 增設「🎵 BGM」即時開關與音量微調按鈕
+- [x] 執行本地 `npm run build` 編譯檢驗確認 100% 通過
+- [x] 將新功能代碼提交並推送到遠端 GitHub 倉庫自動發布
+- [x] 產出日誌至 `log/20261020_14.md` 與更新 `report.md`
+
+

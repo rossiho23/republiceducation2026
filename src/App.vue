@@ -1,5 +1,11 @@
 <template>
   <ArcadeFrame @open-cms="isCmsOpen = true">
+    <!-- 電影級開頭映畫組件 (重整網頁或進入首頁時優先播放) -->
+    <IntroCinema 
+      v-if="showIntroCinema" 
+      @complete="handleIntroComplete" 
+    />
+
     <!-- 首頁街機標題畫面 (未進入地圖時) -->
     <TitleScreen 
       v-if="!isGameStarted" 
@@ -71,10 +77,23 @@ import ContinueModal from './components/game/ContinueModal.vue';
 import ResultModal from './components/game/ResultModal.vue';
 import ResetModal from './components/game/ResetModal.vue';
 import QuestionCMS from './components/cms/QuestionCMS.vue';
+import IntroCinema from './components/game/IntroCinema.vue';
+import { bgmEngine } from './utils/bgmEngine';
 
 const gameStore = useGameStore();
 const questionStore = useQuestionStore();
 const characterStore = useCharacterStore();
+
+const showIntroCinema = ref<boolean>(true);
+
+/**
+ * 開頭映畫結束或被跳過時的回呼處理
+ * 關閉片頭組件並自動啟動 The_Final_Question 背景音樂循環播放
+ */
+function handleIntroComplete(): void {
+  showIntroCinema.value = false;
+  bgmEngine.play();
+}
 
 const isCmsOpen = ref<boolean>(false);
 const isGameStarted = ref<boolean>(false);
