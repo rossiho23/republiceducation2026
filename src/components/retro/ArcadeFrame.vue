@@ -69,8 +69,8 @@
             :title="bgmEngine.state.isMuted ? '開啟背景音樂' : '靜音背景音樂'"
           >
             <span class="text-rose-400 font-mono">BGM:</span>
-            <span :class="!bgmEngine.state.isMuted ? 'text-emerald-400 font-black' : 'text-red-500'">
-              {{ !bgmEngine.state.isMuted ? `[♫ ${bgmEngine.state.currentTrackIndex + 1}/2]` : 'MUTE' }}
+            <span :class="bgmEngine.state.isPausedByAudioQuiz ? 'text-amber-400 font-black animate-pulse' : (!bgmEngine.state.isMuted ? 'text-emerald-400 font-black' : 'text-red-500')">
+              {{ bgmEngine.state.isPausedByAudioQuiz ? '[🔇 聆聽中暫停]' : (!bgmEngine.state.isMuted ? `[♫ ${bgmEngine.state.currentTrackIndex + 1}/2]` : 'MUTE') }}
             </span>
             <span class="text-gray-300 hidden md:inline text-[11px] truncate max-w-[130px]">
               {{ bgmEngine.state.currentTrackTitle }}

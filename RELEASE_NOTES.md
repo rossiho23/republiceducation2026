@@ -4,6 +4,30 @@
 
 ---
 
+## [v2.5.2] - 2026-10-21
+
+### 🚀 新功能與多媒體升級 (Features & Multimedia)
+- **升級 BOSS 戰全多媒體題型支援 (Boss Exam Multimedia Integration)**：
+  - 升學檢定大考 (`BossExamModal.vue`) 完整引入 Web Audio API 8-Bit 程序化方波合成器（`melodySynthesizer`），支援懷舊老歌／經典廣告旋律播放條、狀態指示燈與「▶ 重新播放」按鈕。
+  - 同步支援視覺局部放大照片題（`VISUAL_ZOOM`），清晰度隨倒數時間動態由模糊轉清晰。
+- **音樂題 BGM 智能專注暫停 (Audio Quiz Smart Pause & Resume)**：
+  - 全面升級背景音樂電台 `bgmEngine.ts`，新增專用專注聆聽控制：
+    - 無論隨堂考還是 BOSS 戰，凡進入 `AUDIO_GUESS` 題型，BGM 自動暫停，給予玩家 100% 零雜音純淨聆聽體驗。
+    - 玩家作答完成、換題或關閉彈窗瞬間，BGM 自動原位無縫恢復播放。
+    - 嚴密防呆：若玩家手動設定為靜音，作答結束後絕不擅自解除靜音。
+- **機台頂部 HUD 狀態動態聯動**：
+  - 機台頂部控制列實時響應，聽歌題期間動態顯示閃爍的 `[🔇 聆聽中暫停]` 提示標籤。
+
+### 🐛 缺陷修復與狀態機防死鎖 (Bug Fixes & Anti-Deadlock)
+- **修復升級 BOSS 戰音樂題無聲問題**：徹底解決先前因組件缺乏音訊播放器導致音樂題聽不到聲音的缺陷。
+- **根除倒數超時（Time Out）導致的 BOSS 戰永久死鎖**：
+  - 修復 `gameStore.ts` 的 `handleTimeOut()`，若處於 BOSS 戰，倒數至 0 秒時正確扣除容錯次數，並於 1.2 秒後自動載入下一題，徹底杜絕畫面卡死。
+- **增設「下一題 ➔ (ENTER)」雙保險推進按鈕**：
+  - 在 BOSS 戰作答完成後，畫面上呈現黃色「下一題 ➔」推進按鈕，並支援 <kbd>ENTER</kbd> / <kbd>SPACE</kbd> 鍵，兼具 1.2 秒自動換題與手動點擊雙保險，保證 100% 絕不卡死！
+  - 支援全套鍵盤作答快速鍵（<kbd>A</kbd>/<kbd>B</kbd>/<kbd>C</kbd>/<kbd>D</kbd>、<kbd>1</kbd>/<kbd>2</kbd>/<kbd>3</kbd>/<kbd>4</kbd>）。
+
+---
+
 ## [v2.5.1] - 2026-10-20
 
 ### 🚀 核心升級與發聲重構 (Audio Architecture Upgrade)

@@ -77,6 +77,9 @@
           <div class="flex items-center gap-2.5 text-sm sm:text-base font-black text-cyan-400">
             <span class="w-3 h-3 bg-emerald-400 animate-ping inline-block"></span>
             <span>// 8-BIT 懷舊旋律播放中... //</span>
+            <span class="text-xs bg-red-600 text-white font-mono px-2 py-0.5 border border-black shadow ml-1">
+              🔇 BGM 自動暫停中
+            </span>
           </div>
           <button
             @click="replayAudioMelody"
@@ -297,6 +300,7 @@ import { computed, onMounted, onUnmounted, watch } from 'vue';
 import { useGameStore } from '../../stores/gameStore';
 import { useCharacterStore } from '../../stores/characterStore';
 import { melodySynthesizer } from '../../utils/audioMelodySynthesizer';
+import { bgmEngine } from '../../utils/bgmEngine';
 import {
   PIXEL_STUDENT_THINKING,
   PIXEL_STUDENT_CORRECT,
@@ -333,14 +337,19 @@ const visualBlurAmount = computed(() => {
  */
 watch(() => gameStore.currentQuestion, (newQ) => {
   if (newQ && newQ.questionType === 'AUDIO_GUESS' && newQ.audioMelodyId) {
+    bgmEngine.pauseForAudioQuiz();
     melodySynthesizer.play(newQ.audioMelodyId);
   } else {
     melodySynthesizer.stop();
+  bgmEngine.resumeFromAudioQuiz();
+
+  
   }
 });
 
 function replayAudioMelody(): void {
   if (gameStore.currentQuestion?.audioMelodyId) {
+    bgmEngine.pauseForAudioQuiz();
     melodySynthesizer.play(gameStore.currentQuestion.audioMelodyId);
   }
 }
@@ -352,11 +361,17 @@ function isOptionDisabled(index: number): boolean {
 function selectAnswer(index: number): void {
   if (isOptionDisabled(index)) return;
   melodySynthesizer.stop();
+  bgmEngine.resumeFromAudioQuiz();
+
+
   gameStore.answerCurrentQuestion(index);
 }
 
 function handleCloseModal(): void {
   melodySynthesizer.stop();
+  bgmEngine.resumeFromAudioQuiz();
+
+
   gameStore.closeQuizModal();
 }
 
@@ -413,6 +428,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   melodySynthesizer.stop();
+  bgmEngine.resumeFromAudioQuiz();
+
   window.removeEventListener('keydown', handleQuizKeyDown);
 });
 </script>

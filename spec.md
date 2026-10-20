@@ -891,3 +891,82 @@ flowchart TD
     G --> H["回報使用者時附上當次 Release Note 摘要與官方連結"]
 ```
 
+---
+
+## 16. 升學檢定大考 (BOSS 戰) 多媒體全支援、超時防死鎖與音樂題 BGM 智能避讓規格 (Boss Exam Multimedia & Audio Quiz Ducking Spec)
+
+### 16.1 設計背景與問題修復
+1. **問題一：BOSS 戰抽到音樂題完全無聲**
+   * 原架構 `BossExamModal.vue` 缺乏多媒體題型渲染元件，未引入 `melodySynthesizer`，也無重新播放按鈕。
+   * 升級方案：全面引進 8-bit 方波程序化旋律合成器、視覺局部放大（`VISUAL_ZOOM`）多媒體區塊與「▶ 重新播放」按鈕。
+2. **問題二：BOSS 戰作答與超時後卡死死鎖**
+   * 原架構 `handleTimeOut()` 在倒數至 0 秒時未處理 BOSS 戰換題流程，導致 `isAnswered` 永久為 true，4 個按鈕全面被 disabled 且無任何「下一題」按鈕，造成永久死鎖。
+   * 升級方案：
+     - 修復 `handleTimeOut()`：若為 `BOSS_EXAM`，自動判定為超時答錯、扣除容錯次數，並於 1.2 秒後調用 `loadNextBossQuestion()`。
+     - 增設雙保險「下一題 ➔」按鈕：作答後若未達通關/失敗條件，呈現顯目之手動跳題按鈕（支援 ENTER 鍵），與 1.2 秒自動計時器互為備援，確保 100% 絕不卡死。
+     - 增設快速鍵監聽（A/B/C/D、1/2/3/4 作答，ENTER 換題）。
+3. **問題三：音樂題旋律被全域 BGM 掩蓋**
+   * 背景音樂交響樂編制過於澎湃，掩蓋細微 8-bit 單音旋律。
+   * 升級方案：
+     - `bgmEngine` 新增 `pauseForAudioQuiz()` 與 `resumeFromAudioQuiz()`。
+     - 凡遇到 `AUDIO_GUESS` 題型，BGM 立即自動暫停，並在 UI 上提示「[🔇 背景音樂已自動暫停，請專心聆聽題目旋律]」；
+     - 作答完畢、跳題或關閉彈窗時，自動無縫平滑恢復背景音樂，保證 100% 純淨聽覺體驗。
+
+### 16.2 升學檢定大考 (BOSS 戰) 狀態轉移與超時防死鎖流程圖 (Flowchart)
+```mermaid
+flowchart TD
+    Init["初始化 BossExam (initBossExam)"] --> LoadQ["載入題目 (loadNextBossQuestion)"]
+    LoadQ --> CheckType{"題目是否為 AUDIO_GUESS?"}
+    CheckType -- 是 --> PauseBGM["BGM 自動暫停 (pauseForAudioQuiz) + 播放 8-Bit 方波"]
+    CheckType -- 否 --> NormalPlay["維持常態背景音訊"]
+    PauseBGM --> WaitAnswer["等待玩家作答 (10秒倒數)"]
+    NormalPlay --> WaitAnswer
+    
+    WaitAnswer -- 玩家點選選項 --> SelectAns["handleBossAnswer(choiceIndex)"]
+    WaitAnswer -- 倒數至 0 秒超時 --> TimeOut["handleBossTimeout() 自動判錯"]
+    
+    SelectAns --> StopMelody["停止 8-Bit 旋律 + resumeFromAudioQuiz()"]
+    TimeOut --> StopMelody
+    
+    StopMelody --> CheckResult{"判定是否晉級或留級?"}
+    CheckResult -- 通關合格 --> Victory["播放通關號角，1.8秒後晉級下一學程 (advanceToNextStage)"]
+    CheckResult -- 容錯耗盡失敗 --> Defeat["判定留級重修，1.8秒後退回地圖"]
+    CheckResult -- 繼續考試 --> AutoOrManual{"換題方式 (雙保險)"}
+    AutoOrManual -- 1.2秒計時到達 --> LoadQ
+    AutoOrManual -- 玩家手動點擊 [下一題 ➔] 或按 ENTER --> LoadQ
+```
+
+### 16.3 音樂題 BGM 自動避讓暫停與循序圖 (Sequence Diagram)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Player as 玩家 (Player)
+    participant Modal as 答題視窗 (QuizCard / BossExamModal)
+    participant Melody as 8-bit 合成器 (melodySynthesizer)
+    participant BGM as 背景音樂電台 (bgmEngine)
+    participant Store as 狀態中心 (gameStore)
+
+    Modal->>Store: 偵測到當前題目為 AUDIO_GUESS
+    Modal->>BGM: pauseForAudioQuiz() (暫停 BGM 雙曲電台)
+    Modal->>Melody: play(audioMelodyId) (清澈方波奏響懷舊旋律)
+    Modal-->>Player: 顯示 [🔇 背景音樂已自動暫停] 與 [▶ 重新播放]
+
+    alt 玩家作答或按鍵選題
+        Player->>Modal: 點選選項 (或按 1/2/3/4)
+        Modal->>Melody: stop()
+        Modal->>BGM: resumeFromAudioQuiz() (恢復背景音樂播放)
+        Modal->>Store: 提交答案並結算
+    else 倒數超時 (Time Out)
+        Store->>Store: 倒數至 0 秒 -> handleBossTimeout()
+        Modal->>Melody: stop()
+        Modal->>BGM: resumeFromAudioQuiz() (恢復背景音樂播放)
+        Store-->>Modal: 判定超時答錯，啟動換題定時器與手動換題按鈕
+    end
+
+    opt 手動點擊或時間到達
+        Player->>Modal: 點擊 [下一題 ➔] 或 1.2 秒超時換題
+        Modal->>Store: loadNextBossQuestion()
+    end
+```
+
+

@@ -22,6 +22,8 @@ export interface BgmState {
   volume: number;
   /** 是否處於音訊避讓狀態 (降低襯底) */
   isDucking: boolean;
+  /** 是否因 8-Bit 聽力題而處於專注暫停狀態 */
+  isPausedByAudioQuiz: boolean;
   /** 當前播放曲目索引 */
   currentTrackIndex: number;
   /** 當前播放曲目名稱 */
@@ -37,12 +39,14 @@ class BgmEngine {
   private currentSourceFallbackIndex = 0;
   private currentTitleVoiceFallbackIndex = 0;
   private duckingTimer: number | null = null;
+  private wasPlayingBeforeAudioQuiz = false;
 
   public state: BgmState = reactive<BgmState>({
     isPlaying: false,
     isMuted: false,
     volume: 0.35, // 預設 35% 混音平衡
     isDucking: false,
+    isPausedByAudioQuiz: false,
     currentTrackIndex: 0,
     currentTrackTitle: 'The Final Question',
   });
@@ -307,6 +311,37 @@ class BgmEngine {
       this.audio.pause();
       this.state.isPlaying = false;
     }
+  }
+
+  /**
+   * 遇到 8-Bit 聽力音樂題時自動暫停背景音樂 (專注聆聽模式)
+   * 記錄暫停前之播放狀態，以便作答結束後精確原位恢復
+   */
+  public pauseForAudioQuiz(): void {
+    if (this.state.isPausedByAudioQuiz) return;
+    this.wasPlayingBeforeAudioQuiz = this.state.isPlaying;
+    this.state.isPausedByAudioQuiz = true;
+
+    if (this.audio) {
+      this.audio.pause();
+      this.state.isPlaying = false;
+    }
+  }
+
+  /**
+   * 音樂題作答結束、換題或關閉題卡時恢復背景音樂
+   * 防呆保護：若玩家本來就設定靜音，或進入音樂題前原本就處於暫停狀態，則不擅自播放
+   */
+  public resumeFromAudioQuiz(): void {
+    if (!this.state.isPausedByAudioQuiz) return;
+    this.state.isPausedByAudioQuiz = false;
+
+    if (this.wasPlayingBeforeAudioQuiz && !this.state.isMuted && this.audio) {
+      this.play().catch(err => {
+        console.warn('恢復 BGM 播放重試中:', err);
+      });
+    }
+    this.wasPlayingBeforeAudioQuiz = false;
   }
 
   /**

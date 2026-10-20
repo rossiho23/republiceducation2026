@@ -260,6 +260,22 @@
 - [x] 產出日誌至 `log/20261020_21.md` 與更新 `report.md`
 
 
+## 階段三十六：升學大考多媒體支援、超時死鎖修復與聽歌題 BGM 智能避讓實作 (方案 A)
+- [x] 升級 `src/utils/bgmEngine.ts`：實作 `pauseForAudioQuiz()` 與 `resumeFromAudioQuiz()`，在音樂題時自動暫停 BGM 且維持玩家靜音防呆
+- [x] 更新 `src/components/game/QuizCard.vue`：引入 BGM 避讓聯動，音樂題開始時自動暫停 BGM，作答結束或關閉時無縫恢復，並增設 UI 避讓提示
+- [x] 升級 `src/stores/gameStore.ts`：修復 `handleTimeOut()` 於 BOSS 戰超時死鎖問題，實作 `handleBossTimeout()` 與手動換題 `advanceBossQuestionManually()`
+- [x] 重構 `src/components/game/BossExamModal.vue`：
+  - [x] 完整引入 `melodySynthesizer`，支援 8-Bit 懷舊旋律播放條、狀態指示燈與「▶ 重新播放」按鈕
+  - [x] 支援視覺局部放大題（`VISUAL_ZOOM`）模糊遞減渲染
+  - [x] 增設作答完成狀態反饋與「下一題 ➔ (ENTER)」雙保險按鈕，徹底根除卡死
+  - [x] 增設鍵盤快速鍵支援（A/B/C/D、1/2/3/4 作答，ENTER 推進下一題）
+- [x] 在 `RELEASE_NOTES.md` 追加 `v2.5.2` 發布日誌
+- [x] 執行本地 `npm run build` 編譯檢驗確認 100% 通過
+- [x] 將修復代碼提交並推送到遠端 GitHub 倉庫，並同步發布 GitHub 官方 Release `v2.5.2`
+- [x] 產出日誌至 `log/20261020_22.md` 與更新 `report.md`
+
+
+
 
 
 

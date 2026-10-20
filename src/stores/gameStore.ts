@@ -298,6 +298,13 @@ export const useGameStore = defineStore('gameStore', () => {
 
   function handleTimeOut(): void {
     if (isAnswered.value) return;
+
+    // 若當前處於升學檢定大考 (BOSS 戰) 彈窗，走 BOSS 戰專屬超時判錯與自動換題流程
+    if (activeModal.value === 'BOSS_EXAM') {
+      handleBossTimeout();
+      return;
+    }
+
     isAnswered.value = true;
     isLastAnswerCorrect.value = false;
     soundEngine.playWrong();
@@ -809,11 +816,60 @@ export const useGameStore = defineStore('gameStore', () => {
       }
     }
 
+    let bossNextQuestionTimer: any = null;
+
+    if (bossNextQuestionTimer) clearTimeout(bossNextQuestionTimer);
+    bossNextQuestionTimer = setTimeout(() => {
+      if (bossExam.value.isActive && !bossExam.value.isCleared && !bossExam.value.isFailed && playerHp.value > 0) {
+        loadNextBossQuestion();
+      }
+    }, 1200);
+  }
+
+  /**
+   * 升學檢定大考 (BOSS 戰) 限時作答超時處理
+   * 判定為該題未及時作答（錯誤），扣除容錯次數與體力，並於 1.2 秒後自動平滑載入下一題，徹底杜絕死鎖
+   */
+  function handleBossTimeout(): void {
+    if (isAnswered.value || !bossExam.value.currentQuestion) return;
+    stopTimer();
+    isAnswered.value = true;
+    isLastAnswerCorrect.value = false;
+    lastSelectedChoice.value = -1; // 標記為超時未選
+
+    soundEngine.playWrong();
+    bossExam.value.mistakesCount += 1;
+    takeDamage(20);
+    hostComment.value = '作答時間到！猶豫不決痛失晉級機會，判定答錯並扣除體力！';
+
+    if (bossExam.value.isConsecutiveMode && bossExam.value.passedCount > 0) {
+      bossExam.value.passedCount -= 1;
+      hostComment.value = '作答超時！連續答對中斷，進度倒扣 1 題！';
+    }
+
+    if (!bossExam.value.isConsecutiveMode && bossExam.value.mistakesCount > bossExam.value.maxAllowedMistakes) {
+      bossExam.value.isFailed = true;
+      hostComment.value = '升學大考不及格！成績未達標，遭判定留級重修！';
+      setTimeout(() => {
+        activeModal.value = 'NONE';
+        currentTileIndex.value = Math.max(0, currentTileIndex.value - 2);
+      }, 1800);
+      return;
+    }
+
     setTimeout(() => {
       if (bossExam.value.isActive && !bossExam.value.isCleared && !bossExam.value.isFailed && playerHp.value > 0) {
         loadNextBossQuestion();
       }
     }, 1200);
+  }
+
+  /**
+   * 玩家手動點擊「下一題 ➔」或按 ENTER 鍵提前推進 BOSS 戰題目 (雙保險防死鎖)
+   */
+  function advanceBossQuestionManually(): void {
+    if (!bossExam.value.isActive || bossExam.value.isCleared || bossExam.value.isFailed || playerHp.value <= 0) return;
+    loadNextBossQuestion();
   }
 
   function advanceToNextStage(): void {
@@ -1027,6 +1083,8 @@ export const useGameStore = defineStore('gameStore', () => {
     buyItem,
     initBossExam,
     handleBossAnswer,
+    handleBossTimeout,
+    advanceBossQuestionManually,
     insertCoinToContinue,
     giveUpContinue,
     takeDamage,
