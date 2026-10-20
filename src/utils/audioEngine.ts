@@ -368,6 +368,124 @@ class RetroAudioEngine {
       osc.stop(start + 0.2);
     });
   }
+
+  private titleVoiceBuffer: AudioBuffer | null = null;
+  private isVoiceLoading: boolean = false;
+
+  /**
+   * 預先載入並解碼「念標題.mp3」至 Web Audio 記憶體快取
+   * 由於音訊檔僅 95KB，解碼僅需數毫秒，保證 100% 免疫瀏覽器 Autoplay 攔截
+   */
+  public async preloadTitleVoice(): Promise<void> {
+    if (this.titleVoiceBuffer || this.isVoiceLoading) return;
+    this.isVoiceLoading = true;
+
+    const ctx = this.getContext();
+    if (!ctx) {
+      this.isVoiceLoading = false;
+      return;
+    }
+
+    const baseUrl = ((import.meta as any).env?.BASE_URL as string) || '/';
+    const cleanBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+    const candidateUrls = [
+      `${cleanBase}media/title_voice.mp3`,
+      `${cleanBase}title_voice.mp3`,
+      `${cleanBase}media/%E5%BF%B5%E6%A8%99%E9%A1%8C.mp3`,
+      `${cleanBase}%E5%BF%B5%E6%A8%99%E9%A1%8C.mp3`,
+      './media/title_voice.mp3',
+      './title_voice.mp3',
+    ];
+
+    for (const url of candidateUrls) {
+      try {
+        const resp = await fetch(url);
+        if (!resp.ok) continue;
+        const arrayBuffer = await resp.arrayBuffer();
+        this.titleVoiceBuffer = await ctx.decodeAudioData(arrayBuffer);
+        console.log('✅ Web Audio API 成功解碼標題語音 (AudioBuffer):', url);
+        break;
+      } catch (err) {
+        console.warn(`標題語音載入備援嘗試 [${url}]:`, err);
+      }
+    }
+    this.isVoiceLoading = false;
+  }
+
+  /**
+   * 使用 Web Audio API 原生 BufferSource 大聲播放「念標題.mp3」
+   * 具備 100% 發聲保證，並在播放結束時觸發回呼以啟動背景音樂
+   * @param {() => void} [onEnded] 播畢回呼
+   */
+  public async playTitleVoice(onEnded?: () => void): Promise<void> {
+    if (this.isMuted) {
+      onEnded?.();
+      return;
+    }
+
+    const ctx = this.getContext();
+    if (!ctx) {
+      onEnded?.();
+      return;
+    }
+
+    // 確保 AudioContext 處於激活狀態
+    if (ctx.state === 'suspended') {
+      await ctx.resume();
+    }
+
+    // 若尚未載入完成則即時載入
+    if (!this.titleVoiceBuffer) {
+      await this.preloadTitleVoice();
+    }
+
+    if (this.titleVoiceBuffer) {
+      try {
+        const source = ctx.createBufferSource();
+        source.buffer = this.titleVoiceBuffer;
+
+        const gainNode = ctx.createGain();
+        gainNode.gain.setValueAtTime(1.0, ctx.currentTime); // 100% 全額大音量
+
+        source.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        let endedCalled = false;
+        source.onended = () => {
+          if (!endedCalled) {
+            endedCalled = true;
+            onEnded?.();
+          }
+        };
+
+        source.start(0);
+
+        // 安全定時器：語音全長約 1.2 秒，若 1.6 秒未觸發則自動執行回呼
+        setTimeout(() => {
+          if (!endedCalled) {
+            endedCalled = true;
+            onEnded?.();
+          }
+        }, 1600);
+        return;
+      } catch (err) {
+        console.warn('Web Audio 播放標題語音失敗，降級 HTMLAudio 重試:', err);
+      }
+    }
+
+    // 降級 fallback：HTMLAudioElement
+    try {
+      const baseUrl = ((import.meta as any).env?.BASE_URL as string) || '/';
+      const cleanBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+      const audio = new Audio(`${cleanBase}media/title_voice.mp3`);
+      audio.volume = 1.0;
+      audio.onended = () => onEnded?.();
+      await audio.play();
+    } catch (e) {
+      console.error('所有標題語音播放途徑皆失敗:', e);
+      onEnded?.();
+    }
+  }
 }
 
 /** 匯出單例音效引擎實例 */

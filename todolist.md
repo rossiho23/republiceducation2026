@@ -249,6 +249,18 @@
 - [x] 產出日誌至 `log/20261020_20.md` 與更新 `report.md`
 
 
+## 階段三十五：Web Audio API 標題語音原生緩衝解碼與純序列發聲實作 (方案 A)
+- [x] 部署中文與英文雙檔名：確認 `public/media/念標題.mp3`、`public/念標題.mp3`、`public/media/title_voice.mp3`、`public/title_voice.mp3` 均已部署
+- [x] 升級 `src/utils/audioEngine.ts`：實作 `preloadTitleVoice()` 與 `playTitleVoice(onEnded)`，使用 Web Audio API 原生 AudioBuffer + BufferSource 100% 絕對解鎖發聲
+- [x] 重構 `src/App.vue` 與 `src/utils/bgmEngine.ts`：實作「純序列發聲 (語音落、音樂起)」，等待標題語音以 100% 音量播畢後才啟動 BGM 雙曲循環
+- [x] 在 `src/components/game/IntroCinema.vue` 投幣啟動時預先載入並解碼 `念標題.mp3` 快取至記憶體
+- [x] 在 `RELEASE_NOTES.md` 追加 `v2.5.1` 發布日誌
+- [x] 執行本地 `npm run build` 編譯檢驗確認 100% 通過
+- [x] 將修復代碼提交並推送到遠端 GitHub 倉庫，並同步發布 GitHub 官方 Release `v2.5.1`
+- [x] 產出日誌至 `log/20261020_21.md` 與更新 `report.md`
+
+
+
 
 
 

@@ -748,9 +748,12 @@ sequenceDiagram
    - 玩家重整網頁 (F5) 或初次進入遊戲首頁時，以黑底大型街機劇院全螢幕呈現日系霓虹「🪙 INSERT COIN · PRESS START TO WATCH INTRO」啟動門。
    - 玩家點擊螢幕任一處或按下任意按鍵（<kbd>SPACE</kbd> / <kbd>ENTER</kbd>），瞬間解鎖瀏覽器最高等級的音訊與視訊播放授權（User Gesture），同時觸發投幣音效。
    - 滿版有聲播放最新片頭動畫 `pic/1020.mp4`，右下方提供「⏩ 跳過片頭 [SPACE / 點擊]」戰術按鈕。
-2. **首頁標題語音大吼 (`念標題.mp3`) 與手勢同步預溫熱 (Audio Warm-up)**：
-   - **手勢同步預溫熱解鎖**：玩家在點擊「🪙 投幣啟動」的同一個使用者手勢事件週期中，系統立即對 `title_voice.mp3` 與 BGM 執行微秒級的靜音預載與授權溫熱（Warm-up Pre-unlock），使音訊實例完全繼承投幣手勢之特權。
-   - **播畢零延遲大吼**：片頭動畫播畢或玩家跳過進入首頁瞬間，**100% 突破瀏覽器暫態手勢時效限制，立即以最高清晰度大聲播放 `念標題.mp3`（街機主標題語音「民國教育委員會！」）**。
+2. **首頁標題語音獨立大吼 (`念標題.mp3`) 與 Web Audio API 絕對發聲架構**：
+   - **Web Audio API Buffer 解碼**：於投幣啟動時預載並解碼 `念標題.mp3`（音檔 95 KB），由於投幣手勢已永久激活 AudioContext，此通道 100% 免疫瀏覽器任何延遲阻擋或雙音軌衝突。
+   - **純序列發聲 (語音落、音樂起)**：
+     - 片頭動畫播畢或跳過瞬間，萬籟俱寂，**單獨以 100% 最大音量清晰大喊「民國教育委員會！」**（此時 BGM 保持靜默不搶音）。
+     - 語音播放結束（約 1.2 秒）的瞬間，BGM `The_Final_Question.mp3` 轟然奏響，開始雙曲無限輪流交替播放！
+   - **多重中英文路徑備援**：支援 `念標題.mp3` 與 `title_voice.mp3` 雙檔名備援解析。
 3. **智慧雙曲交替輪播背景音樂 (`bgmEngine.ts`)**：
    - 內建播放清單佇列：
      - 曲目 1：`The_Final_Question.mp3` (最後審判大考曲)
@@ -799,7 +802,7 @@ export interface IntroVideoState {
 flowchart TD
     A["使用者打開網頁 / F5 重整"] --> B["滿版呈現 [🪙 INSERT COIN / PRESS START] 啟動門"]
     B --> C["玩家點擊任意處 / 按 SPACE / 按 ENTER"]
-    C --> D["播放投幣音效 + 獲取瀏覽器最高等級 User Gesture"]
+    C --> D["播放投幣音效 + 解鎖 AudioContext + 原生解碼 念標題.mp3"]
     D --> E["100% 保證全螢幕原聲播放 1020.mp4"]
 
     E --> F{"影片播放狀態"}
@@ -807,10 +810,9 @@ flowchart TD
     F -- "玩家點擊 [⏩ 跳過片頭]" --> G
 
     G --> H["進入首頁 (TitleScreen)"]
-    G --> I["前景立即大聲播放 念標題.mp3 ('民國教育委員會！')"]
-    G --> J["背景啟動曲目一 The_Final_Question (啟動 Ducking: 音量微降至 12% 襯底)"]
+    G --> I["前景萬籟俱寂，單獨以 100% 原生 AudioBuffer 震撼大喊 念標題.mp3"]
     
-    I -->|語音播畢 (ended)| K["BGM 平滑漸強回復至 35% 常駐播放"]
+    I -->|語音播畢 (約 1.2 秒)| J["BGM 轟然奏響！啟動曲目一 The_Final_Question 雙曲交替輪播"]
     
     J --> M{"曲目播放結束判定"}
     M -- "曲目一播放完畢 (ended)" --> N["自動切換播放 曲目二 Ten_Second_Countdown"]
@@ -818,7 +820,7 @@ flowchart TD
     M -- "玩家手動點擊 HUD [⏭️ 下一首]" --> P["立即淡出並切換至下一首曲目"]
     N & O & P --> M
 
-    K --> L["頂部 HUD 呈現 [♫ 曲目] + [⏭️ 下一首] + [MUTE 開關]"]
+    J --> L["頂部 HUD 呈現 [♫ 曲目] + [⏭️ 下一首] + [MUTE 開關]"]
 ```
 
 ### 14.4 開頭映畫、標題語音與雙曲輪播循序圖 (Sequence Diagram - 方案 A)
@@ -827,9 +829,9 @@ sequenceDiagram
     autonumber
     actor Player as 玩家 (Player)
     participant Cinema as 開頭映畫門 (IntroCinema.vue)
+    participant AudioContext as 原生 Web Audio (AudioContext)
     participant Video as 視訊核心 (1020.mp4)
     participant App as 主應用容器 (App.vue)
-    participant TitleVoice as 標題語音 (念標題.mp3)
     participant BGM as 背景音樂引擎 (bgmEngine)
     participant ModernBoard as 現代版校舍 (ModernGameBoard.vue)
 
@@ -837,6 +839,7 @@ sequenceDiagram
     App->>Cinema: 掛載開頭映畫組件 (showIntro = true)
     Cinema-->>Player: 呈現日系霓虹「🪙 INSERT COIN / PRESS START」
     Player->>Cinema: 點擊螢幕任意處或按 SPACE
+    Cinema->>AudioContext: playCoin() 激活音訊上下文 + decodeAudioData(念標題.mp3)
     Cinema->>Video: video.play() (原聲放映 1020.mp4)
     Video-->>Player: 滿版播放片頭影片
 
@@ -844,9 +847,11 @@ sequenceDiagram
         Player->>Cinema: 點擊 [⏩ 跳過片頭] (或 video.onended)
     end
     Cinema->>App: 觸發 complete 事件
-    App->>TitleVoice: 播放「念標題.mp3」(前景高音量)
-    App->>BGM: bgmEngine.playTitleVoiceWithDucking() (曲目一，音量 12% 襯底)
-    TitleVoice-->>BGM: 語音播放結束，平滑回復至 35%
+    App->>AudioContext: playTitleVoiceBuffer() (前景單獨大聲發聲，100% 絕對響亮)
+    Note over AudioContext: 萬籟俱寂，大喊「民國教育委員會！」
+    AudioContext-->>BGM: 語音播放結束 (onended)
+    BGM->>BGM: 啟動 BGM 雙曲無限輪流播放 (音樂轟然奏響)
+```
     
     loop 雙曲無限輪流播放
         BGM->>BGM: 曲目一結束 -> 自動播放曲目二

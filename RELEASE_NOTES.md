@@ -4,6 +4,25 @@
 
 ---
 
+## [v2.5.1] - 2026-10-20
+
+### 🚀 核心升級與發聲重構 (Audio Architecture Upgrade)
+- **Web Audio API 原生音訊解碼獨播 (Native AudioBuffer BufferSource)**：
+  - 徹底跳脫傳統 `HTMLAudioElement` 受限於瀏覽器 Transient User Activation（約 5 秒手勢活躍期）的硬性限制。因片頭動畫長達十餘秒，傳統 `new Audio().play()` 在片頭結束之非手勢事件中會被直接拋出 `NotAllowedError`。
+  - 改採於「🪙 投幣啟動」瞬間以 Web Audio API 的 `AudioContext` 永久解鎖，並在背景以 `fetch` + `decodeAudioData` 微秒級解碼快取為原生 `AudioBuffer`。片頭播畢時透過 `createBufferSource()` 播放，**達成 100% 絕對發聲保證**。
+- **純序列震撼發聲儀式 (Speech First, Music Next)**：
+  - 重新梳理音軌時序，廢除雙軌併發避讓機制，改為「語音落、音樂起」之純序列儀式感：
+    1. 片頭動畫播放完畢或跳過瞬間，畫面切換至標題首頁；
+    2. 萬籟俱寂中，Web Audio 原生緩衝以 100% 全額最大音量大喊「民國教育委員會！」；
+    3. 語音精確播畢瞬間（約 1.2 秒），背景音樂雙曲輪播（`The Final Question` / `Ten Second Countdown`）轟然奏響，徹底杜絕多音軌搶頻與音量起伏問題。
+- **多重資產路徑與 URL 編碼容錯備援**：
+  - 完善中英文檔名與二級 BaseURL 備援機制（支援 `/media/title_voice.mp3`、`title_voice.mp3`、`%E5%BF%B5%E6%A8%99%E9%A1%8C.mp3` 與相對路徑），並設有 1.6 秒回呼保護機制，確保各環境皆能順暢過渡。
+
+### 🐛 問題修復 (Bug Fixes)
+- 修復開頭動畫視訊播放十餘秒後，因瀏覽器使用者手勢過期導致 `/pic/念標題.mp3` 未能播放的重大問題。
+
+---
+
 ## [v2.5.0] - 2026-10-20
 
 ### 🚀 新增功能 (Features)

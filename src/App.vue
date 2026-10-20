@@ -79,6 +79,7 @@ import ResetModal from './components/game/ResetModal.vue';
 import QuestionCMS from './components/cms/QuestionCMS.vue';
 import IntroCinema from './components/game/IntroCinema.vue';
 import { bgmEngine } from './utils/bgmEngine';
+import { soundEngine } from './utils/audioEngine';
 
 const gameStore = useGameStore();
 const questionStore = useQuestionStore();
@@ -88,11 +89,14 @@ const showIntroCinema = ref<boolean>(true);
 
 /**
  * 開頭映畫結束或被跳過時的回呼處理
- * 關閉片頭組件，立即播放「民國教育委員會！」標題語音，並同時啟動 BGM 避讓混音循環播放
+ * 關閉片頭組件，先單獨由 Web Audio API 原生緩衝解碼 100% 絕對原聲震撼大喊「民國教育委員會！」，
+ * 待標題語音播畢後（或若發生意外回退時），才啟動 BGM 雙曲交替輪播，確保無搶軌且 100% 絕對震撼發聲
  */
 function handleIntroComplete(): void {
   showIntroCinema.value = false;
-  bgmEngine.playTitleVoiceWithDucking();
+  soundEngine.playTitleVoice(() => {
+    bgmEngine.play();
+  });
 }
 
 const isCmsOpen = ref<boolean>(false);

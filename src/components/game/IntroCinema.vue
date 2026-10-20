@@ -144,7 +144,8 @@ async function startWithUserGesture(): Promise<void> {
   // 播放經典大型街機投幣音效
   soundEngine.playCoin();
 
-  // 同步在同一個使用者手勢中預溫熱標題語音與背景音樂，取得永久播放授權！
+  // 同步使用 Web Audio API 原生解碼緩衝區預載標題語音 (100% 絕對解鎖)
+  soundEngine.preloadTitleVoice();
   bgmEngine.warmUpAudioContext();
 
   if (!videoRef.value) return;
