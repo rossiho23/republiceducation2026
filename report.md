@@ -127,10 +127,12 @@
 | **橫向長軌道視角跳動** | 玩家踩到後方格子時容易超出畫面邊緣 | 實作 `scrollIntoView({ behavior: 'smooth', inline: 'center' })`，隨時自動置中玩家當前格子 |
 | **肉鴿地圖進去後先顯示答案** | `QuizCard.vue` 缺乏 `activeModal === 'QUIZ'` 約束，且 `closeQuizModal()` / `startNewGame()` 缺少重設 `isAnswered = false`，上一題回答狀態殘留導致下一題直接以「已作答完成」亮起正解 | 修正 `QuizCard` 渲染條件為嚴格模態互斥，於 `gameStore` 擴充 `startDirectQuiz` 與 `startWagerQuiz`，進題前徹底重置答題狀態，確保作答前絕不提前揭曉答案 |
 | **使用者端 LocalStorage 殘留舊頭像** | 舊版用戶端瀏覽器緩存了早期線條 SVG | 升級快取版本為 `V2_PIXEL`，並於 `initCharacters` 中加入預設名師自動同步像素資產機制，保證舊快取無縫無痛自動升級 |
+| **電腦高解析度螢幕留空過大且字級過小** | 早期機台樣式採用固定 `max-w-5xl` (1024px) 限制，且題幹與選項為 13px~18px，在大螢幕上看文字偏小且視野受限 | 採用方案 1，機台寬度解鎖至 `max-w-[1536px] 2xl:max-w-[1680px]` 寬屏自適應模式，實作 Fullscreen API 全螢幕切換按鍵，並將題幹放大至 22px~30px、選項放大至 16px~20px，全彈窗階梯式等比放大，達成大字報沉浸式街機體驗 |
 
 ---
 
 ## 4. 驗證與建置結果
 * **型別檢查與編譯**：執行 `npm run build` (`vue-tsc && vite build`)，專案編譯順利通過（Exit code 0），無任何 TypeScript 型別報錯或 Lint 錯誤。
 * **各模組完整度**：致敬截圖之橫向卷軸校舍地圖、大頭娃娃骰子、立體卡匣軌道、學科隨堂考、福利社商城、轉學命運格、升學 Boss 關卡、投幣續關、成績單、題庫 CMS 以及 16-Bit 大型街機手繪像素點陣資產皆已就緒。
+* **寬屏全畫面支援**：機台支援寬屏與原生全螢幕沉浸式體驗，文字大字報化閱讀無負擔。
 

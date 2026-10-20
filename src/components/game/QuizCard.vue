@@ -1,26 +1,26 @@
 <template>
-  <!-- 日系新潮街機風 答題主舞台組件 (Neo-Arcade Quiz Stage) -->
+  <!-- 日系新潮街機風 答題主舞台組件 (Neo-Arcade Quiz Stage - 寬屏大字報版) -->
   <div 
     v-if="gameStore.activeModal === 'QUIZ' && gameStore.currentQuestion" 
-    class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-2 sm:p-4 font-mono select-none"
+    class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-2 sm:p-5 font-mono select-none overflow-y-auto"
   >
-    <!-- 主視窗容器 (粗黑 4px 邊框、8px 實心黑陰影、日系戰術切角) -->
-    <div class="w-full max-w-3xl bg-[#090b10] border-[4px] border-black shadow-[8px_8px_0px_#000000] p-4 sm:p-6 flex flex-col gap-3 relative overflow-hidden neo-cut">
+    <!-- 主視窗容器 (粗黑 4px 邊框、8px 實心黑陰影、日系戰術切角、寬屏放寬) -->
+    <div class="w-full max-w-5xl 2xl:max-w-6xl bg-[#090b10] border-[4px] border-black shadow-[8px_8px_0px_#000000] p-4 sm:p-7 flex flex-col gap-3.5 relative overflow-hidden neo-cut my-auto">
       
       <!-- 頂部黑黃斑馬警戒條 -->
-      <div class="w-full h-1.5 neo-hazard-yellow border-b border-black -mt-2 mb-1"></div>
+      <div class="w-full h-2 neo-hazard-yellow border-b border-black -mt-2 mb-1"></div>
 
       <!-- 頂部街機情報欄 (致敬 quiz1.jpg 最上方：民國教育委員會 與 分數) -->
-      <div class="w-full bg-[#121620] border-2 border-black p-2 px-3 flex items-center justify-between shadow-[3px_3px_0px_#000]">
+      <div class="w-full bg-[#121620] border-2 border-black p-2.5 px-4 flex items-center justify-between shadow-[3px_3px_0px_#000]">
         <!-- 左側標題與分數 -->
         <div class="flex items-center gap-3">
-          <span class="px-2 py-0.5 bg-yellow-400 text-black text-xs font-black uppercase tracking-wider transform -rotate-1">
+          <span class="px-2.5 py-0.5 bg-yellow-400 text-black text-xs sm:text-sm font-black uppercase tracking-wider transform -rotate-1">
             SCORE
           </span>
-          <span class="text-sm sm:text-base font-black font-mono text-yellow-400 neo-text-stroke">
+          <span class="text-base sm:text-xl font-black font-mono text-yellow-400 neo-text-stroke">
             {{ gameStore.score }}
           </span>
-          <span class="hidden sm:inline-block text-xs font-black tracking-widest text-white neo-skew-title">
+          <span class="hidden sm:inline-block text-sm sm:text-base font-black tracking-widest text-white neo-skew-title">
             民國教育委員會
           </span>
         </div>
@@ -30,26 +30,26 @@
           <!-- 信心下注標籤 -->
           <span 
             v-if="gameStore.currentWagerAmount > 0" 
-            class="px-2 py-0.5 bg-yellow-400 text-black text-[11px] font-black border border-black animate-pulse"
+            class="px-2.5 py-0.5 bg-yellow-400 text-black text-xs sm:text-sm font-black border border-black animate-pulse"
           >
             [下注: {{ gameStore.currentWagerAmount }}]
           </span>
           <!-- 三選一送分標籤 -->
           <span 
             v-if="gameStore.isThreeChoiceMode" 
-            class="px-2 py-0.5 bg-cyan-400 text-black text-[11px] font-black border border-black"
+            class="px-2.5 py-0.5 bg-cyan-400 text-black text-xs sm:text-sm font-black border border-black"
           >
             [三選一送分]
           </span>
           <!-- 天才挑戰標籤 -->
           <span 
             v-if="gameStore.isTalentMode" 
-            class="px-2 py-0.5 bg-[#ff0055] text-white text-[11px] font-black border border-black animate-pulse"
+            class="px-2.5 py-0.5 bg-[#ff0055] text-white text-xs sm:text-sm font-black border border-black animate-pulse"
           >
             [天才雙倍]
           </span>
           <!-- 學科階級標牌 -->
-          <span class="px-2.5 py-0.5 bg-white text-black text-xs font-black border border-black">
+          <span class="px-3 py-0.5 bg-white text-black text-xs sm:text-sm font-black border border-black shadow-[1px_1px_0px_#000]">
             {{ gameStore.currentQuestion.stage }} · {{ gameStore.currentQuestion.subject }}
           </span>
         </div>
@@ -58,29 +58,29 @@
       <!-- 反向陷阱題警報橫幅 -->
       <div 
         v-if="gameStore.currentQuestion.isTrapReverse"
-        class="neo-hazard-red p-1.5 border-2 border-black text-center text-xs font-black text-white shadow-[3px_3px_0px_#000] tracking-widest animate-pulse"
+        class="neo-hazard-red p-2 border-2 border-black text-center text-xs sm:text-sm font-black text-white shadow-[3px_3px_0px_#000] tracking-widest animate-pulse"
       >
         // 警報！本題為【選出錯誤／不符合選項】之反向陷阱題！請睜大眼睛！ //
       </div>
 
-      <!-- 題幹文字與多媒體提示看板 (致敬 quiz1.jpg 黑板上方清晰大字) -->
-      <div class="bg-[#121620] border-2 border-black p-3.5 text-center flex flex-col gap-2.5 shadow-[4px_4px_0px_#000] relative">
-        <h3 class="text-sm sm:text-base font-black text-yellow-300 leading-relaxed tracking-wide">
+      <!-- 題幹文字與多媒體提示看板 (大字報粗體題幹 · 22px~28px 放大) -->
+      <div class="bg-[#121620] border-[3px] border-black p-4 sm:p-6 text-center flex flex-col gap-3 shadow-[4px_4px_0px_#000] relative">
+        <h3 class="text-xl sm:text-2xl md:text-3xl font-black text-yellow-300 leading-snug tracking-wide">
           {{ gameStore.currentQuestion.question }}
         </h3>
 
         <!-- 多媒體區 A：聽力猜歌旋律播放控制器 (Audio Quiz) -->
         <div 
           v-if="gameStore.currentQuestion.questionType === 'AUDIO_GUESS'"
-          class="flex items-center justify-center gap-3 p-2 bg-[#090b10] border-2 border-cyan-400 neo-cut-sm"
+          class="flex items-center justify-center gap-4 p-2.5 bg-[#090b10] border-2 border-cyan-400 neo-cut-sm"
         >
-          <div class="flex items-center gap-2 text-xs font-black text-cyan-400">
-            <span class="w-2.5 h-2.5 bg-emerald-400 animate-ping inline-block"></span>
+          <div class="flex items-center gap-2.5 text-sm sm:text-base font-black text-cyan-400">
+            <span class="w-3 h-3 bg-emerald-400 animate-ping inline-block"></span>
             <span>// 8-BIT 懷舊旋律播放中... //</span>
           </div>
           <button
             @click="replayAudioMelody"
-            class="neo-btn neo-btn-yellow py-1 px-3 text-xs tracking-wider"
+            class="neo-btn neo-btn-yellow py-1.5 px-4 text-xs sm:text-sm tracking-wider font-black"
           >
             ▶ 重新播放
           </button>
@@ -89,31 +89,31 @@
         <!-- 多媒體區 B：視覺局部放大照片 (Visual Zoom Quiz) -->
         <div 
           v-if="gameStore.currentQuestion.questionType === 'VISUAL_ZOOM' && gameStore.currentQuestion.visualImageUrl"
-          class="flex flex-col items-center gap-1.5 p-2 bg-black border-2 border-yellow-400 neo-cut-sm"
+          class="flex flex-col items-center gap-2 p-3 bg-black border-2 border-yellow-400 neo-cut-sm"
         >
-          <div class="relative w-48 h-32 overflow-hidden border-2 border-black shadow-[3px_3px_0px_#000]">
+          <div class="relative w-56 sm:w-64 h-36 sm:h-44 overflow-hidden border-2 border-black shadow-[3px_3px_0px_#000]">
             <img 
               :src="gameStore.currentQuestion.visualImageUrl" 
               alt="視覺線索照片"
               class="w-full h-full object-cover transition-all duration-500"
               :style="{ filter: `blur(${visualBlurAmount}px)` }"
             />
-            <span class="absolute bottom-1 right-1 bg-black text-[10px] text-yellow-400 px-1 font-black border border-yellow-400">
+            <span class="absolute bottom-1 right-1 bg-black text-xs text-yellow-400 px-1.5 py-0.5 font-black border border-yellow-400">
               清晰度: {{ 100 - visualBlurAmount * 10 }}%
             </span>
           </div>
-          <span class="text-[11px] text-gray-400 font-bold">// 隨著作答時間流逝，影像將自動逐步清晰 //</span>
+          <span class="text-xs sm:text-sm text-gray-300 font-bold">// 隨著作答時間流逝，影像將自動逐步清晰 //</span>
         </div>
       </div>
 
       <!-- 答題主舞台：實木外框深海軍藍黑板 + 左側學生 + 右側名師 (致敬 quiz1.jpg) -->
-      <div class="relative w-full bg-[#002b49] border-[6px] border-[#854d0e] p-3 sm:p-5 shadow-inner overflow-hidden min-h-[220px] flex items-center justify-between">
+      <div class="relative w-full bg-[#002b49] border-[6px] border-[#854d0e] p-3 sm:p-6 shadow-inner overflow-hidden min-h-[260px] sm:min-h-[300px] flex items-center justify-between gap-3">
         <!-- 黑板粉筆槽實木裝飾底條 -->
-        <div class="absolute bottom-0 inset-x-0 h-2 bg-[#713f12] border-t border-[#a16207]"></div>
+        <div class="absolute bottom-0 inset-x-0 h-2.5 bg-[#713f12] border-t border-[#a16207]"></div>
 
         <!-- ================= 1. 左側：固定學生角色 (100% 16-Bit 大型街機手繪像素點陣立繪) ================= -->
-        <div class="relative z-20 flex flex-col items-center w-24 sm:w-32 flex-shrink-0 select-none">
-          <div class="relative w-20 h-20 sm:w-24 sm:h-24">
+        <div class="relative z-20 flex flex-col items-center w-28 sm:w-40 flex-shrink-0 select-none">
+          <div class="relative w-24 h-24 sm:w-32 sm:h-32">
             <!-- 學生 16-Bit 像素大頭立繪 (思考/開懷比V/抱頭痛哭三態切換) -->
             <img 
               :src="studentAvatar" 
@@ -124,46 +124,46 @@
             <!-- 答對/答錯日系印章標記 -->
             <div 
               v-if="gameStore.isAnswered" 
-              class="absolute -top-3 left-1/2 -translate-x-1/2 text-sm font-black whitespace-nowrap border-2 border-black px-2 py-0.5 shadow-[2px_2px_0px_#000] transform -rotate-6"
+              class="absolute -top-3.5 left-1/2 -translate-x-1/2 text-sm sm:text-base font-black whitespace-nowrap border-2 border-black px-2.5 py-0.5 shadow-[2px_2px_0px_#000] transform -rotate-6"
               :class="gameStore.isLastAnswerCorrect ? 'bg-yellow-400 text-black' : 'bg-[#ff0055] text-white'"
             >
               {{ gameStore.isLastAnswerCorrect ? '⭕ 正解 PASS' : '❌ 答錯 FAIL' }}
             </div>
           </div>
-          <span class="text-[10px] font-black text-black bg-white px-2 py-0.5 border border-black mt-1">
+          <span class="text-xs sm:text-sm font-black text-black bg-white px-2.5 py-0.5 border border-black mt-1 shadow-[2px_2px_0px_#000]">
             考生代表
           </span>
         </div>
 
-        <!-- ================= 2. 中央：黑板選項題目區 (日系戰術按鈕) ================= -->
-        <div class="relative z-20 flex-1 max-w-md mx-2 bg-[#001d33] border-[3px] border-black p-3 shadow-[4px_4px_0px_#000] flex flex-col gap-2 neo-cut-sm">
+        <!-- ================= 2. 中央：黑板選項題目區 (日系戰術按鈕 · 寬度加寬與文字放大) ================= -->
+        <div class="relative z-20 flex-1 max-w-2xl mx-1 sm:mx-3 bg-[#001d33] border-[3px] border-black p-3.5 sm:p-5 shadow-[5px_5px_0px_#000] flex flex-col gap-2.5 neo-cut-sm">
           <!-- 盲答迷霧解鎖按鈕 -->
           <div 
             v-if="isBlackoutActive"
-            class="p-2 bg-[#3b0764] border-2 border-[#bd00ff] flex items-center justify-between text-xs text-white neo-cut-sm"
+            class="p-2.5 bg-[#3b0764] border-2 border-[#bd00ff] flex items-center justify-between text-xs sm:text-sm text-white neo-cut-sm"
           >
             <span class="font-bold">// 考官啟動盲答迷霧 //</span>
             <button
               @click="gameStore.revealBlackoutOptions"
-              class="neo-btn neo-btn-yellow py-0.5 px-2 text-[11px]"
+              class="neo-btn neo-btn-yellow py-1 px-3 text-xs sm:text-sm font-black"
             >
               花費 15 學分揭開
             </button>
           </div>
 
-          <!-- 四個（或三選一）題目選項 (Neo-Arcade 按鈕) -->
-          <div class="flex flex-col gap-2">
+          <!-- 四個（或三選一）題目選項 (Neo-Arcade 按鈕 · 16px~19px 大字) -->
+          <div class="flex flex-col gap-2.5">
             <button 
               v-for="(option, idx) in visibleOptions" 
               :key="idx"
               @click="selectAnswer(idx)"
               :disabled="gameStore.isAnswered || isOptionDisabled(idx)"
-              class="neo-btn p-2.5 text-left flex items-center justify-between text-xs sm:text-sm transition-all neo-cut-sm"
+              class="neo-btn p-3 sm:p-4 text-left flex items-center justify-between text-base sm:text-lg md:text-xl transition-all neo-cut-sm"
               :class="getOptionButtonClass(idx)"
             >
-              <div class="flex items-center gap-2.5">
-                <!-- 數字序號 1, 2, 3, 4 (黑底黃字粗框) -->
-                <span class="w-6 h-6 bg-black border border-yellow-400 flex items-center justify-center font-black font-mono text-yellow-400 text-xs">
+              <div class="flex items-center gap-3">
+                <!-- 數字序號 1, 2, 3, 4 (黑底黃字粗框大標) -->
+                <span class="w-8 h-8 sm:w-9 sm:h-9 bg-black border-2 border-yellow-400 flex items-center justify-center font-black font-mono text-yellow-400 text-sm sm:text-base flex-shrink-0 shadow-[2px_2px_0px_#000]">
                   {{ idx + 1 }}
                 </span>
                 
@@ -171,16 +171,16 @@
                 <span v-if="isBlackoutActive && !gameStore.isAnswered" class="italic text-purple-300">
                   [選項已被考官迷霧遮蔽]
                 </span>
-                <span v-else class="font-sans font-bold">
+                <span v-else class="font-sans font-black tracking-wide leading-tight">
                   {{ option }}
                 </span>
               </div>
 
               <!-- 答對/答錯圖示標記 -->
-              <span v-if="gameStore.isAnswered && idx === gameStore.currentQuestion?.correctIndex" class="px-2 py-0.5 bg-yellow-400 text-black text-[11px] font-black border border-black transform rotate-1">
+              <span v-if="gameStore.isAnswered && idx === gameStore.currentQuestion?.correctIndex" class="px-2.5 py-0.5 bg-yellow-400 text-black text-xs sm:text-sm font-black border border-black transform rotate-1 whitespace-nowrap ml-2">
                 ✓ 正解
               </span>
-              <span v-else-if="gameStore.isAnswered && idx === gameStore.lastSelectedChoice && !gameStore.isLastAnswerCorrect" class="px-2 py-0.5 bg-[#ff0055] text-white text-[11px] font-black border border-black transform -rotate-1">
+              <span v-else-if="gameStore.isAnswered && idx === gameStore.lastSelectedChoice && !gameStore.isLastAnswerCorrect" class="px-2.5 py-0.5 bg-[#ff0055] text-white text-xs sm:text-sm font-black border border-black transform -rotate-1 whitespace-nowrap ml-2">
                 ✗ 錯誤
               </span>
             </button>
@@ -188,8 +188,8 @@
         </div>
 
         <!-- ================= 3. 右側：可替換授課老師 (手持教鞭指黑板) ================= -->
-        <div class="relative z-20 flex flex-col items-center w-24 sm:w-32 flex-shrink-0 select-none">
-          <div class="relative w-20 h-20 sm:w-24 sm:h-24">
+        <div class="relative z-20 flex flex-col items-center w-28 sm:w-40 flex-shrink-0 select-none">
+          <div class="relative w-24 h-24 sm:w-32 sm:h-32">
             <div class="w-full h-full border-[3px] border-black p-0.5 bg-yellow-400 shadow-[3px_3px_0px_#000] overflow-hidden">
               <img 
                 :src="characterStore.activeTeacher.avatarUrl" 
@@ -201,44 +201,44 @@
 
             <!-- 教鞭圖標 (直指黑板選項) -->
             <div class="absolute -bottom-2 -left-3 pointer-events-none transform -rotate-12">
-              <div class="w-16 h-2 bg-yellow-500 rounded-full border border-black shadow"></div>
+              <div class="w-20 h-2.5 bg-yellow-500 rounded-full border border-black shadow"></div>
             </div>
           </div>
 
           <!-- 老師姓名標牌 -->
           <div class="mt-1 flex flex-col items-center">
-            <span class="text-[10px] font-black text-black bg-yellow-400 px-2 py-0.5 border border-black">
+            <span class="text-xs sm:text-sm font-black text-black bg-yellow-400 px-2.5 py-0.5 border border-black shadow-[2px_2px_0px_#000]">
               {{ characterStore.activeTeacher.name }}
             </span>
-            <span class="text-[9px] text-yellow-300 font-bold">
+            <span class="text-xs text-yellow-300 font-bold mt-0.5">
               {{ characterStore.activeTeacher.title }}
             </span>
           </div>
         </div>
       </div>
 
-      <!-- 名師解答小彩蛋 (作答後才顯示) -->
+      <!-- 名師解答小彩蛋 (作答後才顯示 · 字級放大) -->
       <div 
         v-if="gameStore.isAnswered && gameStore.currentQuestion.explanation" 
-        class="p-2.5 bg-[#121620] border-2 border-yellow-400 text-xs text-yellow-200 font-sans leading-relaxed neo-cut-sm shadow-[3px_3px_0px_#000]"
+        class="p-3 bg-[#121620] border-2 border-yellow-400 text-sm sm:text-base text-yellow-200 font-sans leading-relaxed neo-cut-sm shadow-[3px_3px_0px_#000]"
       >
         ★ <strong>名師解答：</strong> {{ gameStore.currentQuestion.explanation }}
       </div>
 
-      <!-- 底部計時條與道具操作列 -->
-      <div class="flex items-center justify-between gap-3 pt-1 border-t-2 border-black">
+      <!-- 底部計時條與道具操作列 (字級與按鈕放大) -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-1.5 border-t-2 border-black">
         <!-- 倒數計時條 -->
-        <div class="flex-1 flex flex-col gap-1">
-          <div class="flex items-center justify-between text-xs text-gray-300">
+        <div class="flex-1 min-w-[200px] flex flex-col gap-1">
+          <div class="flex items-center justify-between text-xs sm:text-sm text-gray-300">
             <span class="font-bold">作答倒數：</span>
             <span 
-              class="font-black font-mono text-sm px-1.5 border border-black" 
+              class="font-black font-mono text-sm sm:text-base px-2 py-0.5 border border-black" 
               :class="gameStore.timeRemaining <= 3 ? 'bg-[#ff0055] text-white animate-pulse' : 'bg-yellow-400 text-black'"
             >
               {{ gameStore.timeRemaining }} 秒
             </span>
           </div>
-          <div class="w-full bg-black h-2.5 border border-gray-700 overflow-hidden">
+          <div class="w-full bg-black h-3 border border-gray-700 overflow-hidden">
             <div 
               class="h-full transition-all duration-1000"
               :class="gameStore.timeRemaining <= 3 ? 'bg-[#ff0055]' : 'bg-yellow-400'"
@@ -247,26 +247,26 @@
           </div>
         </div>
 
-        <!-- 答題道具輔助列 -->
-        <div v-if="!gameStore.isAnswered" class="flex items-center gap-1.5 text-xs">
+        <!-- 答題道具輔助列 (按鈕加大) -->
+        <div v-if="!gameStore.isAnswered" class="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
           <button 
             @click="gameStore.useItem('MAGNIFIER')"
             :disabled="(gameStore.inventory.MAGNIFIER || 0) <= 0 || gameStore.disabledOptionIndices.length >= 2"
-            class="neo-btn bg-[#121620] hover:bg-[#1a2130] text-gray-200 px-2 py-1 text-xs disabled:opacity-40"
+            class="neo-btn bg-[#121620] hover:bg-[#1a2130] text-gray-200 px-3 py-1.5 text-xs sm:text-sm disabled:opacity-40"
           >
             [放大鏡: {{ gameStore.inventory.MAGNIFIER || 0 }}]
           </button>
           <button 
             @click="gameStore.useItem('CLOCK')"
             :disabled="(gameStore.inventory.CLOCK || 0) <= 0"
-            class="neo-btn bg-[#121620] hover:bg-[#1a2130] text-gray-200 px-2 py-1 text-xs disabled:opacity-40"
+            class="neo-btn bg-[#121620] hover:bg-[#1a2130] text-gray-200 px-3 py-1.5 text-xs sm:text-sm disabled:opacity-40"
           >
             [加時: {{ gameStore.inventory.CLOCK || 0 }}]
           </button>
           <button 
             @click="gameStore.useItem('PASS_TICKET')"
             :disabled="(gameStore.inventory.PASS_TICKET || 0) <= 0"
-            class="neo-btn bg-[#121620] hover:bg-[#1a2130] text-gray-200 px-2 py-1 text-xs disabled:opacity-40"
+            class="neo-btn bg-[#121620] hover:bg-[#1a2130] text-gray-200 px-3 py-1.5 text-xs sm:text-sm disabled:opacity-40"
           >
             [PASS券: {{ gameStore.inventory.PASS_TICKET || 0 }}]
           </button>
@@ -277,10 +277,10 @@
         <button 
           v-if="gameStore.isAnswered"
           @click="handleCloseModal"
-          class="neo-btn neo-btn-yellow text-black font-black text-xs sm:text-sm py-1.5 px-5 flex items-center gap-1 shadow-[4px_4px_0px_#000]"
+          class="neo-btn neo-btn-yellow text-black font-black text-sm sm:text-base py-2 px-6 flex items-center gap-1.5 shadow-[4px_4px_0px_#000]"
         >
           <span>繼續前進 ➔</span>
-          <span class="text-[10px] bg-black text-yellow-400 px-1 font-mono">ENTER</span>
+          <span class="text-xs bg-black text-yellow-400 px-1.5 py-0.5 font-mono">ENTER</span>
         </button>
       </div>
     </div>

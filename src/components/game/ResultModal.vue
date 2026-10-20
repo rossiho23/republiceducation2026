@@ -1,37 +1,37 @@
 <template>
   <div v-if="gameStore.activeModal === 'VICTORY' || (gameStore.activeModal === 'CONTINUE' && gameStore.continueCountdown <= 0)" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="w-full max-w-lg bg-arcade-dark border-4 rounded-3xl p-6 sm:p-8 shadow-pixel flex flex-col items-center text-center gap-5" :class="isVictory ? 'border-arcade-yellow shadow-arcade-yellow' : 'border-slate-700'">
+    <div class="w-full max-w-2xl 2xl:max-w-3xl bg-arcade-dark border-4 rounded-3xl p-6 sm:p-10 shadow-pixel flex flex-col items-center text-center gap-6" :class="isVictory ? 'border-arcade-yellow shadow-arcade-yellow' : 'border-slate-700'">
       <!-- 獎章圖標 -->
-      <div class="text-6xl animate-bounce-short">
+      <div class="text-7xl animate-bounce-short">
         {{ isVictory ? '🎓' : '📜' }}
       </div>
 
       <div>
-        <h2 class="text-2xl sm:text-3xl font-black tracking-wider" :class="isVictory ? 'text-arcade-yellow' : 'text-gray-300'">
+        <h2 class="text-3xl sm:text-4xl font-black tracking-wider" :class="isVictory ? 'text-arcade-yellow' : 'text-gray-300'">
           {{ isVictory ? '光榮畢業！大學文憑頒發！' : '學業成績結算清單' }}
         </h2>
-        <p class="text-xs text-gray-400 mt-1">
+        <p class="text-sm sm:text-base text-gray-300 mt-2 font-bold">
           {{ isVictory ? '恭喜您完成了《民國教育委員會》最高學府學制闖關！' : '學海無涯，勝敗乃兵家常事，隨時歡迎投幣再戰！' }}
         </p>
       </div>
 
       <!-- 成績單表格 -->
-      <div class="w-full bg-slate-900/90 border border-slate-700 rounded-xl p-4 flex flex-col gap-3 text-xs sm:text-sm font-mono">
-        <div class="flex justify-between border-b border-slate-800 pb-2">
+      <div class="w-full bg-slate-900/95 border border-slate-700 rounded-2xl p-5 sm:p-6 flex flex-col gap-4 text-sm sm:text-base font-mono">
+        <div class="flex justify-between border-b border-slate-800 pb-3">
           <span class="text-gray-400">達成最高學歷：</span>
-          <span class="font-bold text-arcade-cyan">{{ gameStore.currentStageConfig.title }} ({{ isVictory ? '正式畢業' : '肄業' }})</span>
+          <span class="font-bold text-arcade-cyan text-base sm:text-lg">{{ gameStore.currentStageConfig.title }} ({{ isVictory ? '正式畢業' : '肄業' }})</span>
         </div>
-        <div class="flex justify-between border-b border-slate-800 pb-2">
+        <div class="flex justify-between border-b border-slate-800 pb-3">
           <span class="text-gray-400">最終累積得分：</span>
-          <span class="font-bold text-arcade-yellow text-base">{{ gameStore.score }} 分</span>
+          <span class="font-black text-arcade-yellow text-lg sm:text-xl">{{ gameStore.score }} 分</span>
         </div>
-        <div class="flex justify-between border-b border-slate-800 pb-2">
+        <div class="flex justify-between border-b border-slate-800 pb-3">
           <span class="text-gray-400">殘餘學分金幣：</span>
-          <span class="font-bold text-arcade-green">{{ gameStore.credits }} 學分</span>
+          <span class="font-bold text-arcade-green text-base sm:text-lg">{{ gameStore.credits }} 學分</span>
         </div>
-        <div class="flex justify-between">
+        <div class="flex justify-between items-center">
           <span class="text-gray-400">街機名人堂評級：</span>
-          <span class="font-black text-base" :class="getGradeColor(finalRankGrade)">
+          <span class="font-black text-lg sm:text-2xl" :class="getGradeColor(finalRankGrade)">
             RANK [ {{ finalRankGrade }} ] - {{ getGradeTitle(finalRankGrade) }}
           </span>
         </div>
@@ -40,7 +40,7 @@
       <!-- 重新挑戰按鈕 -->
       <button 
         @click="restart"
-        class="btn-arcade bg-gradient-to-r from-arcade-yellow via-amber-400 to-orange-500 text-black font-black text-sm sm:text-base py-3 px-8 rounded-xl shadow-arcade-yellow w-full flex items-center justify-center gap-2"
+        class="btn-arcade bg-gradient-to-r from-arcade-yellow via-amber-400 to-orange-500 text-black font-black text-base sm:text-lg py-4 px-10 rounded-2xl shadow-arcade-yellow w-full flex items-center justify-center gap-3"
       >
         <span>🔄 重新入學挑戰 (START NEW GAME)</span>
       </button>

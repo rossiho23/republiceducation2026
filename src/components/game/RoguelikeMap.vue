@@ -5,32 +5,32 @@
     <!-- 頂部黑黃斑馬飾條 -->
     <div class="w-full h-1.5 neo-hazard-yellow border-b border-black -mt-1 mb-2"></div>
 
-    <!-- 頂部學程狀態與聖物裝備列 -->
-    <div class="flex flex-wrap items-center justify-between gap-2.5 p-3 bg-[#121620] border-2 border-black shadow-[3px_3px_0px_#000] neo-cut-sm">
+    <!-- 頂部學程狀態與聖物裝備列 (字級放大) -->
+    <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 sm:p-4 bg-[#121620] border-2 border-black shadow-[3px_3px_0px_#000] neo-cut-sm">
       <!-- 學程與樓層指標 -->
-      <div class="flex items-center gap-2.5">
-        <span class="px-2.5 py-0.5 bg-yellow-400 text-black text-xs font-black uppercase tracking-wider transform -rotate-1 border border-black">
+      <div class="flex items-center gap-3">
+        <span class="px-3 py-1 bg-yellow-400 text-black text-xs sm:text-sm font-black uppercase tracking-wider transform -rotate-1 border border-black shadow-[2px_2px_0px_#000]">
           {{ gameStore.currentStage }}階段
         </span>
-        <div class="text-xs text-gray-300 font-bold">
-          探索進度：<span class="text-yellow-400 font-black text-sm">第 {{ currentFloor + 1 }} 層 / 共 {{ totalFloors }} 層</span>
+        <div class="text-sm sm:text-base text-gray-200 font-bold">
+          探索進度：<span class="text-yellow-400 font-black text-base sm:text-lg">第 {{ currentFloor + 1 }} 層 / 共 {{ totalFloors }} 層</span>
         </div>
       </div>
 
       <!-- 玩家已裝備的稀有被動聖物清單 -->
       <div class="flex items-center gap-2">
-        <span class="text-xs text-gray-400 font-bold">[已裝備聖物]:</span>
-        <div class="flex items-center gap-1.5">
+        <span class="text-xs sm:text-sm text-gray-400 font-bold">[已裝備聖物]:</span>
+        <div class="flex items-center gap-2">
           <div 
             v-for="relic in gameStore.ownedRelics" 
             :key="relic.id"
-            class="px-2 py-0.5 bg-black border border-yellow-400 text-xs font-bold text-yellow-300 flex items-center gap-1 shadow-[2px_2px_0px_#ffe600]"
+            class="px-2.5 py-1 bg-black border border-yellow-400 text-xs sm:text-sm font-bold text-yellow-300 flex items-center gap-1.5 shadow-[2px_2px_0px_#ffe600]"
             :title="relic.description"
           >
             <span>{{ relic.icon }}</span>
-            <span class="text-[10px] font-black">{{ relic.name }}</span>
+            <span class="text-xs sm:text-sm font-black">{{ relic.name }}</span>
           </div>
-          <span v-if="gameStore.ownedRelics.length === 0" class="text-xs text-gray-500 italic">
+          <span v-if="gameStore.ownedRelics.length === 0" class="text-xs sm:text-sm text-gray-500 italic">
             (尚無聖物，通過補考或菁英戰可獲取)
           </span>
         </div>
@@ -39,55 +39,55 @@
       <!-- 模式切換按鈕 -->
       <button
         @click="$emit('switch-to-classic')"
-        class="neo-btn bg-[#182030] hover:bg-[#222c42] text-yellow-400 text-xs py-1 px-3 neo-cut-sm tracking-wider"
+        class="neo-btn bg-[#182030] hover:bg-[#222c42] text-yellow-400 text-xs sm:text-sm font-black py-1.5 px-3.5 neo-cut-sm tracking-wider shadow-[2px_2px_0px_#000]"
       >
         🔄 切換為經典雙軌模式
       </button>
     </div>
 
-    <!-- 樹狀地圖畫布區塊 (包含半色調網點與層次排列節點) -->
+    <!-- 樹狀地圖畫布區塊 (包含半色調網點與層次排列節點 · 寬屏放寬) -->
     <div 
       ref="mapContainerRef" 
-      class="flex-1 w-full mt-3 neo-halftone-dark border-2 border-black p-4 sm:p-6 overflow-y-auto relative min-h-[460px] flex flex-col-reverse justify-between items-center gap-8 neo-cut-sm shadow-inner"
+      class="flex-1 w-full mt-3 neo-halftone-dark border-2 border-black p-4 sm:p-8 overflow-y-auto relative min-h-[500px] flex flex-col-reverse justify-between items-center gap-8 neo-cut-sm shadow-inner"
     >
-      <!-- 每一層節點排列 (由下至上推進) -->
+      <!-- 每一層節點排列 (由下至上推進 · 寬度加寬) -->
       <div 
         v-for="(floorNodes, fIdx) in roguelikeFloors" 
         :key="fIdx"
-        class="relative z-10 w-full max-w-xl flex items-center justify-around py-2"
+        class="relative z-10 w-full max-w-3xl 2xl:max-w-4xl flex items-center justify-around py-2.5"
       >
-        <!-- 節點按鈕 (日系戰術切角、粗黑邊框與實心陰影) -->
+        <!-- 節點按鈕 (日系戰術切角、粗黑邊框與實心陰影 · 尺寸加大) -->
         <button
           v-for="node in floorNodes"
           :key="node.id"
           @click="handleNodeClick(node)"
           :disabled="!node.isAvailable || node.isVisited"
-          class="relative neo-btn p-3 flex flex-col items-center gap-1 transition-all neo-cut-sm min-w-[100px] sm:min-w-[120px]"
+          class="relative neo-btn p-3.5 sm:p-4 flex flex-col items-center gap-1.5 transition-all neo-cut-sm min-w-[130px] sm:min-w-[160px]"
           :class="getNodeClass(node)"
         >
           <!-- 當前玩家所處位置標籤 (日系紅黑立體小標牌) -->
           <div 
             v-if="isCurrentPlayerNode(node)"
-            class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#ff0055] text-white px-2 py-0.2 text-[10px] font-black border border-black shadow-[2px_2px_0px_#000] animate-bounce whitespace-nowrap transform -rotate-2"
+            class="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#ff0055] text-white px-2.5 py-0.5 text-xs font-black border-2 border-black shadow-[2px_2px_0px_#000] animate-bounce whitespace-nowrap transform -rotate-2"
           >
             YOU // 當前
           </div>
 
-          <!-- 16-Bit 像素節點圖標 (告別 Emoji 佔位符號) -->
+          <!-- 16-Bit 像素節點圖標 (尺寸等比放大) -->
           <img 
             :src="getNodeBadgeIcon(node)" 
             :alt="node.title"
-            class="w-7 h-7 object-contain select-none"
+            class="w-9 h-9 sm:w-10 sm:h-10 object-contain select-none"
           />
 
-          <!-- 節點標題 -->
-          <span class="text-xs font-black whitespace-nowrap px-1 neo-skew-title">
+          <!-- 節點標題 (字體放大) -->
+          <span class="text-sm sm:text-base font-black whitespace-nowrap px-1 neo-skew-title">
             {{ node.title }}
           </span>
 
-          <!-- 難度或學科標記 (高對比方塊) -->
+          <!-- 難度或學科標記 (高對比方塊 · 字體放大) -->
           <span 
-            class="text-[9px] px-1.5 py-0.2 font-black border border-black"
+            class="text-xs sm:text-sm px-2 py-0.5 font-black border border-black"
             :class="node.difficulty === '困難' ? 'bg-[#ff0055] text-white' : 'bg-black text-yellow-400'"
           >
             {{ node.subject }} · {{ node.difficulty }}

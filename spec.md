@@ -397,3 +397,53 @@ flowchart LR
     QuizComp --> StudentUI["學生三態動態表情 (思考/比V/哭泣)"]
     BoardComp --> MascotUI["趴骰子大頭吉祥物 & 3D卡匣格子圖標"]
 ```
+
+---
+
+## 8. 電腦版寬屏全畫面與全域字級階層規範 (Desktop Wide & Large Font Spec)
+
+### 8.1 寬屏機台架構與原生全螢幕機制 (Fullscreen & Wide Canvas)
+1. **框體寬度解除上限**：
+   * 原架構 `max-w-5xl`（1024px）擴展為寬屏自適應模式（`w-full max-w-[1536px] 2xl:max-w-[1680px]`），填滿 1080p、2K 與 4K 螢幕兩側留白。
+   * 保留頂部黑黃斑馬紋警戒條與 Neo-Arcade 戰術幾何切角。
+2. **HTML5 Fullscreen API 整合**：
+   * 在頂部導航燈箱新增 `🖥️ [全螢幕 FULLSCREEN]` 實體街機微動開關。
+   * 支援 `document.fullscreenElement` 檢測與 `requestFullscreen()` / `exitFullscreen()`。
+   * 玩家按下 ESC 或點擊按鍵時即時雙向同步開關狀態。
+
+### 8.2 全域字級階梯規範 (Typography Hierarchy)
+
+| 介面元件 | 原版字級 | 寬屏放大升級字級 | Tailwind 規範類別 | 備註說明 |
+| :--- | :--- | :--- | :--- | :--- |
+| **題目題幹文字** | 14px~16px | **22px ~ 26px** | `text-xl sm:text-2xl font-black` | 黑板大字報粗體，高對比黃字 |
+| **四選一選項文字** | 12px~14px | **16px ~ 19px** | `text-base sm:text-lg font-bold` | 按鈕高度增至 56px+，點擊熱區擴大 |
+| **雙軌地圖卡匣標籤** | 8px~10px | **12px ~ 14px** | `text-xs sm:text-sm font-black` | 3D 卡匣厚度與像素圖標等比放大 |
+| **肉鴿地圖節點標籤** | 9px~10px | **12px ~ 14px** | `text-xs sm:text-sm font-black` | 節點按鈕寬度增至 130px~150px |
+| **HUD 狀態列數值** | 12px | **15px ~ 18px** | `text-sm sm:text-base font-black` | HP 條增厚、分數與學分一目了然 |
+| **主持評論跑馬燈** | 12px | **14px ~ 16px** | `text-sm sm:text-base font-bold` | 播報橫幅醒目清晰 |
+| **操作功能按鍵** | 11px~12px | **14px ~ 16px** | `text-sm font-black py-2 px-4` | 擲骰 (SPACE) 與道具欄大幅擴大 |
+
+### 8.3 寬屏佈局與全螢幕切換循序圖 (Sequence Diagram)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Player as 玩家 (Player)
+    participant Frame as 街機外框 (ArcadeFrame)
+    participant DOM as 瀏覽器核心 (HTML5 Fullscreen API)
+    participant Stage as 寬屏主舞台 (QuizCard / GameBoard)
+
+    Player->>Frame: 點擊「🖥️ [全螢幕]」或快捷鍵
+    Frame->>DOM: 檢查 document.fullscreenElement
+    alt 目前非全螢幕
+        DOM->>DOM: requestFullscreen()
+        DOM-->>Frame: 觸發 fullscreenchange 事件 (isFullScreen = true)
+        Frame->>Stage: 啟動寬屏滿版模式 (w-full max-w-[1680px])
+        Stage-->>Player: 全螢幕無黑邊、大字報題目極速呈現
+    else 目前為全螢幕
+        DOM->>DOM: exitFullscreen()
+        DOM-->>Frame: 觸發 fullscreenchange 事件 (isFullScreen = false)
+        Frame->>Stage: 還原為常規寬屏視窗模式
+        Stage-->>Player: 退出全螢幕
+    end
+```
+

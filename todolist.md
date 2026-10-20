@@ -155,3 +155,14 @@
 - [x] 提交並推送到 GitHub 遠端倉庫自動發布
 - [x] 產出像素美術升級日誌至 `/log` 目錄
 
+## 階段二十一：電腦版寬屏全畫面與字體大字報全面重構 (方案 1)
+- [x] 升級 `ArcadeFrame.vue` 框體寬度至寬屏自適應 (`max-w-[1536px] 2xl:max-w-[1680px]`)，並實作 Fullscreen API 全螢幕切換按鈕
+- [x] 重構答題主舞台 `QuizCard.vue`：黑板寬度加大至 `max-w-5xl 2xl:max-w-6xl`，題目題幹放大至 22px~30px，選項按鈕加大且文字放大至 16px~20px
+- [x] 重構雙軌卡匣地圖 `GameBoard.vue` 與 `RetroTileIcon.vue`：擴展卡匣尺寸、放大卡匣文字與上方 HUD 資訊列 (16px~18px)
+- [x] 重構肉鴿樹狀地圖 `RoguelikeMap.vue`：擴展畫布寬度、加大節點按鈕尺寸與文字字級 (14px~16px)
+- [x] 重構彈窗系列 (`WagerModal.vue`, `BossExamModal.vue`, `RemedialExamModal.vue`, `CanteenModal.vue`, `TransferModal.vue`, `ContinueModal.vue`, `EventModal.vue`, `ForkModal.vue`, `ResultModal.vue`, `NewsIntroModal.vue`) 字級與按鈕熱區
+- [x] 執行全專案 `npm run build` 編譯與型別檢驗
+- [x] 提交並推送到 GitHub 遠端倉庫自動發布
+- [x] 產出大字報重構日誌至 `/log` 目錄與更新 `report.md`
+
+
