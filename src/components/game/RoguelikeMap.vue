@@ -1,37 +1,34 @@
 <template>
-  <!-- 日系新潮街機風 樹狀分支地圖組件 (Neo-Arcade Roguelike Map) -->
-  <div class="w-full flex-1 flex flex-col bg-[#090b10] border-[4px] border-black shadow-[8px_8px_0px_#000] p-3 sm:p-5 relative overflow-hidden font-mono select-none neo-cut">
+  <!-- 現代極簡 SaaS 風格 樹狀分支地圖組件 (Linear Modern Roguelike Map) -->
+  <div class="w-full flex-1 flex flex-col saas-card p-4 sm:p-6 relative overflow-hidden select-none">
     
-    <!-- 頂部黑黃斑馬飾條 -->
-    <div class="w-full h-1.5 neo-hazard-yellow border-b border-black -mt-1 mb-2"></div>
-
-    <!-- 頂部學程狀態與聖物裝備列 (字級放大) -->
-    <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 sm:p-4 bg-[#121620] border-2 border-black shadow-[3px_3px_0px_#000] neo-cut-sm">
+    <!-- 頂部學程狀態與聖物裝備列 (Bento 資訊欄) -->
+    <div class="flex flex-wrap items-center justify-between gap-4 p-4 bg-zinc-950/60 border border-white/[0.08] rounded-xl">
       <!-- 學程與樓層指標 -->
       <div class="flex items-center gap-3">
-        <span class="px-3 py-1 bg-yellow-400 text-black text-xs sm:text-sm font-black uppercase tracking-wider transform -rotate-1 border border-black shadow-[2px_2px_0px_#000]">
+        <span class="saas-pill saas-pill-indigo font-medium text-xs">
           {{ gameStore.currentStage }}階段
         </span>
-        <div class="text-sm sm:text-base text-gray-200 font-bold">
-          探索進度：<span class="text-yellow-400 font-black text-base sm:text-lg">第 {{ currentFloor + 1 }} 層 / 共 {{ totalFloors }} 層</span>
+        <div class="text-xs sm:text-sm text-zinc-300 font-mono">
+          探索進度：<strong class="text-zinc-100 font-semibold">第 {{ currentFloor + 1 }} 層 / 共 {{ totalFloors }} 層</strong>
         </div>
       </div>
 
       <!-- 玩家已裝備的稀有被動聖物清單 -->
-      <div class="flex items-center gap-2">
-        <span class="text-xs sm:text-sm text-gray-400 font-bold">[已裝備聖物]:</span>
+      <div class="flex items-center gap-2 text-xs">
+        <span class="text-zinc-500 font-mono">裝備聖物:</span>
         <div class="flex items-center gap-2">
           <div 
             v-for="relic in gameStore.ownedRelics" 
             :key="relic.id"
-            class="px-2.5 py-1 bg-black border border-yellow-400 text-xs sm:text-sm font-bold text-yellow-300 flex items-center gap-1.5 shadow-[2px_2px_0px_#ffe600]"
+            class="saas-pill bg-zinc-800/80 border-white/[0.1] text-zinc-200"
             :title="relic.description"
           >
             <span>{{ relic.icon }}</span>
-            <span class="text-xs sm:text-sm font-black">{{ relic.name }}</span>
+            <span class="font-medium">{{ relic.name }}</span>
           </div>
-          <span v-if="gameStore.ownedRelics.length === 0" class="text-xs sm:text-sm text-gray-500 italic">
-            (尚無聖物，通過補考或菁英戰可獲取)
+          <span v-if="gameStore.ownedRelics.length === 0" class="text-xs text-zinc-600 italic">
+            (尚無聖物裝備)
           </span>
         </div>
       </div>
@@ -39,56 +36,56 @@
       <!-- 模式切換按鈕 -->
       <button
         @click="$emit('switch-to-classic')"
-        class="neo-btn bg-[#182030] hover:bg-[#222c42] text-yellow-400 text-xs sm:text-sm font-black py-1.5 px-3.5 neo-cut-sm tracking-wider shadow-[2px_2px_0px_#000]"
+        class="saas-btn saas-btn-secondary py-1.5 px-3 text-xs"
       >
-        🔄 切換為經典雙軌模式
+        切換為經典雙軌模式 ➔
       </button>
     </div>
 
-    <!-- 樹狀地圖畫布區塊 (包含半色調網點與層次排列節點 · 寬屏放寬) -->
+    <!-- 樹狀地圖畫布區塊 (現代極簡網格背景與層次排列節點) -->
     <div 
       ref="mapContainerRef" 
-      class="flex-1 w-full mt-3 neo-halftone-dark border-2 border-black p-4 sm:p-8 overflow-y-auto relative min-h-[500px] flex flex-col-reverse justify-between items-center gap-8 neo-cut-sm shadow-inner"
+      class="flex-1 w-full mt-4 bg-zinc-950/70 border border-white/[0.08] rounded-xl p-6 sm:p-10 overflow-y-auto relative min-h-[500px] flex flex-col-reverse justify-between items-center gap-8 shadow-inner"
     >
-      <!-- 每一層節點排列 (由下至上推進 · 寬度加寬) -->
+      <!-- 每一層節點排列 (由下至上推進) -->
       <div 
         v-for="(floorNodes, fIdx) in roguelikeFloors" 
         :key="fIdx"
-        class="relative z-10 w-full max-w-3xl 2xl:max-w-4xl flex items-center justify-around py-2.5"
+        class="relative z-10 w-full max-w-3xl 2xl:max-w-4xl flex items-center justify-around py-3"
       >
-        <!-- 節點按鈕 (日系戰術切角、粗黑邊框與實心陰影 · 尺寸加大) -->
+        <!-- 節點卡片按鈕 (Modern SaaS Card · 微光邊框與平滑懸停) -->
         <button
           v-for="node in floorNodes"
           :key="node.id"
           @click="handleNodeClick(node)"
           :disabled="!node.isAvailable || node.isVisited"
-          class="relative neo-btn p-3.5 sm:p-4 flex flex-col items-center gap-1.5 transition-all neo-cut-sm min-w-[130px] sm:min-w-[160px]"
+          class="relative p-4 rounded-xl border flex flex-col items-center gap-2 transition-all duration-200 min-w-[130px] sm:min-w-[160px]"
           :class="getNodeClass(node)"
         >
-          <!-- 當前玩家所處位置標籤 (日系紅黑立體小標牌) -->
+          <!-- 當前玩家所處位置標籤 (微膠囊指示器) -->
           <div 
             v-if="isCurrentPlayerNode(node)"
-            class="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#ff0055] text-white px-2.5 py-0.5 text-xs font-black border-2 border-black shadow-[2px_2px_0px_#000] animate-bounce whitespace-nowrap transform -rotate-2"
+            class="absolute -top-3 left-1/2 -translate-x-1/2 saas-pill saas-pill-indigo text-[10px] py-0.5 whitespace-nowrap animate-pulse"
           >
-            YOU // 當前
+            YOU 當前位置
           </div>
 
-          <!-- 16-Bit 像素節點圖標 (尺寸等比放大) -->
+          <!-- 16-Bit 像素節點圖標 -->
           <img 
             :src="getNodeBadgeIcon(node)" 
             :alt="node.title"
-            class="w-9 h-9 sm:w-10 sm:h-10 object-contain select-none"
+            class="w-8 h-8 sm:w-9 sm:h-9 object-contain select-none opacity-90"
           />
 
-          <!-- 節點標題 (字體放大) -->
-          <span class="text-sm sm:text-base font-black whitespace-nowrap px-1 neo-skew-title">
+          <!-- 節點標題 -->
+          <span class="text-sm font-medium text-zinc-100 whitespace-nowrap px-1">
             {{ node.title }}
           </span>
 
-          <!-- 難度或學科標記 (高對比方塊 · 字體放大) -->
+          <!-- 難度或學科微標籤 -->
           <span 
-            class="text-xs sm:text-sm px-2 py-0.5 font-black border border-black"
-            :class="node.difficulty === '困難' ? 'bg-[#ff0055] text-white' : 'bg-black text-yellow-400'"
+            class="text-[11px] font-mono px-2 py-0.5 rounded-full border"
+            :class="node.difficulty === '困難' ? 'bg-rose-500/10 text-rose-300 border-rose-500/30' : 'bg-zinc-800/80 text-zinc-400 border-white/[0.08]'"
           >
             {{ node.subject }} · {{ node.difficulty }}
           </span>
@@ -101,8 +98,8 @@
 <script setup lang="ts">
 /**
  * @file RoguelikeMap.vue
- * @description 日系新潮街機風 樹狀分支地圖組件 (Neo-Arcade Roguelike Map)
- * 具備粗黑 4px 邊框、日系戰術切角按鈕、半色調波點網底與俐落乾淨的選路回饋。
+ * @description 現代極簡 SaaS 風格 樹狀分支地圖組件 (Linear Modern Roguelike Map)
+ * 具備 Bento 狀態欄、Zinc 冷調微透背景、Indigo 呼吸節點與平滑選路微互動。
  */
 import { ref, computed, onMounted, watch } from 'vue';
 import { useGameStore } from '../../stores/gameStore';
@@ -156,23 +153,23 @@ function isCurrentPlayerNode(node: RoguelikeNode): boolean {
 }
 
 /**
- * 依據節點狀態動態決定按鈕樣式 (日系撞色)
+ * 依據節點狀態動態決定按鈕樣式 (Linear 現代極簡微光)
  * @param {RoguelikeNode} node 節點
  */
 function getNodeClass(node: RoguelikeNode): string {
   if (node.isVisited) {
-    return 'bg-[#050608] text-gray-600 border-gray-800 opacity-40 shadow-none cursor-default';
+    return 'bg-zinc-950/40 text-zinc-600 border-white/[0.04] opacity-35 cursor-default';
   }
   if (node.isAvailable) {
     if (node.type === 'FINAL_EXAM') {
-      return 'neo-hazard-yellow text-black border-black shadow-[5px_5px_0px_#000] hover:scale-105';
+      return 'bg-indigo-950/40 border-indigo-500/60 shadow-[0_0_25px_rgba(99,102,241,0.3)] text-zinc-100 hover:bg-indigo-900/40 hover:scale-[1.02] cursor-pointer';
     }
     if (node.type === 'QUIZ_ELITE') {
-      return 'bg-[#ff0055] text-white border-black shadow-[5px_5px_0px_#000] hover:scale-105';
+      return 'bg-zinc-900/90 border-rose-500/40 shadow-[0_0_20px_rgba(244,63,94,0.15)] text-zinc-100 hover:bg-zinc-850 hover:scale-[1.02] cursor-pointer';
     }
-    return 'bg-yellow-400 text-black border-black shadow-[5px_5px_0px_#000] hover:scale-105';
+    return 'bg-zinc-900/90 border-indigo-500/40 shadow-[0_0_20px_rgba(99,102,241,0.15)] text-zinc-100 hover:bg-zinc-800 hover:border-indigo-400 hover:scale-[1.02] cursor-pointer';
   }
-  return 'bg-[#090b10] text-gray-500 border-gray-800 opacity-40 cursor-not-allowed shadow-none';
+  return 'bg-zinc-950/20 text-zinc-600 border-white/[0.04] opacity-30 cursor-not-allowed';
 }
 
 function getNodeBadgeIcon(node: RoguelikeNode): string {
@@ -199,7 +196,6 @@ function handleNodeClick(node: RoguelikeNode): void {
   activeNodeId.value = node.id;
   currentFloor.value = node.floor;
 
-  // 更新下一層可選節點
   if (node.nextNodeIds && node.nextNodeIds.length > 0) {
     const nextFloorIndex = node.floor + 1;
     if (roguelikeFloors.value[nextFloorIndex]) {
@@ -221,20 +217,18 @@ function handleNodeClick(node: RoguelikeNode): void {
 function resolveNodeAction(node: RoguelikeNode): void {
   switch (node.type) {
     case 'QUIZ_NORMAL': {
-      // 一般隨堂考：直接乾淨開啟作答黑板，節奏俐落
       const q = questionStore.pickQuestion(gameStore.currentStage, node.subject);
       if (q) {
         gameStore.startDirectQuiz(q, false);
-        gameStore.hostComment = `抵達【${node.title}】！請沉著應對【${node.subject}】隨堂測驗！`;
+        gameStore.hostComment = `抵達【${node.title}】！請應對【${node.subject}】隨堂測驗。`;
       }
       break;
     }
     case 'QUIZ_ELITE': {
-      // 菁英挑戰考：進入信心下注博弈
       const q = questionStore.pickQuestion(gameStore.currentStage, node.subject);
       if (q) {
         gameStore.startWagerQuiz(q, true);
-        gameStore.hostComment = `抵達【${node.title}】！面臨高難度菁英考驗，請評估信心下注！`;
+        gameStore.hostComment = `抵達【${node.title}】！面臨菁英考驗，請評估信心下注。`;
       }
       break;
     }
@@ -242,7 +236,7 @@ function resolveNodeAction(node: RoguelikeNode): void {
       const q = questionStore.pickQuestion(gameStore.currentStage, node.subject);
       if (q) {
         gameStore.startWagerQuiz(q, false);
-        gameStore.hostComment = `抵達【${node.title}】！視覺局部放大題，評估信心後開始辨識！`;
+        gameStore.hostComment = `抵達【${node.title}】！視覺局部放大題，開始辨識。`;
       }
       break;
     }
@@ -250,21 +244,21 @@ function resolveNodeAction(node: RoguelikeNode): void {
       const q = questionStore.pickQuestion(gameStore.currentStage, '流行音樂');
       if (q) {
         gameStore.startWagerQuiz(q, false);
-        gameStore.hostComment = `抵達【8-bit 聽力猜歌】節點！請評估下注後開始聆聽！`;
+        gameStore.hostComment = `抵達【8-Bit 聽力猜歌】節點，請準備聆聽。`;
       }
       break;
     }
     case 'CANTEEN_REST': {
       soundEngine.playShopBell();
       gameStore.activeModal = 'CANTEEN';
-      gameStore.hostComment = `抵達【${node.title}】！添購補給道具與養樂多，準備衝向頂層大考！`;
+      gameStore.hostComment = `抵達【${node.title}】！添購補給道具與養樂多。`;
       break;
     }
     case 'CAMPUS_FATE': {
       soundEngine.playEvent();
       gameStore.playerHp = Math.min(gameStore.maxHp, gameStore.playerHp + 20);
       gameStore.credits += 30;
-      gameStore.hostComment = `在校園圖書館靜心自習，體力回復 +20 點，獲得研習津貼 +30 學分！`;
+      gameStore.hostComment = `在校園圖書館靜心自習，體力回復 +20 點，獲得津貼 +30 學分。`;
       break;
     }
     case 'FINAL_EXAM': {

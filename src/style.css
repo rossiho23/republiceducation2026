@@ -1,4 +1,4 @@
-@import './styles/neoArcade.css';
+@import './styles/modernSaaS.css';
 
 @tailwind base;
 @tailwind components;
@@ -6,55 +6,33 @@
 
 @layer base {
   body {
-    @apply bg-arcade-bg text-white select-none overflow-x-hidden font-sans;
+    @apply bg-zinc-950 text-zinc-100 select-none overflow-x-hidden font-sans antialiased;
+    background-color: #09090b;
     background-image: 
-      radial-gradient(circle at 50% 50%, rgba(20, 25, 38, 0.8) 0%, rgba(12, 15, 23, 1) 100%),
-      linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
-    background-size: 100% 100%, 32px 32px, 32px 32px;
+      radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.12), transparent);
+    background-size: 32px 32px, 100% 100%;
+    min-height: 100vh;
   }
 }
 
-/* CRT 螢幕掃描線特效 */
-.crt-overlay::before {
-  content: " ";
-  display: block;
-  position: fixed;
-  top: 0; left: 0; bottom: 0; right: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-  background-size: 100% 4px;
-  z-index: 999;
-  pointer-events: none;
-  opacity: 0.6;
-}
-
-/* 復古像素邊框按鈕 */
+/* 復古像素邊框按鈕 (保留別名以防舊組件呼叫，統一轉化為現代平滑風格) */
 .btn-arcade {
-  @apply relative px-4 py-2 font-bold tracking-wider uppercase transition-all duration-100 active:translate-x-1 active:translate-y-1;
-  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.8);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  @apply saas-btn transition-all duration-200;
 }
 
-.btn-arcade:hover {
-  filter: brightness(1.15);
-}
-
-.btn-arcade:active {
-  box-shadow: 1px 1px 0px 0px rgba(0, 0, 0, 0.8);
-}
-
-/* 自訂捲軸樣式 */
+/* 自訂捲軸樣式 - 現代極簡微型捲軸 */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #141926;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #324263;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #00f0ff;
+  background: rgba(99, 102, 241, 0.5);
 }

@@ -447,3 +447,53 @@ sequenceDiagram
     end
 ```
 
+---
+
+## 9. 現代極簡 SaaS 風格 (Linear / Vercel) 設計系統規格 (Modern Minimalist Spec)
+
+### 9.1 設計哲學與色彩系統 (Color System & Tokens)
+捨棄高飽和度刺眼顏色（黃黑斑馬紋、CRT 掃描線、粗黑邊與漫畫波點），全面重構為類似 **Linear / Vercel** 的當代極簡暗色工程美學（Clean, Modern, Minimalist SaaS）：
+
+1. **唯一主強調色 (Single Accent Color)**：
+   * **電光紫藍 (Electric Indigo)**：`#6366f1` (`indigo-500`) / 懸停 `#4f46e5` (`indigo-600`)，微光光暈 `shadow-[0_0_20px_rgba(99,102,241,0.25)]`。
+   * 全站除狀態指示外，所有重要操作、選中狀態與按鍵焦點嚴格統一收斂至此單一主色。
+2. **中性灰度層次 (Zinc Hierarchy)**：
+   * **畫布底層 (Canvas)**：`#09090b` (`zinc-950`)。
+   * **容器卡片 (Surface Card)**：`rgba(24, 24, 27, 0.65)` (`zinc-900/65`) 搭配 `backdrop-blur-xl`。
+   * **卡片懸停 (Surface Hover)**：`rgba(39, 39, 42, 0.75)` (`zinc-800/75`)。
+   * **極細微光邊框 (Subtle Border)**：`rgba(255, 255, 255, 0.08)` (`border-white/[0.08]`) 或 `border-zinc-800/80`。
+3. **文字對比層次 (Typography Contrast)**：
+   * **主文本 (Primary Text)**：`#f4f4f5` (`zinc-100`)，用於題幹、重要大標題。
+   * **次要文本 (Secondary Text)**：`#a1a1aa` (`zinc-400`)，用於說明文、選項內容。
+   * **弱化文本 (Muted Text)**：`#71717a` (`zinc-500`)，用於 Metadata、快捷鍵提示、標籤。
+4. **功能語義色 (低飽和柔和色)**：
+   * **正確／成功 (Success)**：`#34d399` (`emerald-400`)，低飽和翡翠綠。
+   * **錯誤／危險 (Danger)**：`#fb7185` (`rose-400`)，低飽和柔和玫瑰紅。
+
+### 9.2 空間排版與 Bento Grid 規範 (Layout & Spacing)
+1. **充足留白 (Whitespace)**：
+   * 卡片內距一律規範為 `p-6 sm:p-8`，消除擁擠壓迫感。
+   * 元素垂直與水平間距嚴格以 8px 倍數推進：`gap-4` (16px), `gap-6` (24px), `gap-8` (32px)。
+2. **Bento Grid 結構**：
+   * 答題舞台、首頁卡片與選路地圖使用對齊良好的 CSS Grid / Flexbox 系統，區塊自帶獨立邊框與微柔和陰影。
+3. **現代圓角與微光質感**：
+   * 統一採用 `rounded-xl` (12px) 與 `rounded-2xl` (16px)，全面捨棄 CSS 切角與 4px 黑色硬邊。
+   * 邊框採用 `1px solid rgba(255, 255, 255, 0.08)`。
+   * 陰影採用柔和環境光 `shadow-[0_8px_30px_rgb(0,0,0,0.12)]`。
+   * 微互動動畫統一配置 `transition-all duration-200 ease-out`。
+
+### 9.3 設計系統組件對應圖 (Design Architecture)
+```mermaid
+flowchart TD
+    AppShell["SaaS 現代沉浸工作台 (Zinc-950 底色 / 極細邊框頂欄)"] --> Nav["極簡微型 HUD (生命/學分/代幣/全螢幕微按鈕)"]
+    AppShell --> MainStage["Bento Grid 主視圖容器 (p-6 / rounded-2xl / Subtle Border)"]
+    
+    MainStage --> Title["首頁入口 TitleScreen (極簡 Hero / 雙層卡片)"]
+    MainStage --> Board["雙軌經典地圖 GameBoard (細線軌道流 / 簡潔指示標記)"]
+    MainStage --> Map["肉鴿節點地圖 RoguelikeMap (現代節點卡片 / 柔和光纖線路)"]
+    MainStage --> QuizCard["答題主舞台 QuizCard (大字題幹 / Bento 四選一選項 / Indigo 焦點)"]
+    
+    QuizCard --> Modals["現代毛玻璃彈窗系統 (Backdrop-blur-xl / p-8 / rounded-2xl)"]
+```
+
+
