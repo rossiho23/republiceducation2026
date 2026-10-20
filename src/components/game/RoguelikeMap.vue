@@ -47,6 +47,17 @@
 
       <!-- 功能按鍵組 -->
       <div class="flex items-center gap-2">
+        <!-- 雙軌風格切換開關 -->
+        <button
+          @click="gameStore.toggleVisualTheme()"
+          class="neo-btn text-xs sm:text-sm font-black py-1.5 px-2.5 neo-cut-sm tracking-wider shadow-[2px_2px_0px_#000] cursor-pointer flex items-center gap-1 transition-all"
+          :class="gameStore.visualTheme === 'MODERN_LUXURY' ? 'bg-[#9f1239] hover:bg-[#be123c] text-amber-200' : 'bg-yellow-400 hover:bg-yellow-300 text-black'"
+          title="切換雙軌地圖視覺風格 (現代旗艦版 ⇄ 1993 街機版)"
+        >
+          <span>🎨</span>
+          <span>{{ gameStore.visualTheme === 'MODERN_LUXURY' ? '現代風格' : '街機風格' }}</span>
+        </button>
+
         <button
           @click="$emit('switch-to-classic')"
           class="neo-btn bg-[#182030] hover:bg-[#222c42] text-yellow-400 text-xs sm:text-sm font-black py-1.5 px-3.5 neo-cut-sm tracking-wider shadow-[2px_2px_0px_#000] cursor-pointer"

@@ -169,3 +169,16 @@
 - [x] 執行本地 `npm run build` 編譯檢驗確認 100% 通過
 - [x] 將新功能代碼提交並推送到遠端 GitHub 倉庫自動發布
 - [x] 產出日誌至 `log/20261020_12.md` 與更新 `report.md`
+
+
+## 階段二十七：全域主題調度修復與現代版完全響應實作 (方案 A)
+- [x] 在 `src/stores/gameStore.ts` 增補 `setVisualTheme(theme: VisualTheme)` Action 支援精準主題設定
+- [x] 修復 `src/components/game/ModernGameBoard.vue` 背景圖片 Base URL 絕對路徑缺陷，避免 GitHub Pages 404
+- [x] 在 `src/components/game/ModernGameBoard.vue` 增設 `switch-to-roguelike` 事件與頂部功能按鍵
+- [x] 修復 `src/components/game/GameBoard.vue` 模板條件分支，確保 `v-if="visualTheme === 'MODERN_LUXURY'"` 正確渲染現代版
+- [x] 在首頁畫面 (`src/components/game/TitleScreen.vue`) 新增現代旗艦版與 1993 街機版主題切換面板
+- [x] 在肉鴿地圖 (`src/components/game/RoguelikeMap.vue`) 頂部 HUD 支援主題切換按鈕
+- [x] 執行本地 `npm run build` 編譯檢驗確認 100% 通過
+- [x] 將修復與新功能代碼提交並推送到遠端 GitHub 倉庫自動發布
+- [x] 產出修復日誌至 `log/20261020_13.md` 與更新 `report.md`
+

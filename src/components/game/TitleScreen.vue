@@ -98,6 +98,77 @@
       </div>
     </div>
 
+    <!-- 介面視覺風格選擇 (現代旗艦版 vs 1993 街機版) -->
+    <div class="my-3 w-full max-w-2xl bg-[#14050b] border-2 border-rose-500 p-3.5 neo-cut-sm shadow-[5px_5px_0px_#000]">
+      <div class="flex items-center justify-between mb-3 pb-2 border-b border-rose-950 text-left">
+        <div class="flex items-center gap-2">
+          <span class="px-2 py-0.5 bg-rose-500 text-white text-xs font-black uppercase">
+            VISUAL THEME
+          </span>
+          <span class="text-xs sm:text-sm font-bold text-gray-200">
+            請選擇雙軌地圖視覺風格
+          </span>
+        </div>
+        <span class="text-xs sm:text-sm text-rose-300 font-mono font-black">
+          當前：{{ gameStore.visualTheme === 'MODERN_LUXURY' ? '🎨 現代旗艦版 (擬真酒紅金屬)' : '👾 1993 復古街機版 (8-Bit 像素懷舊)' }}
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <!-- 現代旗艦版按鈕 -->
+        <button
+          type="button"
+          @click="selectVisualTheme('MODERN_LUXURY')"
+          class="p-3.5 border-2 transition-all neo-cut-sm text-left flex flex-col justify-between cursor-pointer"
+          :class="gameStore.visualTheme === 'MODERN_LUXURY' 
+            ? 'bg-gradient-to-r from-[#9f1239] to-[#be123c] text-white border-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.5)] scale-[1.02]' 
+            : 'bg-[#1a050f] text-gray-300 border-rose-950 hover:border-rose-400 hover:text-white'"
+        >
+          <div class="flex items-center justify-between">
+            <span class="text-base sm:text-lg font-black neo-skew-title flex items-center gap-1.5 text-amber-200">
+              🎨 現代旗艦版
+            </span>
+            <span 
+              class="text-[11px] font-bold px-2 py-0.5 border rounded"
+              :class="gameStore.visualTheme === 'MODERN_LUXURY' ? 'bg-amber-400 text-black border-amber-400' : 'bg-black text-rose-300 border-rose-900'"
+            >
+              2026 擬真酒紅
+            </span>
+          </div>
+          <p class="text-xs mt-2 leading-relaxed opacity-90 text-rose-100">
+            奢華暗酒紅金屬卡匣質感！高清國小/國中/高中/大學實景舞台校舍與立體金屬升學門！
+          </p>
+        </button>
+
+        <!-- 1993 復古街機版按鈕 -->
+        <button
+          type="button"
+          @click="selectVisualTheme('RETRO_ARCADE')"
+          class="p-3.5 border-2 transition-all neo-cut-sm text-left flex flex-col justify-between cursor-pointer"
+          :class="gameStore.visualTheme === 'RETRO_ARCADE' 
+            ? 'bg-yellow-400 text-black border-black shadow-[4px_4px_0px_#000] scale-[1.02]' 
+            : 'bg-[#0a0d14] text-gray-300 border-gray-700 hover:border-yellow-400 hover:text-white'"
+        >
+          <div class="flex items-center justify-between">
+            <span class="text-base sm:text-lg font-black neo-skew-title flex items-center gap-1.5">
+              👾 1993 復古街機版
+            </span>
+            <span 
+              class="text-[11px] font-bold px-2 py-0.5 border"
+              :class="gameStore.visualTheme === 'RETRO_ARCADE' ? 'bg-black text-yellow-400 border-black' : 'bg-gray-800 text-gray-400 border-gray-700'"
+            >
+              16-Bit 像素原味
+            </span>
+          </div>
+          <p class="text-xs mt-2 leading-relaxed opacity-90">
+            還原 1993 大型機台卡匣軌道！像素黑板校舍、晨昏光影漸層與日系大頭吉祥物骰子！
+          </p>
+        </button>
+      </div>
+    </div>
+
+
+
     <!-- 模式選擇卡片 (三張日系戰術斜切卡片 · 寬屏加大版) -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl w-full my-4">
       
@@ -228,7 +299,7 @@
  * 提供日系大字報斜體排版、Persona 5 風格戰術斜切卡片、五關/十關長度自選與乾淨去 AI 化的選路入口。
  */
 import { useGameStore } from '../../stores/gameStore';
-import { GameLengthMode } from '../../types/quiz';
+import { GameLengthMode, VisualTheme } from '../../types/quiz';
 import { soundEngine } from '../../utils/audioEngine';
 
 const emit = defineEmits<{
@@ -238,6 +309,15 @@ const emit = defineEmits<{
 }>();
 
 const gameStore = useGameStore();
+
+/**
+ * 切換雙軌地圖視覺風格主題 (現代旗艦版 ⇄ 1993 街機版)
+ * @param {VisualTheme} theme 視覺風格
+ */
+function selectVisualTheme(theme: VisualTheme): void {
+  gameStore.setVisualTheme(theme);
+}
+
 
 /**
  * 切換關卡長度模式 (5 關速通 或 10 關馬拉松)

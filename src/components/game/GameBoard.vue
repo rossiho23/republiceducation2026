@@ -1,5 +1,12 @@
 <template>
-  <div class="flex flex-col gap-3 w-full select-none font-mono">
+  <!-- 現代旗艦版：渲染 ModernGameBoard (擬真深酒紅金屬立體風格) -->
+  <ModernGameBoard 
+    v-if="gameStore.visualTheme === 'MODERN_LUXURY'" 
+    @switch-to-roguelike="$emit('switch-to-roguelike')" 
+  />
+
+  <!-- 1993 街機版：經典雙軌卡匣棋盤與像素校舍 -->
+  <div v-else class="flex flex-col gap-3 w-full select-none font-mono">
     <!-- 頂部跑馬燈燈箱：致敬 map1.jpg「離畢業還有 10 層次。」 (日系戰術切角) -->
     <div class="w-full bg-black border-[3px] border-black py-3 px-4 shadow-[6px_6px_0px_#000] flex items-center justify-center neo-cut-sm">
       <h2 class="text-lg sm:text-2xl md:text-3xl font-black tracking-widest text-yellow-400 neo-skew-title neo-text-stroke animate-pulse">

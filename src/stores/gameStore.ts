@@ -140,6 +140,19 @@ export const useGameStore = defineStore('gameStore', () => {
     soundEngine.playCoin();
   }
 
+  /**
+   * 明確設定視覺風格主題
+   * @param {VisualTheme} theme 目標視覺主題
+   */
+  function setVisualTheme(theme: VisualTheme): void {
+    if (visualTheme.value === theme) return;
+    visualTheme.value = theme;
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('REPUBLIC_QUIZ_THEME', theme);
+    }
+    soundEngine.playCoin();
+  }
+
   // 關卡長度模式 (10 關挑戰 或 20 關長征，預設 10)
   const gameLength = ref<GameLengthMode>(10);
 
@@ -990,6 +1003,7 @@ export const useGameStore = defineStore('gameStore', () => {
     // 主題與長度模式
     visualTheme,
     toggleVisualTheme,
+    setVisualTheme,
     gameLength,
 
     // 現代化博弈與肉鴿狀態

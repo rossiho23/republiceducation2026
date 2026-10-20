@@ -65,6 +65,16 @@
 
       <!-- 右側風格切換與退學重置鍵 -->
       <div class="flex items-center gap-2">
+        <!-- 切換肉鴿地圖按鈕 -->
+        <button
+          @click="$emit('switch-to-roguelike')"
+          class="bg-gradient-to-r from-emerald-700 to-teal-800 hover:from-emerald-600 hover:to-teal-700 text-emerald-100 text-xs sm:text-sm font-black py-1 px-2.5 rounded border border-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.4)] cursor-pointer flex items-center gap-1 transition-all"
+          title="切換至 Slay the Spire 樹狀探索地圖"
+        >
+          <span>🌲</span>
+          <span>肉鴿地圖</span>
+        </button>
+
         <!-- 風格切換按鈕 -->
         <button
           @click="gameStore.toggleVisualTheme()"
@@ -305,18 +315,24 @@ import { computed, onMounted, onUnmounted } from 'vue';
 import { useGameStore } from '../../stores/gameStore';
 import { MapTile } from '../../types/quiz';
 
+const emit = defineEmits<{
+  (e: 'switch-to-roguelike'): void;
+}>();
+
 const gameStore = useGameStore();
 
 /**
- * 依據學程階段載入對應的現代校舍舞台背景圖
+ * 依據學程階段載入對應的現代校舍舞台背景圖 (自動解析 Base URL)
  */
+const baseUrl = ((import.meta as any).env?.BASE_URL as string) || '/';
 const currentModernSchoolBg = computed(() => {
+  const cleanBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
   switch (gameStore.currentStage) {
-    case '國小': return '/modern/school_elementary.jfif';
-    case '國中': return '/modern/school_junior.jfif';
-    case '高中': return '/modern/school_high.png';
-    case '大學': return '/modern/school_university.png';
-    default: return '/modern/school_elementary.jfif';
+    case '國小': return `${cleanBase}modern/school_elementary.jfif`;
+    case '國中': return `${cleanBase}modern/school_junior.jfif`;
+    case '高中': return `${cleanBase}modern/school_high.png`;
+    case '大學': return `${cleanBase}modern/school_university.png`;
+    default: return `${cleanBase}modern/school_elementary.jfif`;
   }
 });
 
