@@ -501,3 +501,84 @@ sequenceDiagram
     end
     Store-->>Player: 進入對應長度之地圖，開始闖關！
 ```
+
+
+---
+
+## 11. 「緊急退學與重置入學系統」規格 (School Dropout & Reset System Spec)
+
+### 11.1 需求背景與核心目標
+玩家在遊玩過程中可能因選錯路線、體力低落、或希望重新挑戰時，需要隨時可觸發的「退學重置鍵」。
+為防止誤觸並兼顧街機遊戲張力，設計二度確認對話框機制：
+1. **觸發入口**：在經典雙軌 HUD 與肉鴿地圖頂部顯著位置設置「🔄 重置入學 / RESET」日系戰術按鈕。
+2. **防誤觸防護**：點擊後立即暫停計時並開啟街機二度確認彈窗 (`ResetModal.vue`)。
+3. **退學重置邏輯**：
+   * 學程歸零重設為「國小」階段。
+   * 體力 HP 補滿至 100%。
+   * 學分重置為初始 150 分，得分歸 0，連擊歸 0。
+   * 難度 Rank 重置回國小基礎等級 (LV.1)。
+   * 背包道具恢復初始狀態（放大鏡 x1、懷錶 x1、Pass券 x0、養樂多 x0）。
+   * 清空所有被動聖物裝備 (`ownedRelics = []`)。
+   * 重新生成國小階段之 5 步/10 步地圖，立即以小學生身份展開全新學業！
+
+### 11.2 資料結構擴充
+```typescript
+export type ActiveModalType = 
+  | 'NONE'
+  | 'QUIZ'
+  | 'CANTEEN'
+  | 'TRANSFER'
+  | 'EVENT'
+  | 'FATE'
+  | 'FORK_SELECT'
+  | 'BOSS_EXAM'
+  | 'CONTINUE'
+  | 'VICTORY'
+  | 'CMS'
+  | 'NEWS_INTRO'
+  | 'WAGER'
+  | 'REMEDIAL_EXAM'
+  | 'RESET_CONFIRM'; // 新增：退學重置二度確認彈窗
+```
+
+### 11.3 系統流程圖 (Flowchart)
+```mermaid
+flowchart TD
+    A["玩家於地圖中點擊 [🔄 重置入學] 按鈕"] --> B["暫停當前題目計時器"]
+    B --> C["開啟 [ResetModal] 街機二度確認彈窗"]
+    C --> D{"玩家選擇操作"}
+    D -- "點擊 [繼續作答]" --> E["關閉確認彈窗，恢復計時與原遊戲進度"]
+    D -- "點擊 [確定退學 (回到國小)]" --> F["播放街機投幣與退學音效"]
+    F --> G["重設學程為「國小」"]
+    G --> H["重設 HP=100, 學分=150, 得分=0, Rank=1"]
+    H --> I["清空被動聖物，重置背包道具"]
+    I --> J["重新生成國小地圖 (支援當前長度模式)"]
+    J --> K["回到國小起點全新開局！"]
+```
+
+### 11.4 循序圖 (Sequence Diagram)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Player as 玩家 (Player)
+    participant HUD as 地圖頂部資訊列 (HUD)
+    participant Store as 遊戲狀態庫 (gameStore)
+    participant Modal as 重置確認彈窗 (ResetModal)
+    participant Audio as 音效引擎 (audioEngine)
+
+    Player->>HUD: 點擊 [🔄 重置入學]
+    HUD->>Store: openResetConfirmModal()
+    Store->>Store: activeModal = 'RESET_CONFIRM' (暫停計時)
+    Store-->>Modal: 顯示黑黃警戒退學確認彈窗
+    alt 玩家取消
+        Player->>Modal: 點擊 [繼續挑戰]
+        Modal->>Store: closeResetConfirmModal()
+        Store->>Store: activeModal = 'NONE' (恢復原狀態)
+    else 玩家確認退學
+        Player->>Modal: 點擊 [確定退學 (回到國小)]
+        Modal->>Store: resetGameToElementary()
+        Store->>Audio: playCoin()
+        Store->>Store: startNewGame('國小', gameLength)
+        Store-->>Player: 全新國小學程啟動！
+    end
+```

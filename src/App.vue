@@ -35,6 +35,7 @@
     <NewsIntroModal />
     <ContinueModal />
     <ResultModal />
+    <ResetModal />
 
     <!-- 題庫自訂後台中心 CMS (可隨時開啟) -->
     <QuestionCMS 
@@ -68,6 +69,7 @@ import NewsIntroModal from './components/game/NewsIntroModal.vue';
 import BossExamModal from './components/game/BossExamModal.vue';
 import ContinueModal from './components/game/ContinueModal.vue';
 import ResultModal from './components/game/ResultModal.vue';
+import ResetModal from './components/game/ResetModal.vue';
 import QuestionCMS from './components/cms/QuestionCMS.vue';
 
 const gameStore = useGameStore();

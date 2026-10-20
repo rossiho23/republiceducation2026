@@ -41,7 +41,8 @@ export type ActiveModalType =
   | 'CMS'
   | 'NEWS_INTRO'
   | 'WAGER'
-  | 'REMEDIAL_EXAM';
+  | 'REMEDIAL_EXAM'
+  | 'RESET_CONFIRM';
 
 export const useGameStore = defineStore('gameStore', () => {
   const questionStore = useQuestionStore();
@@ -193,6 +194,8 @@ export const useGameStore = defineStore('gameStore', () => {
     isLastAnswerCorrect.value = null;
     disabledOptionIndices.value = [];
     currentWagerAmount.value = 0;
+    ownedRelics.value = [];
+    stageMistakeCount.value = 0;
     isBlackoutRevealed.value = false;
     isThreeChoiceMode.value = false;
     isTalentMode.value = false;
@@ -795,6 +798,38 @@ export const useGameStore = defineStore('gameStore', () => {
     hostComment.value = `恭喜榮升【${STAGE_CONFIGS[currentStage.value].title}】！離畢業還有 ${remainingCount} 層次！`;
   }
 
+
+  const previousModalBeforeReset = ref<ActiveModalType>('NONE');
+
+  /**
+   * 開啟退學重置二度確認對話框
+   */
+  function openResetConfirmModal(): void {
+    stopTimer();
+    soundEngine.playCoin();
+    previousModalBeforeReset.value = activeModal.value === 'RESET_CONFIRM' ? 'NONE' : activeModal.value;
+    activeModal.value = 'RESET_CONFIRM';
+  }
+
+  /**
+   * 關閉退學重置二度確認對話框
+   */
+  function closeResetConfirmModal(): void {
+    activeModal.value = previousModalBeforeReset.value;
+    if (currentQuestion.value && !isAnswered.value && timeRemaining.value > 0) {
+      startQuestionTimer(timeRemaining.value);
+    }
+  }
+
+  /**
+   * 執行緊急退學手續，全面重置回到國小重新入學
+   */
+  function resetGameToElementary(): void {
+    stopTimer();
+    startNewGame('國小', gameLength.value);
+    hostComment.value = '已辦理退學手續！重新以【國民小學】新鮮人身分展開學程！加油！';
+  }
+
   function triggerGameOver(): void {
     stopTimer();
     soundEngine.playGameOver();
@@ -950,5 +985,8 @@ export const useGameStore = defineStore('gameStore', () => {
     revealBlackoutOptions,
     passRemedialExam,
     failRemedialExam,
+    openResetConfirmModal,
+    closeResetConfirmModal,
+    resetGameToElementary,
   };
 });

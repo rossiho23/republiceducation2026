@@ -64,13 +64,24 @@
         </span>
       </div>
 
-      <!-- 切換肉鴿地圖按鈕 -->
-      <button
-        @click="$emit('switch-to-roguelike')"
-        class="neo-btn neo-btn-yellow text-black text-xs sm:text-sm font-black py-1.5 px-3.5 neo-cut-sm tracking-wider shadow-[2px_2px_0px_#000]"
-      >
-        [切換肉鴿地圖]
-      </button>
+      <!-- 功能按鈕群 -->
+      <div class="flex items-center gap-2">
+        <button
+          @click="$emit('switch-to-roguelike')"
+          class="neo-btn neo-btn-yellow text-black text-xs sm:text-sm font-black py-1.5 px-3.5 neo-cut-sm tracking-wider shadow-[2px_2px_0px_#000] cursor-pointer"
+        >
+          [切換肉鴿地圖]
+        </button>
+
+        <button
+          @click="gameStore.openResetConfirmModal()"
+          class="neo-btn bg-[#ff0055] hover:bg-[#ff2a70] text-white text-xs sm:text-sm font-black py-1.5 px-3 neo-cut-sm tracking-wider shadow-[2px_2px_0px_#000] cursor-pointer flex items-center gap-1"
+          title="緊急退學，回到國小重新入學"
+        >
+          <span>⚠️</span>
+          <span>重置學業</span>
+        </button>
+      </div>
     </div>
 
     <!-- 主持播音跑馬燈 -->

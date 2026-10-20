@@ -39,13 +39,24 @@
         </div>
       </div>
 
-      <!-- 模式切換按鈕 -->
-      <button
-        @click="$emit('switch-to-classic')"
-        class="neo-btn bg-[#182030] hover:bg-[#222c42] text-yellow-400 text-xs sm:text-sm font-black py-1.5 px-3.5 neo-cut-sm tracking-wider shadow-[2px_2px_0px_#000]"
-      >
-        🔄 切換為經典雙軌模式
-      </button>
+      <!-- 功能按鍵組 -->
+      <div class="flex items-center gap-2">
+        <button
+          @click="$emit('switch-to-classic')"
+          class="neo-btn bg-[#182030] hover:bg-[#222c42] text-yellow-400 text-xs sm:text-sm font-black py-1.5 px-3.5 neo-cut-sm tracking-wider shadow-[2px_2px_0px_#000] cursor-pointer"
+        >
+          🔄 切換雙軌
+        </button>
+
+        <button
+          @click="gameStore.openResetConfirmModal()"
+          class="neo-btn bg-[#ff0055] hover:bg-[#ff2a70] text-white text-xs sm:text-sm font-black py-1.5 px-3 neo-cut-sm tracking-wider shadow-[2px_2px_0px_#000] cursor-pointer flex items-center gap-1"
+          title="緊急退學，回到國小重新入學"
+        >
+          <span>⚠️</span>
+          <span>重置學業</span>
+        </button>
+      </div>
     </div>
 
     <!-- 樹狀地圖畫布區塊 (包含半色調網點與層次排列節點 · 寬屏放寬) -->

@@ -132,3 +132,15 @@
 - [x] 執行本地 `npm run build` 編譯檢驗確認 100% 通過
 - [x] 將新功能代碼提交並推送到遠端 GitHub 倉庫自動發布
 - [x] 產出關卡長度自選日誌至 `log/20261020_9.md` 與更新 `report.md`
+
+
+## 階段二十四：緊急退學與重置入學系統實作 (方案 A)
+- [x] 在 `src/stores/gameStore.ts` 之 `ActiveModalType` 增加 `'RESET_CONFIRM'` 類型
+- [x] 在 `src/stores/gameStore.ts` 實作 `resetGameToElementary()` 與確認彈窗開關 Action
+- [x] 建立日系新潮街機二度確認彈窗組件 `src/components/game/ResetModal.vue`
+- [x] 在經典雙軌地圖頂部 HUD (`src/components/game/GameBoard.vue`) 增設「🔄 重置入學」戰術按鈕
+- [x] 在樹狀肉鴿地圖頂部 HUD (`src/components/game/RoguelikeMap.vue`) 增設「🔄 重置入學」戰術按鈕
+- [x] 在主應用 (`src/App.vue`) 掛載 `ResetModal.vue` 並綁定觸發
+- [x] 執行本地 `npm run build` 編譯檢驗確認 100% 通過
+- [x] 將新功能代碼提交並推送到遠端 GitHub 倉庫自動發布
+- [x] 產出重置退學日誌至 `log/20261020_10.md` 與更新 `report.md`
