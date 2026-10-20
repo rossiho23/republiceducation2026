@@ -224,6 +224,16 @@
 - [x] 產出日誌至 `log/20261020_17.md` 與更新 `report.md`
 
 
+## 階段三十二：標題語音手勢預溫熱與視訊播畢零延遲大吼實作 (方案 A)
+- [x] 在 `src/utils/bgmEngine.ts` 實作 `warmUpAudioContext()`：於投幣手勢當下預先建立並溫熱 `titleVoiceAudio` 與 `audio` 實例，取得永久手勢特權
+- [x] 在 `src/components/game/IntroCinema.vue` 投幣啟動 `startWithUserGesture()` 中同步呼叫 `bgmEngine.warmUpAudioContext()`
+- [x] 強化 `playTitleVoiceWithDucking()`：支援主動重試、音軌就緒狀態檢查與多路徑 fallback，確保 100% 發聲
+- [x] 執行本地 `npm run build` 編譯檢驗確認 100% 通過
+- [x] 將修復代碼提交並推送到遠端 GitHub 倉庫自動發布
+- [x] 產出修復日誌至 `log/20261020_18.md` 與更新 `report.md`
+
+
+
 
 
 

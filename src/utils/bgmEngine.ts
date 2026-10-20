@@ -2,7 +2,7 @@
  * @file bgmEngine.ts
  * @description 全域背景音樂 (BGM) 雙曲佇列播放電台與標題語音智慧混音引擎
  * 專為《民國教育委員會》設計，負責 The_Final_Question.mp3 與 Ten_Second_Countdown.mp3 雙曲無縫交替輪播、
- * 手動切歌 (Next Track)、首頁「念標題.mp3」音訊避讓 (Audio Ducking) 漸強混音。
+ * 手勢同步預溫熱解鎖 (Warm-up Pre-unlock)、手動切歌、首頁「念標題.mp3」音訊避讓 (Audio Ducking) 漸強混音。
  */
 
 import { reactive } from 'vue';
@@ -35,6 +35,7 @@ class BgmEngine {
   private titleVoiceSources: string[] = [];
   private isInitialized = false;
   private currentSourceFallbackIndex = 0;
+  private currentTitleVoiceFallbackIndex = 0;
   private duckingTimer: number | null = null;
 
   public state: BgmState = reactive<BgmState>({
@@ -148,6 +149,38 @@ class BgmEngine {
   }
 
   /**
+   * 在玩家投幣手勢當下執行音軌預溫熱 (Pre-unlock)
+   * 建立並靜音預載 titleVoiceAudio 與 audio，取得永久播放特權
+   */
+  public warmUpAudioContext(): void {
+    this.initAudio();
+
+    if (!this.titleVoiceAudio && typeof window !== 'undefined') {
+      this.titleVoiceAudio = new Audio(this.titleVoiceSources[0]);
+      this.titleVoiceAudio.preload = 'auto';
+      this.titleVoiceAudio.load();
+
+      // 在手勢中瞬間進行零音量觸發，讓瀏覽器標記為已授權
+      const originalVolume = this.state.isMuted ? 0 : 1.0;
+      this.titleVoiceAudio.volume = 0;
+      this.titleVoiceAudio.play().then(() => {
+        this.titleVoiceAudio?.pause();
+        if (this.titleVoiceAudio) {
+          this.titleVoiceAudio.currentTime = 0;
+          this.titleVoiceAudio.volume = originalVolume;
+        }
+      }).catch(err => {
+        console.warn('標題語音手勢預溫熱已捕捉:', err);
+      });
+    }
+
+    if (this.audio) {
+      this.audio.preload = 'auto';
+      this.audio.load();
+    }
+  }
+
+  /**
    * 啟動背景音樂播放
    */
   public async play(): Promise<void> {
@@ -198,8 +231,15 @@ class BgmEngine {
 
         await this.titleVoiceAudio.play();
       } catch (err) {
-        console.warn('標題語音播放被攔截或失敗，直接回復 BGM 音量:', err);
-        this.fadeRestoreBgmVolume();
+        console.warn('標題語音主路徑播放失敗，切換備援重試:', err);
+        if (this.currentTitleVoiceFallbackIndex < this.titleVoiceSources.length - 1) {
+          this.currentTitleVoiceFallbackIndex += 1;
+          this.titleVoiceAudio.src = this.titleVoiceSources[this.currentTitleVoiceFallbackIndex];
+          this.titleVoiceAudio.load();
+          this.titleVoiceAudio.play().catch(e => console.error('標題語音備援播放失敗:', e));
+        } else {
+          this.fadeRestoreBgmVolume();
+        }
       }
     }
 

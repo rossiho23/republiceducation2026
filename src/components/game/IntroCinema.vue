@@ -90,6 +90,7 @@
  */
 import { ref, onMounted, onUnmounted } from 'vue';
 import { soundEngine } from '../../utils/audioEngine';
+import { bgmEngine } from '../../utils/bgmEngine';
 
 const emit = defineEmits<{
   /** 影片播放完畢或玩家跳過時觸發 */
@@ -143,6 +144,9 @@ async function startWithUserGesture(): Promise<void> {
   // 播放經典大型街機投幣音效
   soundEngine.playCoin();
 
+  // 同步在同一個使用者手勢中預溫熱標題語音與背景音樂，取得永久播放授權！
+  bgmEngine.warmUpAudioContext();
+
   if (!videoRef.value) return;
 
   try {
@@ -159,7 +163,7 @@ async function startWithUserGesture(): Promise<void> {
 }
 
 /**
- * 處理影片播放完畢或跳過事件 (帶 400ms 黑屏平滑淡出)
+ * 處理影片播放完畢或跳過事件
  */
 function handleComplete(): void {
   if (isFadingOut.value) return;
@@ -169,9 +173,8 @@ function handleComplete(): void {
     videoRef.value.pause();
   }
 
-  setTimeout(() => {
-    emit('complete');
-  }, 400);
+  // 立即發出完成通知，讓手勢權限無縫延續至念標題音軌
+  emit('complete');
 }
 
 /**
