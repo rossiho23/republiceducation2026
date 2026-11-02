@@ -98,19 +98,19 @@ export const CANTEEN_ITEMS: GameItem[] = [
 ];
 
 /**
- * 產生雙軌分叉地圖格子集合
+ * 產生雙軌分叉地圖格子集合 (支援 30 關長征挑戰與 40 關終極馬拉松程序化生成)
  * 架構：
- * 1. 起點「昇學」
- * 2. 分叉選擇格 (FORK)
- * 3. 上分歧路線 (UPPER BRANCH / 理科與冒險)：自然理化、流行音樂、三選一、LUCKY 福利社、TROUBLE 骷髏
- * 4. 下分歧路線 (LOWER BRANCH / 文藝與挑戰)：健康教育、美術、天才問題、問號事件、課外常識
- * 5. 終點「升學大考 Boss 關卡」
+ * 1. 起點「昇學」 (Step 1)
+ * 2. 分叉選擇格 (FORK) (Step 2)
+ * 3. 上分歧路線 (UPPER BRANCH / 理科與冒險)：自然理化、流行音樂、三選一、LUCKY 福利社、TROUBLE 骷髏等
+ * 4. 下分歧路線 (LOWER BRANCH / 文藝與挑戰)：健康教育、美術、天才問題、問號事件、課外常識等
+ * 5. 終點「升學大考 Boss 關卡」 (Step 30 或 Step 40)
  * 
- * @param {StageGrade} grade 學程階段
- * @param {GameLengthMode} length 關卡長度模式 (5 關速通 或 10 關馬拉松，預設 10)
+ * @param {StageGrade} grade 學程階段 (國小/國中/高中/大學)
+ * @param {GameLengthMode} [length=30] 關卡長度模式 (30 關長征挑戰 或 40 關終極馬拉松，預設 30)
  * @returns {MapTile[]} 格子資料陣列
  */
-export function generateBoardTiles(grade: StageGrade, length: GameLengthMode = 10): MapTile[] {
+export function generateBoardTiles(grade: StageGrade, length: GameLengthMode = 30): MapTile[] {
   const config = STAGE_CONFIGS[grade] || STAGE_CONFIGS['高中'];
   const tiles: MapTile[] = [];
 
@@ -140,8 +140,8 @@ export function generateBoardTiles(grade: StageGrade, length: GameLengthMode = 1
     stepNumber: 2
   });
 
-  // 根據 10 關或 20 關定義上下路格子 (步數精準對齊總長度)
-  const branchCount = length === 20 ? 17 : 7; // 起點1 + 分叉1 + 分歧N + Boss1 = 10 或 20 步
+  // 根據 30 關或 40 關定義上下路格子數 (起點1 + 分叉1 + 分歧branchCount + Boss1 = 30 或 40 步)
+  const branchCount = Math.max(7, length - 3);
 
   const upperPool = [
     { type: 'QUIZ', subject: '自然', title: '理化隨堂考', desc: '實驗室化學分析測驗！' },
@@ -151,17 +151,19 @@ export function generateBoardTiles(grade: StageGrade, length: GameLengthMode = 1
     { type: 'QUIZ', subject: '社會', title: '文理小試', desc: '綜合歷史地理與社會人文測驗！' },
     { type: 'TROUBLE', subject: undefined, title: 'TROUBLE 骷髏災難', desc: '校規記過警告！損失體力 20 點！' },
     { type: 'RECOVERY', subject: undefined, title: '模擬考前自修', desc: '安靜溫習，體力與專注度完全回復！' },
-    // 20 關長征延伸格
     { type: 'TALENT', subject: '數學', title: '代數極限挑戰', desc: '超微積分與聯考難題！' },
     { type: 'EVENT', subject: undefined, title: '校園廣播尋人', desc: '廣播室突然插播重要尋人啟事！' },
     { type: 'QUIZ', subject: '國文', title: '唐詩宋詞賞析', desc: '古典文采修辭填空！' },
     { type: 'THREE_CHOICE', subject: '地理', title: '台灣鐵路三選一', desc: '縱貫鐵路車站大考驗！' },
     { type: 'CANTEEN', subject: undefined, title: '福利社中途補給', desc: '補充提神飲料與答題文具！' },
-    { type: 'QUIZ', subject: '英文', title: '常春藤字彙測驗', desc: '文法克漏字大挑戰！' },
-    { type: 'HEALTH', subject: '體育', title: '體適能登階測驗', desc: '心肺耐力考驗，體力 +20 點！' },
+    { type: 'QUIZ', subject: '自然', title: '生物演化測驗', desc: '生態系與遺傳法則隨堂考！' },
+    { type: 'HEALTH', subject: '體育運動', title: '體適能登階測驗', desc: '心肺耐力考驗，體力 +25 點！' },
     { type: 'TROUBLE', subject: undefined, title: '突擊隨堂小考', desc: '未帶課本被記缺點！' },
     { type: 'TALENT', subject: '自然', title: '全國科展金牌題', desc: '頂級科學競賽思維難題！' },
-    { type: 'RECOVERY', subject: undefined, title: '考前最後衝刺自修', desc: '全神貫注，進入最佳應考狀態！' }
+    { type: 'RECOVERY', subject: undefined, title: '實驗室午休小憩', desc: '補足精神，準備迎接下半場考驗！' },
+    { type: 'QUIZ', subject: '數學', title: '幾何三角函數', desc: '平面與空間幾何推理測驗！' },
+    { type: 'EXTRACURRICULAR', subject: '課外', title: '科學期刊快報', desc: '最新科普時事連線問答！' },
+    { type: 'THREE_CHOICE', subject: '自然', title: '元素週期三選一', desc: '化學元素符號快速搶答！' }
   ];
 
   const lowerPool = [
@@ -170,23 +172,37 @@ export function generateBoardTiles(grade: StageGrade, length: GameLengthMode = 1
     { type: 'TALENT', subject: '數學', title: '天才問題挑戰', desc: '極限高難度題！答對可獲雙倍分數與大量學分！' },
     { type: 'EVENT', subject: undefined, title: '？號校園突發事件', desc: '走廊上突然發生神祕意外事件！' },
     { type: 'EXTRACURRICULAR', subject: '課外', title: '課外時事大百科', desc: '報章雜誌生活冷知識測驗！' },
-    { type: 'TALENT', subject: '常識', title: '奧林匹克競賽題', desc: '金牌挑戰！極高難度思維題目！' },
+    { type: 'TALENT', subject: '時事冷知識', title: '奧林匹克競賽題', desc: '金牌挑戰！極高難度思維題目！' },
     { type: 'CANTEEN', subject: undefined, title: '歷屆筆記傳授', desc: '向學長姐請益考試技巧與補充道具！' },
-    // 20 關長征延伸格
     { type: 'QUIZ', subject: '歷史', title: '三國春秋戰史', desc: '歷史風雲英雄傳奇測驗！' },
     { type: 'THREE_CHOICE', subject: '流行音樂', title: '金曲龍虎榜三選一', desc: '經典港台金曲年度冠軍題！' },
     { type: 'EVENT', subject: undefined, title: '校長室喝茶談心', desc: '受到校長親切勉勵與加分！' },
-    { type: 'HEALTH', subject: '體育', title: '健康操大會操', desc: '伸展筋骨，體力回復 +20 點！' },
+    { type: 'HEALTH', subject: '體育運動', title: '健康操大會操', desc: '伸展筋骨，體力回復 +25 點！' },
     { type: 'TALENT', subject: '國文', title: '成語接龍大師', desc: '生僻成語形音義大挑戰！' },
-    { type: 'CANTEEN', subject: undefined, title: '舊書攤尋寶', desc: '淘到歷屆模擬試題密笈！' },
-    { type: 'QUIZ', subject: '公民', title: '三民主義與憲政', desc: '五權分立與法律常識考驗！' },
+    { type: 'CANTEEN', subject: undefined, title: '舊書攤尋寶補給', desc: '淘到歷屆模擬試題密笈與補給品！' },
+    { type: 'QUIZ', subject: '社會', title: '三民主義與憲政', desc: '五權分立與法律常識考驗！' },
     { type: 'TROUBLE', subject: undefined, title: '黑板值日生罰留', desc: '值日生擦黑板吸入粉筆灰！' },
     { type: 'TALENT', subject: '課外', title: '百科全書狀元考', desc: '博古通今頂峰智力測驗！' },
-    { type: 'RECOVERY', subject: undefined, title: '圖書館文昌祈福', desc: '求取功名符令，心境沉穩！' }
+    { type: 'RECOVERY', subject: undefined, title: '圖書館文昌祈福', desc: '求取功名符令，心境沉穩！' },
+    { type: 'QUIZ', subject: '地理', title: '寶島風物志測驗', desc: '台灣山川地形與名產大考驗！' },
+    { type: 'THREE_CHOICE', subject: '國文', title: '字音字形三選一', desc: '聯考常考易錯字輕鬆三選一！' },
+    { type: 'EXTRACURRICULAR', subject: '時事冷知識', title: '電視新聞焦點題', desc: '主播台連線時事快問快答！' }
   ];
 
-  const upperTilesDef = upperPool.slice(0, branchCount);
-  const lowerTilesDef = lowerPool.slice(0, branchCount);
+  // 程序化擴充生成指定長度 (27 格或 37 格) 之上下路軌道，並確保尾端考前最後一格為補給/自修
+  const upperTilesDef = Array.from({ length: branchCount }, (_, i) => {
+    if (i === branchCount - 1) {
+      return { type: 'RECOVERY', subject: undefined, title: '考前最後衝刺自修', desc: '全神貫注，進入最佳應考狀態！' };
+    }
+    return upperPool[i % upperPool.length];
+  });
+
+  const lowerTilesDef = Array.from({ length: branchCount }, (_, i) => {
+    if (i === branchCount - 1) {
+      return { type: 'CANTEEN', subject: undefined, title: '大考前福利社總整備', desc: '最後採購機會！補足道具迎戰升學大考！' };
+    }
+    return lowerPool[i % lowerPool.length];
+  });
 
   upperTilesDef.forEach((item, i) => {
     tiles.push({

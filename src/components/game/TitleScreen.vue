@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <!-- 關卡長度自選模式 (10 關標準挑戰 vs 20 關終極長征) -->
+    <!-- 關卡長度自選模式 (30 關長征挑戰 vs 40 關終極馬拉松) -->
     <div class="my-3 w-full max-w-2xl bg-[#121620] border-2 border-yellow-400 p-3.5 neo-cut-sm shadow-[5px_5px_0px_#000]">
       <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-800 text-left">
         <div class="flex items-center gap-2">
@@ -37,62 +37,62 @@
             LENGTH SELECT
           </span>
           <span class="text-xs sm:text-sm font-bold text-gray-200">
-            請選擇關卡長度模式
+            請選擇關卡長度模式 (30 關 / 40 關)
           </span>
         </div>
         <span class="text-xs sm:text-sm text-yellow-400 font-mono font-black">
-          當前：{{ gameStore.gameLength === 20 ? '👑 二十關終極大考驗 (20 關長征)' : '🏆 十關挑戰賽 (10 關標準)' }}
+          當前：{{ gameStore.gameLength === 40 ? '👑 四十關終極馬拉松 (40 關極限)' : '🏆 三十關長征挑戰 (30 關標準)' }}
         </span>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-        <!-- 10 關挑戰賽按鈕 -->
+        <!-- 30 關長征挑戰按鈕 -->
         <button
           type="button"
-          @click="selectGameLength(10)"
+          @click="selectGameLength(30)"
           class="p-3.5 border-2 transition-all neo-cut-sm text-left flex flex-col justify-between cursor-pointer"
-          :class="gameStore.gameLength === 10 
+          :class="gameStore.gameLength === 30 
             ? 'bg-yellow-400 text-black border-black shadow-[4px_4px_0px_#000] scale-[1.02]' 
             : 'bg-[#0a0d14] text-gray-300 border-gray-700 hover:border-yellow-400 hover:text-white'"
         >
           <div class="flex items-center justify-between">
             <span class="text-base sm:text-lg font-black neo-skew-title flex items-center gap-1.5">
-              🏆 十關挑戰賽
+              🏆 三十關長征挑戰
             </span>
             <span 
               class="text-[11px] font-bold px-2 py-0.5 border"
-              :class="gameStore.gameLength === 10 ? 'bg-black text-yellow-400 border-black' : 'bg-gray-800 text-gray-400 border-gray-700'"
+              :class="gameStore.gameLength === 30 ? 'bg-black text-yellow-400 border-black' : 'bg-gray-800 text-gray-400 border-gray-700'"
             >
-              8~10 分鐘標準
+              30 關標準長征
             </span>
           </div>
           <p class="text-xs mt-2 leading-relaxed opacity-90">
-            10 步標準闖關！體驗隨堂考、聽力/局部謎題、福利社與升學 Boss 戰！
+            30 步完整闖關！體驗日夜晨昏流轉、隨堂考、聽力/局部謎題、多次福利社與升學 Boss 戰！
           </p>
         </button>
 
-        <!-- 20 關終極長征按鈕 -->
+        <!-- 40 關終極馬拉松按鈕 -->
         <button
           type="button"
-          @click="selectGameLength(20)"
+          @click="selectGameLength(40)"
           class="p-3.5 border-2 transition-all neo-cut-sm text-left flex flex-col justify-between cursor-pointer"
-          :class="gameStore.gameLength === 20 
+          :class="gameStore.gameLength === 40 
             ? 'bg-cyan-400 text-black border-black shadow-[4px_4px_0px_#000] scale-[1.02]' 
             : 'bg-[#0a0d14] text-gray-300 border-gray-700 hover:border-cyan-400 hover:text-white'"
         >
           <div class="flex items-center justify-between">
             <span class="text-base sm:text-lg font-black neo-skew-title flex items-center gap-1.5">
-              👑 二十關終極大考驗
+              👑 四十關終極馬拉松
             </span>
             <span 
               class="text-[11px] font-bold px-2 py-0.5 border"
-              :class="gameStore.gameLength === 20 ? 'bg-black text-cyan-400 border-black' : 'bg-gray-800 text-gray-400 border-gray-700'"
+              :class="gameStore.gameLength === 40 ? 'bg-black text-cyan-400 border-black' : 'bg-gray-800 text-gray-400 border-gray-700'"
             >
-              15~20 分鐘深度長征
+              40 關極限耐力
             </span>
           </div>
           <p class="text-xs mt-2 leading-relaxed opacity-90">
-            20 步終極考驗！歷經清晨升旗至挑燈夜戰、多次奧賽菁英戰與畢業檢定！
+            40 步終極大考驗！從清晨升旗奮戰至深夜夜讀、多次奧賽菁英對決與最高榮譽畢業總檢定！
           </p>
         </button>
       </div>
@@ -320,8 +320,9 @@ function selectVisualTheme(theme: VisualTheme): void {
 
 
 /**
- * 切換關卡長度模式 (5 關速通 或 10 關馬拉松)
- * @param {GameLengthMode} length 模式步數
+ * 切換關卡長度模式 (30 關長征挑戰 或 40 關終極馬拉松)
+ * @param {GameLengthMode} length 模式步數 (30 | 40)
+ * @returns {void}
  */
 function selectGameLength(length: GameLengthMode): void {
   gameStore.setGameLength(length);

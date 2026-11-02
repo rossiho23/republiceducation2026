@@ -969,4 +969,82 @@ sequenceDiagram
     end
 ```
 
+---
+
+## 17. 「30 關長征挑戰 vs 40 關終極馬拉松」程序化地圖生成規格 (Thirty vs Forty Floors Procedural Map Spec)
+
+### 17.1 設計背景與核心目標 (方案 A)
+為全面提升各學程的耐玩度與策略深度，將關卡長度模式由原「10 關 / 20 關」全面升級替換為**「🏆 30 關長征挑戰 (`30`)」**與**「👑 40 關終極馬拉松 (`40`)」**，並引進程序化周期生成演算法（Procedural Cycle Generation）：
+1. **雙模式長度定位**：
+   * `30`（🏆 三十關長征挑戰）：預設標準長征模式（Floor 0 ~ 29），共 30 步/層，涵蓋完整日夜晨昏流轉與多次福利社補給、多媒體特考、奧林匹亞菁英戰。
+   * `40`（👑 四十關終極馬拉松）：史詩級耐力考驗（Floor 0 ~ 39），共 40 步/層，考驗玩家對學分博弈、道具調度與被動聖物組合的極限掌控力。
+2. **程序化周期生成演算法 (Procedural Map Generation)**：
+   * **經典雙軌棋盤 (`generateBoardTiles`)**：
+     - 步驟 1 為「起點：昇學」，步驟 2 為「路線分叉抉擇點 (`FORK`)」，最後一步（第 30 或 40 步）為「終點：升學檢定大考 (`EXAM`)」。
+     - 中間雙軌分支長度為 `branchCount = length - 3`（30 關為 27 格分支，40 關為 37 格分支），透過豐富的上路（理科冒險）與下路（文藝挑戰）題庫池搭配周期性補給節點動態鋪設，確保每 7~8 步必有福利社或健康回血站。
+   * **輕度肉鴿樹狀地圖 (`generateRoguelikeMap`)**：
+     - 依據目標總樓層數 `length`（30 或 40）動態構建 `0` 至 `length - 1` 層節點並自動計算 `nextNodeIds` 拓撲連線：
+       * `Floor 0`：單一入口「開學實力檢定」。
+       * `Floor length - 1`：單一頂層終點「期末升學大考 Boss 戰 (`FINAL_EXAM`)」。
+       * `Floor length - 2`：考前最終福利社大整備 (`CANTEEN_REST`)。
+       * 每隔 6 層（如 Floor 6, 12, 18, 24, 30, 36）：中繼福利社與奇遇充電層，確保長征續航力。
+       * 每隔 5 層（如 Floor 5, 10, 15, 20, 25, 35）：高難度「🔥 奧林匹亞／期中模擬菁英考 (`QUIZ_ELITE`)」。
+       * 每隔 4 層（如 Floor 2, 8, 14, 22, 28, 34）：8-Bit 聽力猜歌 (`AUDIO_EVENT`) 與局部放大視覺謎題 (`VISUAL_EVENT`)。
+       * 其餘樓層：2~3 個平行分支之學科隨堂考與校園突發事件，並自動建立跨層分支與匯流連線。
+
+### 17.2 資料結構與參數對照表
+
+```typescript
+/** 關卡長度模式：30 關長征挑戰 或 40 關終極馬拉松 */
+export type GameLengthMode = 30 | 40;
+```
+
+| 關卡模式 | 總步數 / 總樓層 | 雙軌中間分支格數 | 福利社補給站頻率 | 菁英挑戰次數 | Boss 戰時機 | 跑馬燈標示 |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **🏆 30 關長征挑戰** | 30 層 (Floor 0~29) | 27 格雙軌卡匣 | 每 6~7 層 (約 4~5 次) | 5 次 | 第 30 關 (Floor 29) | `// 離畢業還有 30 層次。 //` |
+| **👑 40 關終極馬拉松** | 40 層 (Floor 0~39) | 37 格雙軌卡匣 | 每 6~7 層 (約 6~7 次) | 7 次 | 第 40 關 (Floor 39) | `// 離畢業還有 40 層次。 //` |
+
+### 17.3 程序化 30 / 40 關地圖生成流程圖 (Flowchart)
+```mermaid
+flowchart TD
+    A["玩家於首頁選擇關卡長度: [🏆 30 關長征挑戰] 或 [👑 40 關終極馬拉松]"] --> B["gameStore.setGameLength(30 | 40)"]
+    B --> C{"選擇遊玩模式"}
+    C -- "經典雙軌模式" --> D["generateBoardTiles(stage, length)"]
+    D --> D1["建立 起點(Step 1) + 分叉點(Step 2)"]
+    D1 --> D2["依 branchCount = length - 3 程序化鋪設上下雙軌卡匣 (27格 或 37格)"]
+    D2 --> D3["尾端匯流至 升學大考 Boss 格 (Step 30 或 Step 40)"]
+    
+    C -- "輕度肉鴿選路模式" --> E["generateRoguelikeMap(stage, length)"]
+    E --> E1["Floor 0: 開學隨堂檢定起點"]
+    E1 --> E2["Floor 1 ~ length-3: 依樓層周期動態配置 (隨堂考 / 聽力視覺 / 菁英戰 / 福利社)"]
+    E2 --> E3["自動進行上下層節點拓撲連線 (nextNodeIds)"]
+    E3 --> E4["Floor length-2: 考前福利社總整備 ➔ Floor length-1: 升學大考 Boss 戰"]
+    
+    D3 & E4 --> F["連動日夜晨昏光影系統 (0~25% 晨曦, 25~60% 正午, 60~85% 黃昏, 85~100% 深夜)"]
+```
+
+### 17.4 30 / 40 關長度切換與狀態同步循序圖 (Sequence Diagram)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Player as 玩家 (Player)
+    participant Title as 標題首頁 (TitleScreen.vue)
+    participant Store as 遊戲狀態庫 (gameStore.ts)
+    participant BoardGen as 雙軌生成器 (boardGenerator.ts)
+    participant RogueGen as 肉鴿生成器 (roguelikeGenerator.ts)
+    participant MapUI as 地圖介面 (GameBoard / ModernGameBoard / RoguelikeMap)
+
+    Player->>Title: 點擊選擇 [🏆 三十關長征挑戰 (30)] 或 [👑 四十關終極馬拉松 (40)]
+    Title->>Store: setGameLength(30 或 40)
+    Store->>BoardGen: generateBoardTiles(currentStage, length)
+    BoardGen-->>Store: 返回 30 步或 40 步雙軌卡匣陣列
+    Player->>Title: 點擊啟動遊戲
+    Store->>MapUI: 渲染對應長度徽章與剩餘層次 (離畢業還有 30/40 層次)
+    opt 肉鴿模式啟動或長度變更
+        MapUI->>RogueGen: generateRoguelikeMap(currentStage, gameLength)
+        RogueGen-->>MapUI: 返回 30 層或 40 層程序化分支節點樹
+    end
+```
+
+
 

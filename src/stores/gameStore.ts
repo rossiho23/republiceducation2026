@@ -153,8 +153,8 @@ export const useGameStore = defineStore('gameStore', () => {
     soundEngine.playCoin();
   }
 
-  // 關卡長度模式 (10 關挑戰 或 20 關長征，預設 10)
-  const gameLength = ref<GameLengthMode>(10);
+  // 關卡長度模式 (30 關長征挑戰 或 40 關終極馬拉松，預設 30)
+  const gameLength = ref<GameLengthMode>(30);
 
   // ================= 輔助計算屬性 =================
   const currentStageConfig = computed(() => STAGE_CONFIGS[currentStage.value]);
@@ -167,10 +167,11 @@ export const useGameStore = defineStore('gameStore', () => {
   const mainForkTile = computed(() => tiles.value.find(t => t.index === 1));
   const mainExamTile = computed(() => tiles.value.find(t => t.type === 'EXAM'));
 
-  // 離畢業還有幾層次 (依據長度模式動態計算：10 或 20)
+  // 離畢業還有幾層次 (依據長度模式與當前步數動態計算：30 或 40)
   const remainingLayers = computed(() => {
     const base = gameLength.value;
-    const progress = Math.min(base, currentTileIndex.value);
+    const stepProgress = currentTile.value ? currentTile.value.stepNumber - 1 : 0;
+    const progress = Math.min(base, Math.max(0, stepProgress));
     return Math.max(1, base - progress);
   });
 
@@ -180,7 +181,8 @@ export const useGameStore = defineStore('gameStore', () => {
    */
   const currentTimeOfDay = computed<TimeOfDay>(() => {
     const total = gameLength.value;
-    const current = Math.min(total, currentTileIndex.value);
+    const stepProgress = currentTile.value ? currentTile.value.stepNumber - 1 : 0;
+    const current = Math.min(total, Math.max(0, stepProgress));
     const ratio = total > 1 ? current / (total - 1) : 0;
     if (ratio < 0.25) return 'DAWN';
     if (ratio < 0.6) return 'DAY';
@@ -191,8 +193,9 @@ export const useGameStore = defineStore('gameStore', () => {
   // ================= 核心方法 =================
 
   /**
-   * 設定遊戲長度模式 (5 關速通 或 10 關馬拉松)
-   * @param {GameLengthMode} length 關卡長度模式
+   * 設定遊戲長度模式 (30 關長征挑戰 或 40 關終極馬拉松)
+   * @param {GameLengthMode} length 關卡長度模式 (30 | 40)
+   * @returns {void}
    */
   function setGameLength(length: GameLengthMode): void {
     gameLength.value = length;
@@ -203,8 +206,9 @@ export const useGameStore = defineStore('gameStore', () => {
 
   /**
    * 初始化並啟動新局遊戲
-   * @param {StageGrade} [stage='高中'] 起始學程
+   * @param {StageGrade} [stage='國小'] 起始學程
    * @param {GameLengthMode} [length] 關卡長度模式 (若未帶則維持既有設定)
+   * @returns {void}
    */
   function startNewGame(stage: StageGrade = '國小', length?: GameLengthMode): void {
     questionStore.initQuestions();
@@ -244,7 +248,7 @@ export const useGameStore = defineStore('gameStore', () => {
     isThreeChoiceMode.value = false;
     isTalentMode.value = false;
     stopTimer();
-    hostComment.value = `歡迎進入【${STAGE_CONFIGS[stage].title}】！離畢業還有 ${STAGE_CONFIGS[stage].layerCount} 層次！請擲骰出發！`;
+    hostComment.value = `歡迎進入【${STAGE_CONFIGS[stage].title}】！離畢業還有 ${gameLength.value} 層次！請擲骰出發！`;
   }
 
   function stopTimer(): void {

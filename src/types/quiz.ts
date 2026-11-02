@@ -29,9 +29,8 @@ export type StageGrade = '國小' | '國中' | '高中' | '大學' | '通用';
 /** 路線分支列舉 (經典模式) */
 export type BranchType = 'MAIN' | 'UPPER' | 'LOWER';
 
-/** 關卡長度模式 (5 關速通 vs 10 關馬拉松) */
-/** 關卡長度模式 (10 關標準挑戰 或 20 關終極長征) */
-export type GameLengthMode = 10 | 20;
+/** 關卡長度模式 (30 關長征挑戰 或 40 關終極馬拉松) */
+export type GameLengthMode = 30 | 40;
 
 /** 晨昏時段列舉 (早晨升旗、正午課堂、黃昏放學、深夜夜讀) */
 export type TimeOfDay = 'DAWN' | 'DAY' | 'DUSK' | 'NIGHT';

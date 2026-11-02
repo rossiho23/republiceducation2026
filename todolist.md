@@ -275,6 +275,20 @@
 - [x] 產出日誌至 `log/20261020_22.md` 與更新 `report.md`
 
 
+## 階段三十七：30關長征挑戰 vs 40關終極馬拉松自選系統與程序化地圖實作 (方案 A)
+- [x] 在 `src/types/quiz.ts` 更新 `GameLengthMode = 30 | 40` 關卡長度列舉型別與註解
+- [x] 在 `src/stores/gameStore.ts` 將 `gameLength` 預設值更新為 `30`，並同步更新相關狀態與函式註解
+- [x] 升級經典雙軌棋盤生成器 (`src/utils/boardGenerator.ts`)：支援 30 關（27 格分支）與 40 關（37 格分支）程序化循環擴充與補給站配置
+- [x] 升級肉鴿樹狀地圖生成器 (`src/utils/roguelikeGenerator.ts`)：實作 `generateProceduralFloorMap(stage, length)`，支援 30 層與 40 層動態分支、菁英戰、聽力/視覺特考與福利社拓撲連線
+- [x] 更新首頁畫面 (`src/components/game/TitleScreen.vue`)：改為「🏆 三十關長征挑戰 (30 關)」與「👑 四十關終極馬拉松 (40 關)」選擇按鈕與預估時間說明
+- [x] 更新雙軌棋盤 (`src/components/game/GameBoard.vue`、`src/components/game/ModernGameBoard.vue`) 與肉鴿地圖 (`src/components/game/RoguelikeMap.vue`) 頂部 HUD 長度徽章顯示（30 關 / 40 關）
+- [x] 執行本地 `npm run build` 編譯檢驗確認 100% 通過
+- [x] 更新 `report.md`、`README.md` 與 `RELEASE_NOTES.md` (`v2.6.0`)
+- [x] 將新功能代碼提交並推送到遠端 GitHub 倉庫，並同步發布 GitHub 官方 Release `v2.6.0`
+- [x] 產出日誌至 `log/20261103_1.md`
+
+
+
 
 
 
