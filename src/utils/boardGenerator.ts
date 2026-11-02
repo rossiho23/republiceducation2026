@@ -98,19 +98,19 @@ export const CANTEEN_ITEMS: GameItem[] = [
 ];
 
 /**
- * 產生雙軌分叉地圖格子集合 (支援 30 關長征挑戰與 40 關終極馬拉松程序化生成)
+ * 產生雙軌分叉地圖格子集合 (支援 10 關 / 20 關 / 30 關 / 40 關四段程序化生成)
  * 架構：
  * 1. 起點「昇學」 (Step 1)
  * 2. 分叉選擇格 (FORK) (Step 2)
  * 3. 上分歧路線 (UPPER BRANCH / 理科與冒險)：自然理化、流行音樂、三選一、LUCKY 福利社、TROUBLE 骷髏等
  * 4. 下分歧路線 (LOWER BRANCH / 文藝與挑戰)：健康教育、美術、天才問題、問號事件、課外常識等
- * 5. 終點「升學大考 Boss 關卡」 (Step 30 或 Step 40)
+ * 5. 終點「升學大考 Boss 關卡」 (Step 10 / 20 / 30 / 40)
  * 
  * @param {StageGrade} grade 學程階段 (國小/國中/高中/大學)
- * @param {GameLengthMode} [length=30] 關卡長度模式 (30 關長征挑戰 或 40 關終極馬拉松，預設 30)
+ * @param {GameLengthMode} [length=10] 關卡長度模式 (10 | 20 | 30 | 40，預設 10)
  * @returns {MapTile[]} 格子資料陣列
  */
-export function generateBoardTiles(grade: StageGrade, length: GameLengthMode = 30): MapTile[] {
+export function generateBoardTiles(grade: StageGrade, length: GameLengthMode = 10): MapTile[] {
   const config = STAGE_CONFIGS[grade] || STAGE_CONFIGS['高中'];
   const tiles: MapTile[] = [];
 

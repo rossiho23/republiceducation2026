@@ -1,17 +1,106 @@
 <template>
   <div class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto font-mono">
-    <div class="w-full max-w-5xl bg-arcade-dark border-4 border-arcade-purple rounded-3xl p-5 sm:p-7 shadow-arcade-glow flex flex-col gap-5 my-auto max-h-[92vh] overflow-y-auto">
+    
+    <!-- ================= 階段 A：教務處機密後台 · 管理員密碼驗證門 ================= -->
+    <div 
+      v-if="!isAuthenticated" 
+      class="w-full max-w-md bg-[#0c0f17] border-4 border-yellow-400 p-6 sm:p-7 shadow-[8px_8px_0px_#ffe600] flex flex-col gap-4 neo-cut my-auto"
+    >
+      <!-- 頂部黑黃警戒條 -->
+      <div class="w-full h-2 neo-hazard-yellow border border-black"></div>
+
+      <div class="flex items-center justify-between border-b-2 border-gray-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="px-2.5 py-1 bg-[#ff0055] text-white text-xs font-black uppercase border border-black">
+            ADMIN LOCK 🔒
+          </span>
+          <h2 class="text-lg sm:text-xl font-black text-yellow-400 neo-skew-title">
+            教務處後台管制中心
+          </h2>
+        </div>
+        <button 
+          @click="$emit('close')"
+          class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-gray-300 text-xs font-bold border border-gray-600 cursor-pointer"
+        >
+          ✕ 關閉
+        </button>
+      </div>
+
+      <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+        為防止考生窺探試題正解或誤刪自訂題庫，進入題庫匯入與名師管理中心需驗證管理員通行密碼。
+      </p>
+
+      <!-- 密碼輸入框 -->
+      <div class="flex flex-col gap-2">
+        <label class="text-xs font-black text-yellow-300 flex items-center justify-between">
+          <span>🔑 請輸入管理員密碼：</span>
+          <span class="text-[11px] text-gray-400 font-normal">(預設密碼：1993)</span>
+        </label>
+        <div class="relative flex items-center">
+          <input 
+            :type="showPassword ? 'text' : 'password'"
+            v-model="passwordInput"
+            @keyup.enter="verifyPassword"
+            placeholder="輸入管理員密碼後按 ENTER..."
+            autofocus
+            class="w-full bg-black border-2 border-yellow-400/80 focus:border-yellow-300 px-3.5 py-2.5 text-sm sm:text-base text-white font-mono tracking-widest focus:outline-none pr-16"
+          />
+          <button
+            type="button"
+            @click="showPassword = !showPassword"
+            class="absolute right-2 px-2 py-1 bg-gray-800 hover:bg-gray-700 text-[11px] text-gray-300 border border-gray-600 cursor-pointer"
+          >
+            {{ showPassword ? '隱藏' : '顯示' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- 驗證錯誤訊息 -->
+      <div 
+        v-if="authError" 
+        class="p-2.5 bg-red-950/90 border-2 border-[#ff0055] text-red-200 text-xs font-bold flex items-center gap-2 animate-pulse"
+      >
+        <span>⚠️</span>
+        <span>{{ authError }}</span>
+      </div>
+
+      <!-- 操作按鈕 -->
+      <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-800">
+        <button
+          type="button"
+          @click="$emit('close')"
+          class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs sm:text-sm font-bold border border-black cursor-pointer"
+        >
+          取消返回
+        </button>
+        <button
+          type="button"
+          @click="verifyPassword"
+          class="px-5 py-2 bg-yellow-400 hover:bg-yellow-300 text-black text-xs sm:text-sm font-black border-2 border-black shadow-[3px_3px_0px_#000] cursor-pointer"
+        >
+          🔓 驗證登入後台
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= 階段 B：已通過驗證之後台控制管理中心 ================= -->
+    <div v-else class="w-full max-w-5xl bg-arcade-dark border-4 border-arcade-purple rounded-3xl p-5 sm:p-7 shadow-arcade-glow flex flex-col gap-5 my-auto max-h-[92vh] overflow-y-auto">
       <!-- 頂部後台標頭與頁籤切換 -->
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-gray-800 pb-4 gap-3">
         <div class="flex items-center gap-3">
           <span class="text-3xl">⚙️</span>
           <div>
-            <h2 class="text-xl sm:text-2xl font-black text-purple-300">後台控制管理中心 (CMS)</h2>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl sm:text-2xl font-black text-purple-300">後台控制管理中心 (CMS)</h2>
+              <span class="px-2 py-0.5 bg-emerald-900/80 border border-emerald-500 text-emerald-300 text-[10px] font-black rounded">
+                🔓 管理員已登入
+              </span>
+            </div>
             <p class="text-xs text-gray-400">支援題庫 Excel/CSV 匯入匯出、自訂題目與名師／新聞主播形象自訂更換</p>
           </div>
         </div>
 
-        <div class="flex items-center gap-2 self-end sm:self-auto">
+        <div class="flex flex-wrap items-center gap-2 self-end sm:self-auto">
           <!-- 頁籤切換按鈕 -->
           <button 
             @click="activeTab = 'questions'"
@@ -28,9 +117,27 @@
             👨‍🏫 名師與主播設定
           </button>
 
+          <!-- 修改管理員密碼按鈕 -->
+          <button 
+            @click="isChangePwdModalOpen = true"
+            class="btn-arcade bg-slate-800 hover:bg-slate-700 text-yellow-300 font-bold text-xs py-1.5 px-3 rounded-lg border border-yellow-500/40"
+            title="修改後台管理員登入密碼"
+          >
+            🔑 修改密碼
+          </button>
+
+          <!-- 鎖定登出按鈕 -->
+          <button 
+            @click="lockCms"
+            class="btn-arcade bg-rose-950 hover:bg-rose-900 text-rose-200 font-bold text-xs py-1.5 px-3 rounded-lg border border-rose-600"
+            title="立即鎖定後台並登出"
+          >
+            🔒 鎖定後台
+          </button>
+
           <button 
             @click="$emit('close')"
-            class="btn-arcade bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs py-1.5 px-3 rounded-lg ml-2"
+            class="btn-arcade bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs py-1.5 px-3 rounded-lg"
           >
             ✕ 關閉返回
           </button>
@@ -570,6 +677,57 @@
         </div>
       </div>
 
+      <!-- 修改管理員密碼彈窗 -->
+      <div v-if="isChangePwdModalOpen" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-slate-900 border-2 border-yellow-400 rounded-2xl p-5 flex flex-col gap-4 text-xs shadow-2xl">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <h3 class="text-base font-black text-yellow-400">🔑 修改教務處後台管理員密碼</h3>
+            <button @click="isChangePwdModalOpen = false" class="text-gray-400 hover:text-white">✕</button>
+          </div>
+
+          <p class="text-gray-300 leading-relaxed">
+            設定專屬管理員密碼後，將儲存於本機瀏覽器中。下次開啟後台時需輸入新密碼方可進入。
+          </p>
+
+          <div>
+            <label class="text-gray-300 font-bold">輸入新管理員密碼：</label>
+            <input
+              type="text"
+              v-model="newPasswordInput"
+              @keyup.enter="saveAdminPassword"
+              placeholder="請輸入至少 3 位字元之新密碼..."
+              class="w-full bg-slate-950 border border-slate-700 rounded p-2.5 text-white mt-1.5 font-mono text-sm"
+            />
+          </div>
+
+          <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+            <button
+              type="button"
+              @click="resetAdminPasswordToDefault"
+              class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-gray-300 rounded font-bold"
+            >
+              還原預設 (1993)
+            </button>
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                @click="isChangePwdModalOpen = false"
+                class="px-3 py-1.5 bg-slate-800 text-gray-300 rounded font-bold"
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                @click="saveAdminPassword"
+                class="px-4 py-1.5 bg-yellow-400 text-black font-black rounded"
+              >
+                儲存新密碼
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- 新聞問題主播台即時試播彈窗 -->
       <NewsIntroModal 
         v-if="isPreviewNewsOpen" 
@@ -592,6 +750,7 @@ import { useQuestionStore } from '../../stores/questionStore';
 import { useCharacterStore } from '../../stores/characterStore';
 import { QuestionItem, StageGrade, SubjectType, DifficultyType, TeacherProfile } from '../../types/quiz';
 import { parseExcelFile, parseCSVText, parseJSONText, downloadExcelTemplate, exportToExcel } from '../../utils/questionParser';
+import { soundEngine } from '../../utils/audioEngine';
 import NewsIntroModal from '../game/NewsIntroModal.vue';
 
 defineEmits<{
@@ -600,6 +759,101 @@ defineEmits<{
 
 const questionStore = useQuestionStore();
 const characterStore = useCharacterStore();
+
+// ================= 後台密碼驗證鎖狀態與邏輯 =================
+const CMS_PWD_STORAGE_KEY = 'REPUBLIC_QUIZ_CMS_PWD';
+const CMS_AUTH_SESSION_KEY = 'REPUBLIC_QUIZ_CMS_AUTH';
+const DEFAULT_ADMIN_PWD = '1993';
+
+const isAuthenticated = ref<boolean>(
+  typeof sessionStorage !== 'undefined' && sessionStorage.getItem(CMS_AUTH_SESSION_KEY) === 'UNLOCKED'
+);
+const passwordInput = ref<string>('');
+const showPassword = ref<boolean>(false);
+const authError = ref<string>('');
+const isChangePwdModalOpen = ref<boolean>(false);
+const newPasswordInput = ref<string>('');
+
+/**
+ * 取得目前生效的管理員密碼 (優先讀取 LocalStorage 自訂密碼，否則使用預設 1993)
+ * @returns {string} 管理員密碼
+ */
+function getEffectiveAdminPassword(): string {
+  if (typeof localStorage !== 'undefined') {
+    const saved = localStorage.getItem(CMS_PWD_STORAGE_KEY);
+    if (saved && saved.trim().length > 0) {
+      return saved.trim();
+    }
+  }
+  return DEFAULT_ADMIN_PWD;
+}
+
+/**
+ * 驗證使用者輸入之管理員密碼
+ * @returns {void}
+ */
+function verifyPassword(): void {
+  const targetPwd = getEffectiveAdminPassword();
+  if (passwordInput.value.trim() === targetPwd) {
+    isAuthenticated.value = true;
+    authError.value = '';
+    passwordInput.value = '';
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem(CMS_AUTH_SESSION_KEY, 'UNLOCKED');
+    }
+    soundEngine.playCorrect();
+  } else {
+    soundEngine.playWrong();
+    authError.value = '密碼錯誤！拒絕存取教務處題庫管制中心！';
+  }
+}
+
+/**
+ * 鎖定後台並清除當次登入授權
+ * @returns {void}
+ */
+function lockCms(): void {
+  isAuthenticated.value = false;
+  passwordInput.value = '';
+  authError.value = '';
+  if (typeof sessionStorage !== 'undefined') {
+    sessionStorage.removeItem(CMS_AUTH_SESSION_KEY);
+  }
+  soundEngine.playCoin();
+}
+
+/**
+ * 儲存管理員自訂新密碼至 LocalStorage
+ * @returns {void}
+ */
+function saveAdminPassword(): void {
+  const trimmed = newPasswordInput.value.trim();
+  if (trimmed.length < 3) {
+    alert('密碼長度請至少輸入 3 個字元！');
+    return;
+  }
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem(CMS_PWD_STORAGE_KEY, trimmed);
+  }
+  newPasswordInput.value = '';
+  isChangePwdModalOpen.value = false;
+  soundEngine.playCorrect();
+  showNotice('管理員密碼已成功更新！下次開啟後台請使用新密碼登入。', false);
+}
+
+/**
+ * 將管理員密碼還原為預設值 (1993)
+ * @returns {void}
+ */
+function resetAdminPasswordToDefault(): void {
+  if (typeof localStorage !== 'undefined') {
+    localStorage.removeItem(CMS_PWD_STORAGE_KEY);
+  }
+  newPasswordInput.value = '';
+  isChangePwdModalOpen.value = false;
+  soundEngine.playCoin();
+  showNotice('管理員密碼已還原為預設值：1993', false);
+}
 
 // 當前頁籤: 'questions' | 'characters'
 const activeTab = ref<'questions' | 'characters'>('questions');

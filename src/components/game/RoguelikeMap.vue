@@ -13,7 +13,7 @@
           {{ gameStore.currentStage }}階段
         </span>
         <span class="px-2.5 py-1 bg-black border border-yellow-400 text-yellow-400 text-xs sm:text-sm font-black tracking-wider shadow-[2px_2px_0px_#000]">
-          {{ gameStore.gameLength === 40 ? '👑 40 關馬拉松' : '🏆 30 關長征' }}
+          {{ gameStore.gameLength === 40 ? '👑 40 關馬拉松' : gameStore.gameLength === 30 ? '🏆 30 關大考驗' : gameStore.gameLength === 20 ? '🔥 20 關長征' : '⚡ 10 關挑戰' }}
         </span>
         <span 
           class="px-2.5 py-1 text-xs sm:text-sm font-black border border-black shadow-[2px_2px_0px_#000]"

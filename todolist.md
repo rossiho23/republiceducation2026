@@ -288,6 +288,20 @@
 - [x] 產出日誌至 `log/20261103_1.md`
 
 
+## 階段三十八：後台管理中心密碼鎖與 10 / 20 / 30 / 40 關四段全自選系統實作 (方案 A)
+- [x] 在 `src/types/quiz.ts` 擴充 `GameLengthMode = 10 | 20 | 30 | 40` 四段關卡長度型別
+- [x] 在 `src/stores/gameStore.ts` 支援 `10 | 20 | 30 | 40` 四段長度狀態與切換（預設 `10` 關標準挑戰）
+- [x] 確認並更新 `src/utils/boardGenerator.ts` 與 `src/utils/roguelikeGenerator.ts` 完整支援 10、20、30、40 四種關卡長度動態生成
+- [x] 更新首頁畫面 (`src/components/game/TitleScreen.vue`)：實作「⚡ 10 關挑戰賽」、「🔥 20 關長征賽」、「🏆 30 關大考驗」、「👑 40 關終極馬拉松」四段選擇面板
+- [x] 更新雙軌棋盤 (`src/components/game/GameBoard.vue`、`src/components/game/ModernGameBoard.vue`) 與肉鴿地圖 (`src/components/game/RoguelikeMap.vue`) 頂部 HUD 長度徽章顯示（支援 10 / 20 / 30 / 40 關）
+- [x] 升級後台管理中心 (`src/components/cms/QuestionCMS.vue`)：實作「🔒 教務處機密後台 · 管理員密碼驗證門」（預設密碼 `1993`）、支援「🔑 修改管理員密碼」與「🔒 鎖定登出」功能
+- [x] 執行本地 `npm run build` 編譯檢驗確認 100% 通過
+- [x] 更新 `report.md`、`README.md` 與 `RELEASE_NOTES.md` (`v2.7.0`)
+- [x] 將新功能代碼提交並推送到遠端 GitHub 倉庫，並同步發布 GitHub 官方 Release `v2.7.0`
+- [x] 產出日誌至 `log/20261103_2.md`
+
+
+
 
 
 

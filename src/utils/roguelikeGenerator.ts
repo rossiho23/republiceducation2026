@@ -110,17 +110,17 @@ const REST_FLOOR_TEMPLATES: NodeTemplate[][] = [
 /**
  * 依據學程與遊戲長度模式產生專屬的 Roguelike 樹狀分支地圖
  * @param {StageGrade} stage 學程階段 (國小/國中/高中/大學)
- * @param {GameLengthMode} [length=30] 關卡長度模式 (30: 三十關長征挑戰, 40: 四十關終極馬拉松)
+ * @param {GameLengthMode} [length=10] 關卡長度模式 (10 / 20 / 30 / 40 關四段自選)
  * @returns {RoguelikeNode[][]} 分層節點陣列 (由 Floor 0 至頂層 Boss 戰)
  */
-export function generateRoguelikeMap(stage: StageGrade, length: GameLengthMode = 30): RoguelikeNode[][] {
+export function generateRoguelikeMap(stage: StageGrade, length: GameLengthMode = 10): RoguelikeNode[][] {
   return generateProceduralFloorMap(stage, length);
 }
 
 /**
- * 程序化生成指定總層數 (30 層或 40 層) 之樹狀分支節點地圖與拓撲連線
+ * 程序化生成指定總層數 (10 / 20 / 30 / 40 層) 之樹狀分支節點地圖與拓撲連線
  * @param {StageGrade} stage 學程階段
- * @param {number} totalFloors 總樓層數 (30 或 40)
+ * @param {number} totalFloors 總樓層數 (10 / 20 / 30 / 40)
  * @returns {RoguelikeNode[][]} 完整連接之節點矩陣
  */
 function generateProceduralFloorMap(stage: StageGrade, totalFloors: number): RoguelikeNode[][] {

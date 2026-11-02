@@ -29,45 +29,95 @@
       </div>
     </div>
 
-    <!-- 關卡長度自選模式 (30 關長征挑戰 vs 40 關終極馬拉松) -->
-    <div class="my-3 w-full max-w-2xl bg-[#121620] border-2 border-yellow-400 p-3.5 neo-cut-sm shadow-[5px_5px_0px_#000]">
-      <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-800 text-left">
+    <!-- 關卡長度自選模式 (10 關 / 20 關 / 30 關 / 40 關 四段全自選) -->
+    <div class="my-3 w-full max-w-4xl bg-[#121620] border-2 border-yellow-400 p-3.5 neo-cut-sm shadow-[5px_5px_0px_#000]">
+      <div class="flex flex-wrap items-center justify-between mb-3 pb-2 border-b border-gray-800 text-left gap-2">
         <div class="flex items-center gap-2">
           <span class="px-2 py-0.5 bg-yellow-400 text-black text-xs font-black uppercase">
             LENGTH SELECT
           </span>
           <span class="text-xs sm:text-sm font-bold text-gray-200">
-            請選擇關卡長度模式 (30 關 / 40 關)
+            請選擇關卡長度模式 (10 / 20 / 30 / 40 關)
           </span>
         </div>
         <span class="text-xs sm:text-sm text-yellow-400 font-mono font-black">
-          當前：{{ gameStore.gameLength === 40 ? '👑 四十關終極馬拉松 (40 關極限)' : '🏆 三十關長征挑戰 (30 關標準)' }}
+          當前：{{ currentLengthLabel }}
         </span>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-        <!-- 30 關長征挑戰按鈕 -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <!-- 10 關挑戰賽按鈕 -->
+        <button
+          type="button"
+          @click="selectGameLength(10)"
+          class="p-3 border-2 transition-all neo-cut-sm text-left flex flex-col justify-between cursor-pointer"
+          :class="gameStore.gameLength === 10 
+            ? 'bg-emerald-400 text-black border-black shadow-[4px_4px_0px_#000] scale-[1.02]' 
+            : 'bg-[#0a0d14] text-gray-300 border-gray-700 hover:border-emerald-400 hover:text-white'"
+        >
+          <div class="flex items-center justify-between gap-1">
+            <span class="text-sm sm:text-base font-black neo-skew-title flex items-center gap-1">
+              ⚡ 十關挑戰賽
+            </span>
+            <span 
+              class="text-[10px] font-bold px-1.5 py-0.5 border whitespace-nowrap"
+              :class="gameStore.gameLength === 10 ? 'bg-black text-emerald-400 border-black' : 'bg-gray-800 text-gray-400 border-gray-700'"
+            >
+              10 關標準
+            </span>
+          </div>
+          <p class="text-xs mt-2 leading-relaxed opacity-90">
+            10 步輕快闖關！約 8~10 分鐘，快速體驗隨堂考、福利社與升學 Boss 戰！
+          </p>
+        </button>
+
+        <!-- 20 關長征賽按鈕 -->
+        <button
+          type="button"
+          @click="selectGameLength(20)"
+          class="p-3 border-2 transition-all neo-cut-sm text-left flex flex-col justify-between cursor-pointer"
+          :class="gameStore.gameLength === 20 
+            ? 'bg-amber-400 text-black border-black shadow-[4px_4px_0px_#000] scale-[1.02]' 
+            : 'bg-[#0a0d14] text-gray-300 border-gray-700 hover:border-amber-400 hover:text-white'"
+        >
+          <div class="flex items-center justify-between gap-1">
+            <span class="text-sm sm:text-base font-black neo-skew-title flex items-center gap-1">
+              🔥 二十關長征賽
+            </span>
+            <span 
+              class="text-[10px] font-bold px-1.5 py-0.5 border whitespace-nowrap"
+              :class="gameStore.gameLength === 20 ? 'bg-black text-amber-400 border-black' : 'bg-gray-800 text-gray-400 border-gray-700'"
+            >
+              20 關進階
+            </span>
+          </div>
+          <p class="text-xs mt-2 leading-relaxed opacity-90">
+            20 步中長程挑戰！約 15~20 分鐘，涵蓋聽力/局部謎題與奧賽菁英考！
+          </p>
+        </button>
+
+        <!-- 30 關大考驗按鈕 -->
         <button
           type="button"
           @click="selectGameLength(30)"
-          class="p-3.5 border-2 transition-all neo-cut-sm text-left flex flex-col justify-between cursor-pointer"
+          class="p-3 border-2 transition-all neo-cut-sm text-left flex flex-col justify-between cursor-pointer"
           :class="gameStore.gameLength === 30 
             ? 'bg-yellow-400 text-black border-black shadow-[4px_4px_0px_#000] scale-[1.02]' 
             : 'bg-[#0a0d14] text-gray-300 border-gray-700 hover:border-yellow-400 hover:text-white'"
         >
-          <div class="flex items-center justify-between">
-            <span class="text-base sm:text-lg font-black neo-skew-title flex items-center gap-1.5">
-              🏆 三十關長征挑戰
+          <div class="flex items-center justify-between gap-1">
+            <span class="text-sm sm:text-base font-black neo-skew-title flex items-center gap-1">
+              🏆 三十關大考驗
             </span>
             <span 
-              class="text-[11px] font-bold px-2 py-0.5 border"
+              class="text-[10px] font-bold px-1.5 py-0.5 border whitespace-nowrap"
               :class="gameStore.gameLength === 30 ? 'bg-black text-yellow-400 border-black' : 'bg-gray-800 text-gray-400 border-gray-700'"
             >
-              30 關標準長征
+              30 關深度
             </span>
           </div>
           <p class="text-xs mt-2 leading-relaxed opacity-90">
-            30 步完整闖關！體驗日夜晨昏流轉、隨堂考、聽力/局部謎題、多次福利社與升學 Boss 戰！
+            30 步深度長征！約 20~30 分鐘，完整體驗晨昏日夜流轉與多次補給博弈！
           </p>
         </button>
 
@@ -75,24 +125,24 @@
         <button
           type="button"
           @click="selectGameLength(40)"
-          class="p-3.5 border-2 transition-all neo-cut-sm text-left flex flex-col justify-between cursor-pointer"
+          class="p-3 border-2 transition-all neo-cut-sm text-left flex flex-col justify-between cursor-pointer"
           :class="gameStore.gameLength === 40 
             ? 'bg-cyan-400 text-black border-black shadow-[4px_4px_0px_#000] scale-[1.02]' 
             : 'bg-[#0a0d14] text-gray-300 border-gray-700 hover:border-cyan-400 hover:text-white'"
         >
-          <div class="flex items-center justify-between">
-            <span class="text-base sm:text-lg font-black neo-skew-title flex items-center gap-1.5">
-              👑 四十關終極馬拉松
+          <div class="flex items-center justify-between gap-1">
+            <span class="text-sm sm:text-base font-black neo-skew-title flex items-center gap-1">
+              👑 四十關馬拉松
             </span>
             <span 
-              class="text-[11px] font-bold px-2 py-0.5 border"
+              class="text-[10px] font-bold px-1.5 py-0.5 border whitespace-nowrap"
               :class="gameStore.gameLength === 40 ? 'bg-black text-cyan-400 border-black' : 'bg-gray-800 text-gray-400 border-gray-700'"
             >
-              40 關極限耐力
+              40 關極限
             </span>
           </div>
           <p class="text-xs mt-2 leading-relaxed opacity-90">
-            40 步終極大考驗！從清晨升旗奮戰至深夜夜讀、多次奧賽菁英對決與最高榮譽畢業總檢定！
+            40 步終極馬拉松！約 30~40 分鐘，從清晨升旗奮戰至深夜夜讀之最高榮譽檢定！
           </p>
         </button>
       </div>
@@ -257,27 +307,27 @@
         <div>
           <div class="flex items-center justify-between mb-3 border-b-2 border-purple-400/40 pb-2.5">
             <span class="px-2.5 py-1 bg-[#bd00ff] text-white text-xs font-black uppercase tracking-wider">
-              [DATABASE CMS]
+              [ADMIN CMS 🔒]
             </span>
             <span class="text-sm font-mono font-bold text-purple-300">
-              CUSTOM
+              PASSWORD GATE
             </span>
           </div>
 
           <h3 class="text-xl sm:text-2xl font-black text-white group-hover:text-purple-300 transition-colors neo-skew-title">
-            題庫與名師主播台
+            題庫與名師管制中心
           </h3>
           <div class="text-xs sm:text-sm font-bold text-purple-400/90 tracking-wide mt-1">
-            // EXCEL / CSV / JSON IMPORT //
+            // ADMIN AUTH · EXCEL / CSV / JSON //
           </div>
 
           <p class="text-xs sm:text-sm text-gray-200 mt-3 leading-relaxed">
-            自由自訂！支援 Excel/CSV/JSON 題庫批次拖曳匯入匯出、線上視覺化編輯、以及授課名師與雙主播相片更換。
+            教務處專屬管制後台（需密碼驗證登入）！支援 Excel/CSV/JSON 題庫批次匯入匯出、線上編輯與名師主播相片更換。
           </p>
         </div>
 
         <div class="mt-6 pt-3.5 border-t-2 border-dashed border-gray-800 flex items-center justify-between text-sm sm:text-base font-black text-purple-300">
-          <span>進入出題中心</span>
+          <span>🔒 管理員驗證進入</span>
           <span class="text-lg group-hover:translate-x-1.5 transition-transform">➔</span>
         </div>
       </div>
@@ -298,6 +348,7 @@
  * @description 日系新潮街機風 標題畫面組件 (Neo-Arcade Title Screen)
  * 提供日系大字報斜體排版、Persona 5 風格戰術斜切卡片、五關/十關長度自選與乾淨去 AI 化的選路入口。
  */
+import { computed } from 'vue';
 import { useGameStore } from '../../stores/gameStore';
 import { GameLengthMode, VisualTheme } from '../../types/quiz';
 import { soundEngine } from '../../utils/audioEngine';
@@ -311,8 +362,27 @@ const emit = defineEmits<{
 const gameStore = useGameStore();
 
 /**
+ * 取得當前關卡長度模式之顯示名稱
+ */
+const currentLengthLabel = computed<string>(() => {
+  switch (gameStore.gameLength) {
+    case 10:
+      return '⚡ 十關挑戰賽 (10 關標準)';
+    case 20:
+      return '🔥 二十關長征賽 (20 關進階)';
+    case 30:
+      return '🏆 三十關大考驗 (30 關深度)';
+    case 40:
+      return '👑 四十關終極馬拉松 (40 關極限)';
+    default:
+      return '⚡ 十關挑戰賽 (10 關標準)';
+  }
+});
+
+/**
  * 切換雙軌地圖視覺風格主題 (現代旗艦版 ⇄ 1993 街機版)
  * @param {VisualTheme} theme 視覺風格
+ * @returns {void}
  */
 function selectVisualTheme(theme: VisualTheme): void {
   gameStore.setVisualTheme(theme);
@@ -320,8 +390,8 @@ function selectVisualTheme(theme: VisualTheme): void {
 
 
 /**
- * 切換關卡長度模式 (30 關長征挑戰 或 40 關終極馬拉松)
- * @param {GameLengthMode} length 模式步數 (30 | 40)
+ * 切換關卡長度模式 (10 / 20 / 30 / 40 關)
+ * @param {GameLengthMode} length 模式步數 (10 | 20 | 30 | 40)
  * @returns {void}
  */
 function selectGameLength(length: GameLengthMode): void {

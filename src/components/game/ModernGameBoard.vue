@@ -25,7 +25,7 @@
           {{ gameStore.currentStageConfig.title }}
         </span>
         <span class="px-2.5 py-0.5 bg-black/60 border border-amber-400 text-amber-300 text-xs font-black rounded">
-          {{ gameStore.gameLength === 40 ? '👑 40 關馬拉松' : '🏆 30 關長征' }}
+          {{ gameStore.gameLength === 40 ? '👑 40 關馬拉松' : gameStore.gameLength === 30 ? '🏆 30 關大考驗' : gameStore.gameLength === 20 ? '🔥 20 關長征' : '⚡ 10 關挑戰' }}
         </span>
         <span class="text-xs sm:text-sm text-rose-300 font-bold hidden md:inline">
           路線: {{ gameStore.currentBranch === 'UPPER' ? '路線上' : gameStore.currentBranch === 'LOWER' ? '路線下' : '昇學主線' }}

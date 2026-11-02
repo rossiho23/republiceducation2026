@@ -1046,5 +1046,101 @@ sequenceDiagram
     end
 ```
 
+---
+
+## 18. 「後台管理中心密碼鎖」與「10 / 20 / 30 / 40 關四段全自選系統」規格 (CMS Password Auth Gate & 4-Tier Game Length Spec)
+
+### 18.1 設計背景與核心目標 (方案 A)
+1. **教務處後台管理中心密碼驗證門 (CMS Admin Password Gate)**：
+   * 為防止一般玩家進入後台偷看題庫正解、竄改題目或誤觸還原預設題庫，於 `QuestionCMS.vue` 實作「管理員密碼驗證門」。
+   * **預設管理員密碼**：`1993`（致敬 1993 年《民國教育委員會》大型街機元年）。
+   * **自訂密碼與工作階段管理**：
+     - 驗證通過後將授權狀態寫入 `sessionStorage` (`REPUBLIC_QUIZ_CMS_AUTH = 'UNLOCKED'`)，單次瀏覽期間免重複輸入。
+     - 頂部工具列提供「🔒 鎖定登出」按鈕，點擊後立即清除授權並返回密碼鎖畫面。
+     - 頂部工具列提供「🔑 修改密碼」彈窗/面板，管理員可隨時變更密碼並持久化儲存於 `localStorage` (`REPUBLIC_QUIZ_CMS_PWD`)。
+2. **10 / 20 / 30 / 40 關四段關卡長度全自選系統 (`GameLengthMode = 10 | 20 | 30 | 40`)**：
+   * 完整保留原「10 關挑戰」、「20 關長征」，並結合新增之「30 關大考驗」與「40 關終極馬拉松」，提供四段關卡長度自由選擇：
+     - `10`（⚡ 十關挑戰賽）：8~10 分鐘標準闖關（Floor 0~9 / 10 步雙軌）。
+     - `20`（🔥 二十關長征賽）：15~20 分鐘進階考驗（Floor 0~19 / 20 步雙軌）。
+     - `30`（🏆 三十關大考驗）：20~30 分鐘深度長征（Floor 0~29 / 30 步雙軌）。
+     - `40`（👑 四十關終極馬拉松）：30~40 分鐘極限耐力（Floor 0~39 / 40 步雙軌）。
+
+### 18.2 資料結構與參數定義
+
+```typescript
+/** 關卡長度模式：10 關 / 20 關 / 30 關 / 40 關四段自選 */
+export type GameLengthMode = 10 | 20 | 30 | 40;
+
+/** 後台管理中心驗證狀態 */
+export interface CmsAuthState {
+  isAuthenticated: boolean;
+  passwordInput: string;
+  showPassword: boolean;
+  authError: string;
+  isChangingPassword: boolean;
+  newPasswordInput: string;
+}
+```
+
+### 18.3 後台密碼驗證與四段關卡選擇流程圖 (Flowchart)
+```mermaid
+flowchart TD
+    Start(["使用者進入遊戲首頁"]) --> Action{"選擇操作"}
+    
+    Action -- "1. 點擊 [題庫 CMS] / [題庫與名師主播台]" --> CheckAuth{"檢查 sessionStorage 是否已解鎖?"}
+    CheckAuth -- "未解鎖" --> ShowGate["顯示 [🔒 教務處機密後台 · 密碼驗證門]"]
+    ShowGate --> InputPwd["輸入管理員密碼 (預設: 1993)"]
+    InputPwd --> VerifyPwd{"密碼是否符合 localStorage 或預設 1993?"}
+    VerifyPwd -- "密碼錯誤" --> ErrorFeedback["播放錯誤音效 + 顯示紅色錯誤提示"]
+    ErrorFeedback --> ShowGate
+    VerifyPwd -- "密碼正確" --> UnlockCMS["寫入 sessionStorage 授權 + 進入後台管理中心"]
+    CheckAuth -- "已解鎖" --> UnlockCMS
+    
+    UnlockCMS --> CmsOps{"後台管理操作"}
+    CmsOps -- "匯入/編輯題庫或更換名師" --> SaveData["儲存題庫至 LocalStorage"]
+    CmsOps -- "點擊 [🔑 修改密碼]" --> UpdatePwd["更新管理員密碼至 LocalStorage"]
+    CmsOps -- "點擊 [🔒 鎖定登出]" --> LockCMS["清除 sessionStorage 授權並退回密碼鎖"]
+    
+    Action -- "2. 於首頁切換關卡長度" --> SelectLen["選擇 [⚡ 10關] / [🔥 20關] / [🏆 30關] / [👑 40關]"]
+    SelectLen --> GenMap["動態生成 10 / 20 / 30 / 40 層肉鴿樹狀圖或雙軌卡匣棋盤"]
+```
+
+### 18.4 後台密碼驗證與修改密碼循序圖 (Sequence Diagram)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Admin as 管理員 (Admin)
+    participant Frame as 街機外框 / 首頁 (ArcadeFrame / TitleScreen)
+    participant CMS as 後台管理中心 (QuestionCMS.vue)
+    participant Storage as 瀏覽器儲存 (sessionStorage / localStorage)
+    participant Audio as 音效引擎 (soundEngine)
+
+    Admin->>Frame: 點擊 [題庫 CMS]
+    Frame->>CMS: 開啟 QuestionCMS 組件
+    CMS->>Storage: 讀取 sessionStorage('REPUBLIC_QUIZ_CMS_AUTH')
+    alt 尚未解鎖
+        CMS-->>Admin: 顯示「🔒 教務處機密後台」密碼輸入框
+        Admin->>CMS: 輸入密碼並按 ENTER / 點擊解鎖
+        CMS->>Storage: 比對 localStorage('REPUBLIC_QUIZ_CMS_PWD') || '1993'
+        alt 驗證成功
+            CMS->>Audio: playCorrect()
+            CMS->>Storage: 設定 sessionStorage('REPUBLIC_QUIZ_CMS_AUTH', 'UNLOCKED')
+            CMS-->>Admin: 渲染完整題庫匯入與名師管理面板
+        else 驗證失敗
+            CMS->>Audio: playWrong()
+            CMS-->>Admin: 顯示「密碼錯誤！拒絕存取教務處題庫」
+        end
+    end
+
+    opt 修改密碼或鎖定後台
+        Admin->>CMS: 點擊 [🔑 修改密碼] 輸入新密碼儲存
+        CMS->>Storage: 寫入 localStorage('REPUBLIC_QUIZ_CMS_PWD', newPwd)
+        Admin->>CMS: 點擊 [🔒 鎖定後台]
+        CMS->>Storage: 移除 sessionStorage('REPUBLIC_QUIZ_CMS_AUTH')
+        CMS-->>Admin: 立即回到密碼鎖畫面
+    end
+```
+
+
 
 

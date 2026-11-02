@@ -153,8 +153,8 @@ export const useGameStore = defineStore('gameStore', () => {
     soundEngine.playCoin();
   }
 
-  // 關卡長度模式 (30 關長征挑戰 或 40 關終極馬拉松，預設 30)
-  const gameLength = ref<GameLengthMode>(30);
+  // 關卡長度模式 (10 關 / 20 關 / 30 關 / 40 關四段自選，預設 10)
+  const gameLength = ref<GameLengthMode>(10);
 
   // ================= 輔助計算屬性 =================
   const currentStageConfig = computed(() => STAGE_CONFIGS[currentStage.value]);
@@ -167,7 +167,7 @@ export const useGameStore = defineStore('gameStore', () => {
   const mainForkTile = computed(() => tiles.value.find(t => t.index === 1));
   const mainExamTile = computed(() => tiles.value.find(t => t.type === 'EXAM'));
 
-  // 離畢業還有幾層次 (依據長度模式與當前步數動態計算：30 或 40)
+  // 離畢業還有幾層次 (依據長度模式與當前步數動態計算：10 / 20 / 30 / 40)
   const remainingLayers = computed(() => {
     const base = gameLength.value;
     const stepProgress = currentTile.value ? currentTile.value.stepNumber - 1 : 0;
@@ -193,8 +193,8 @@ export const useGameStore = defineStore('gameStore', () => {
   // ================= 核心方法 =================
 
   /**
-   * 設定遊戲長度模式 (30 關長征挑戰 或 40 關終極馬拉松)
-   * @param {GameLengthMode} length 關卡長度模式 (30 | 40)
+   * 設定遊戲長度模式 (10 關 / 20 關 / 30 關 / 40 關)
+   * @param {GameLengthMode} length 關卡長度模式 (10 | 20 | 30 | 40)
    * @returns {void}
    */
   function setGameLength(length: GameLengthMode): void {
